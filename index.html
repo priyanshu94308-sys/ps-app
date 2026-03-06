@@ -361,13 +361,17 @@ body{display:block;height:100vh;background:var(--bg);}
     </div>
     <!-- CURRENT AFFAIRS -->
     <div class="tab" id="tab-ca">
-      <div style="display:flex;gap:7px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
-        <div style="background:var(--ac);color:#fff;font-size:.62rem;font-weight:800;padding:3px 10px;border-radius:99px" id="caDate">Today</div>
-        <button style="background:var(--cd2);border:1px solid var(--br);border-radius:99px;color:var(--t2);font-family:inherit;font-size:.61rem;font-weight:700;padding:3px 9px;cursor:pointer" onclick="loadCA(true)">🔄 Refresh</button>
-        <span style="font-size:.6rem;font-weight:800;color:var(--gr)" id="caScoreLbl"></span>
+      <!-- CA List View -->
+      <div id="ca-list">
+        <div style="font-size:.88rem;font-weight:800;margin-bottom:10px">📰 Current Affairs 2024-25</div>
+        <div id="ca-sections"></div>
       </div>
-      <div class="chips" id="caTopics"></div>
-      <div id="caContent"></div>
+      <!-- CA Topic Detail View -->
+      <div id="ca-detail" style="display:none">
+        <button class="back" onclick="document.getElementById('ca-list').style.display='block';document.getElementById('ca-detail').style.display='none'">← Back</button>
+        <div style="font-size:.88rem;font-weight:800;margin-bottom:8px" id="ca-detail-title"></div>
+        <div id="ca-detail-content"></div>
+      </div>
     </div>
     <!-- ASK AI -->
     <div class="tab" id="tab-ask">
@@ -455,107 +459,9 @@ var SUBJS=[
   {id:'gk',name:'Static GK',icon:'🌐',color:'#c084fc',ch:['राष्ट्रीय प्रतीक','अंतर्राष्ट्रीय संगठन','पुरस्कार','खेल','महत्वपूर्ण दिवस','पुस्तकें','भारत में प्रथम','सरकारी योजनाएं','संस्कृति','विविध']}
 ];
 
-var QB={
-  history:[
-    {q:"भारत का प्रथम गवर्नर जनरल कौन था?",opts:["(A) वारेन हेस्टिंग्स","(B) लॉर्ड डलहौजी","(C) लॉर्ड कैनिंग","(D) लॉर्ड कर्जन"],ans:0,sol:"वारेन हेस्टिंग्स 1773-85 — 1773 के Regulating Act से पद बना।",level:"easy",exam:"SSC"},
-    {q:"पानीपत की प्रथम लड़ाई (1526) किनके बीच?",opts:["(A) बाबर और इब्राहिम लोदी","(B) अकबर और हेमू","(C) मराठा और अहमद शाह","(D) शेरशाह और हुमायूं"],ans:0,sol:"बाबर vs इब्राहिम लोदी 1526। मुगल साम्राज्य की नींव।",level:"easy",exam:"SSC"},
-    {q:"असहयोग आंदोलन कब शुरू हुआ?",opts:["(A) 1920","(B) 1919","(C) 1922","(D) 1930"],ans:0,sol:"1920 में गांधीजी ने शुरू किया। चौरी-चौरा (1922) के बाद वापस लिया।",level:"easy",exam:"RRB"},
-    {q:"'Drain of Wealth' सिद्धांत किसने दिया?",opts:["(A) दादाभाई नौरोजी","(B) बाल गंगाधर तिलक","(C) गोपाल कृष्ण गोखले","(D) रोमेश चंद्र दत्त"],ans:0,sol:"दादाभाई नौरोजी — 'Poverty and Un-British Rule in India'।",level:"moderate",exam:"SSC"},
-    {q:"1857 की क्रांति में मंगल पांडे किस रेजिमेंट में?",opts:["(A) 34वीं नेटिव इन्फेंट्री","(B) 54वीं","(C) 19वीं","(D) 11वीं"],ans:0,sol:"34वीं नेटिव इन्फेंट्री, बैरकपुर।",level:"easy",exam:"Police"},
-    {q:"भारतीय राष्ट्रीय कांग्रेस की स्थापना किसने की?",opts:["(A) A.O. ह्यूम","(B) दादाभाई नौरोजी","(C) बाल गंगाधर तिलक","(D) सुरेंद्रनाथ बैनर्जी"],ans:0,sol:"A.O. ह्यूम ने 1885 में। प्रथम अध्यक्ष W.C. बनर्जी।",level:"easy",exam:"SSC"},
-    {q:"बक्सर की लड़ाई कब हुई?",opts:["(A) 1764","(B) 1757","(C) 1761","(D) 1771"],ans:0,sol:"1764 — मीर कासिम, शुजाउद्दौला, शाह आलम vs अंग्रेज।",level:"moderate",exam:"UPSC"},
-    {q:"दिल्ली सल्तनत में बाजार सुधार किसने किए?",opts:["(A) अलाउद्दीन खिलजी","(B) बलबन","(C) इल्तुतमिश","(D) फिरोज शाह तुगलक"],ans:0,sol:"अलाउद्दीन खिलजी — चार बाजार।",level:"moderate",exam:"SSC"}
-  ],
-  polity:[
-    {q:"भारतीय संविधान में कुल कितनी अनुसूचियाँ?",opts:["(A) 12","(B) 10","(C) 8","(D) 14"],ans:0,sol:"12 अनुसूचियाँ। मूल में 8 थीं।",level:"easy",exam:"SSC"},
-    {q:"मौलिक अधिकार संविधान के किस भाग में?",opts:["(A) भाग III (अनु. 12-35)","(B) भाग II","(C) भाग IV","(D) भाग I"],ans:0,sol:"भाग III, अनुच्छेद 12-35।",level:"easy",exam:"Police"},
-    {q:"राज्यसभा में अधिकतम कितने सदस्य?",opts:["(A) 250","(B) 245","(C) 238","(D) 260"],ans:0,sol:"250 — 238 राज्यों से + 12 राष्ट्रपति मनोनीत।",level:"easy",exam:"RRB"},
-    {q:"'मूल संरचना' सिद्धांत किस केस में?",opts:["(A) केशवानंद भारती 1973","(B) गोलकनाथ 1967","(C) मिनर्वा मिल्स 1980","(D) बेरुबारी 1960"],ans:0,sol:"केशवानंद भारती 1973 — 13 जजों की बेंच।",level:"hard",exam:"UPSC"},
-    {q:"भारत का संविधान कब लागू हुआ?",opts:["(A) 26 जनवरी 1950","(B) 26 नवंबर 1949","(C) 15 अगस्त 1947","(D) 2 अक्टूबर 1948"],ans:0,sol:"26 जनवरी 1950 — 26 नवंबर 1949 को अपनाया।",level:"easy",exam:"SSC"},
-    {q:"राष्ट्रीय आपात — कौन सा अनुच्छेद?",opts:["(A) अनु. 352","(B) अनु. 356","(C) अनु. 360","(D) अनु. 370"],ans:0,sol:"अनु. 352 = राष्ट्रीय आपात। 356 = राष्ट्रपति शासन।",level:"moderate",exam:"SSC"},
-    {q:"10वीं अनुसूची किससे संबंधित?",opts:["(A) दल-बदल विरोधी","(B) भाषाएं","(C) जनजाति क्षेत्र","(D) पंचायती राज"],ans:0,sol:"दल-बदल विरोधी कानून — 52वां संशोधन 1985।",level:"hard",exam:"SSC"},
-    {q:"44वें संशोधन 1978 ने क्या हटाया?",opts:["(A) संपत्ति का मौलिक अधिकार","(B) शिक्षा","(C) समानता","(D) धर्म की स्वतंत्रता"],ans:0,sol:"संपत्ति मौलिक से हटा — अनु.300A में कानूनी।",level:"moderate",exam:"UPSC"}
-  ],
-  geography:[
-    {q:"भारत की सबसे लंबी नदी?",opts:["(A) गंगा","(B) सिंधु","(C) गोदावरी","(D) यमुना"],ans:0,sol:"गंगा — 2525 km।",level:"easy",exam:"SSC"},
-    {q:"काली मिट्टी किस फसल के लिए?",opts:["(A) कपास","(B) गेहूँ","(C) चावल","(D) जूट"],ans:0,sol:"कपास। महाराष्ट्र, गुजरात में।",level:"easy",exam:"RRB"},
-    {q:"मानसून किस दिशा से आता है?",opts:["(A) दक्षिण-पश्चिम","(B) उत्तर-पूर्व","(C) दक्षिण-पूर्व","(D) उत्तर-पश्चिम"],ans:0,sol:"दक्षिण-पश्चिम मानसून — जून-सितंबर।",level:"easy",exam:"SSC"},
-    {q:"भारत का सबसे बड़ा राज्य क्षेत्रफल में?",opts:["(A) राजस्थान","(B) मध्य प्रदेश","(C) महाराष्ट्र","(D) उत्तर प्रदेश"],ans:0,sol:"राजस्थान — 342239 km²।",level:"easy",exam:"SSC"},
-    {q:"पश्चिमी और पूर्वी घाट कहाँ मिलते हैं?",opts:["(A) नीलगिरि","(B) अनाइमुडी","(C) पालघाट","(D) शेवरॉय"],ans:0,sol:"नीलगिरि पहाड़ियाँ।",level:"hard",exam:"UPSC"},
-    {q:"सबसे बड़ा मीठे पानी का झील?",opts:["(A) वूलर झील","(B) डल झील","(C) चिल्का झील","(D) लोकटक"],ans:0,sol:"वूलर झील (J&K)।",level:"easy",exam:"Police"}
-  ],
-  economics:[
-    {q:"GST कब लागू हुआ?",opts:["(A) 1 July 2017","(B) 1 April 2017","(C) 1 Jan 2018","(D) 1 April 2016"],ans:0,sol:"1 July 2017 — 101वें संशोधन द्वारा।",level:"easy",exam:"SSC"},
-    {q:"RBI की स्थापना?",opts:["(A) 1 April 1935","(B) 1 Jan 1949","(C) 15 Aug 1947","(D) 1 April 1947"],ans:0,sol:"1 April 1935 — RBI Act 1934।",level:"easy",exam:"RRB"},
-    {q:"मुद्रास्फीति नियंत्रण के लिए RBI?",opts:["(A) रेपो रेट बढ़ाता है","(B) रेपो रेट घटाता है","(C) CRR घटाता है","(D) SLR घटाता है"],ans:0,sol:"रेपो रेट बढ़ाता है — महंगा लोन — खर्च कम।",level:"moderate",exam:"SSC"},
-    {q:"पहली पंचवर्षीय योजना कब?",opts:["(A) 1951","(B) 1947","(C) 1956","(D) 1950"],ans:0,sol:"1951-56 — हैरड-डोमर मॉडल।",level:"easy",exam:"Police"},
-    {q:"NITI Aayog कब बना?",opts:["(A) 1 Jan 2015","(B) 1 April 2014","(C) 15 Aug 2014","(D) 26 Jan 2015"],ans:0,sol:"1 January 2015 — Planning Commission ki jagah।",level:"easy",exam:"SSC"}
-  ],
-  biology:[
-    {q:"मानव शरीर की सबसे बड़ी ग्रंथि?",opts:["(A) यकृत (Liver)","(B) अग्न्याशय","(C) थायरॉइड","(D) पीयूष"],ans:0,sol:"यकृत — पित्त, ग्लाइकोजन।",level:"easy",exam:"SSC"},
-    {q:"DNA की Double Helix संरचना किसने बताई?",opts:["(A) वाटसन और क्रिक","(B) रॉबर्ट हुक","(C) मेंडल","(D) पाश्चर"],ans:0,sol:"वाटसन और क्रिक 1953। 1962 नोबेल।",level:"easy",exam:"RRB"},
-    {q:"मनुष्य में गुणसूत्र कितने?",opts:["(A) 46","(B) 48","(C) 44","(D) 23"],ans:0,sol:"46 (23 जोड़े)।",level:"easy",exam:"Police"},
-    {q:"रक्त में ऑक्सीजन कौन ले जाता है?",opts:["(A) हीमोग्लोबिन","(B) प्लाज्मा","(C) WBC","(D) प्लेटलेट"],ans:0,sol:"हीमोग्लोबिन — RBC में, Iron युक्त।",level:"easy",exam:"SSC"},
-    {q:"प्रकाश संश्लेषण में कौन सा रंग?",opts:["(A) लाल और नीला","(B) हरा","(C) पीला","(D) बैंगनी"],ans:0,sol:"लाल (650-680nm) और नीला (430-450nm)।",level:"moderate",exam:"SSC"}
-  ],
-  chemistry:[
-    {q:"सबसे हल्की धातु?",opts:["(A) लिथियम","(B) सोडियम","(C) पोटेशियम","(D) मैग्नीशियम"],ans:0,sol:"लिथियम — घनत्व 0.534 g/cm³।",level:"easy",exam:"SSC"},
-    {q:"pH 7 से कम — पदार्थ?",opts:["(A) अम्लीय","(B) क्षारीय","(C) उदासीन","(D) कोई नहीं"],ans:0,sol:"अम्लीय। pH<7=अम्ल, =7=उदासीन, >7=क्षार।",level:"easy",exam:"Police"},
-    {q:"हीरा और ग्रेफाइट किसके अपरूप?",opts:["(A) कार्बन","(B) सल्फर","(C) फॉस्फोरस","(D) नाइट्रोजन"],ans:0,sol:"कार्बन। हीरा कठोरतम।",level:"easy",exam:"Police"},
-    {q:"'हास्य गैस' कौन सी?",opts:["(A) N2O","(B) NO2","(C) CO2","(D) SO2"],ans:0,sol:"N2O (Nitrous Oxide) — हास्य गैस।",level:"easy",exam:"SSC"},
-    {q:"जल का रासायनिक सूत्र?",opts:["(A) H2O","(B) H2O2","(C) HO","(D) H3O"],ans:0,sol:"H2O — 2 Hydrogen + 1 Oxygen।",level:"easy",exam:"SSC"}
-  ],
-  physics:[
-    {q:"प्रकाश की गति?",opts:["(A) 3×10⁸ m/s","(B) 3×10⁶ m/s","(C) 3×10¹⁰ m/s","(D) 3×10⁴ m/s"],ans:0,sol:"3×10⁸ m/s = 3 लाख km/s।",level:"easy",exam:"SSC"},
-    {q:"ओम का नियम?",opts:["(A) V = IR","(B) V = I/R","(C) V = I²R","(D) V = IR²"],ans:0,sol:"V = IR — 1827 जॉर्ज ओम।",level:"easy",exam:"RRB"},
-    {q:"न्यूटन का प्रथम नियम?",opts:["(A) जड़त्व का नियम","(B) त्वरण का नियम","(C) क्रिया-प्रतिक्रिया","(D) गुरुत्वाकर्षण"],ans:0,sol:"जड़त्व का नियम।",level:"easy",exam:"Police"},
-    {q:"LASER का पूर्ण रूप?",opts:["(A) Light Amplification by Stimulated Emission of Radiation","(B) Light Absorption by Stimulated Emission","(C) Large Amplification by Stimulated Energy","(D) Light Amplification by Standard Emission"],ans:0,sol:"Light Amplification by Stimulated Emission of Radiation।",level:"moderate",exam:"SSC"},
-    {q:"ध्वनि की गति सबसे अधिक किसमें?",opts:["(A) ठोस में","(B) द्रव में","(C) गैस में","(D) निर्वात में"],ans:0,sol:"ठोस में सबसे अधिक। निर्वात में ध्वनि नहीं चलती।",level:"easy",exam:"SSC"}
-  ],
-  gk:[
-    {q:"ISRO मुख्यालय?",opts:["(A) बेंगलुरु","(B) चेन्नई","(C) हैदराबाद","(D) अहमदाबाद"],ans:0,sol:"बेंगलुरु — स्थापना 1969।",level:"easy",exam:"SSC"},
-    {q:"UNO की स्थापना?",opts:["(A) 24 October 1945","(B) 26 June 1945","(C) 14 August 1945","(D) 1 January 1942"],ans:0,sol:"24 October 1945 — UN Day।",level:"easy",exam:"Police"},
-    {q:"भारत का पहला परमाणु परीक्षण?",opts:["(A) 18 May 1974 पोखरण","(B) 11 May 1998","(C) 1974 चांदीपुर","(D) 1998 रोहतक"],ans:0,sol:"18 May 1974 — 'Smiling Buddha'।",level:"moderate",exam:"SSC"},
-    {q:"भारत के 'आयरन मैन'?",opts:["(A) सरदार पटेल","(B) नेहरू","(C) भगत सिंह","(D) सुभाष चंद्र बोस"],ans:0,sol:"सरदार वल्लभभाई पटेल — 562 रियासतें।",level:"easy",exam:"Police"},
-    {q:"Chandrayaan-3 landing date?",opts:["(A) 23 Aug 2023","(B) 14 July 2023","(C) 1 Sep 2023","(D) 15 Aug 2023"],ans:0,sol:"23 August 2023 — Dakshini Dhruv ke paas।",level:"easy",exam:"SSC"},
-    {q:"Paris Olympics 2024 mein India ke medals?",opts:["(A) 6","(B) 4","(C) 8","(D) 5"],ans:0,sol:"6 medals — 1 Silver (Neeraj Chopra) + 5 Bronze।",level:"easy",exam:"SSC"},
-    {q:"BNS kab lagu hua?",opts:["(A) 1 July 2024","(B) 26 Jan 2024","(C) 15 Aug 2024","(D) 1 Jan 2024"],ans:0,sol:"1 July 2024 — IPC ki jagah Bhartiya Nyaya Sanhita।",level:"easy",exam:"Police"},
-    {q:"T20 World Cup 2024 winner?",opts:["(A) India","(B) Australia","(C) England","(D) Pakistan"],ans:0,sol:"India — South Africa ko 7 wickets se haraya। Barbados।",level:"easy",exam:"SSC"}
-  ]
-};
+var QB={};
 
-var CA_DATA=[
-  {name:"Economy",theory:"**RBI repo rate 6.5%** par stable. India GDP **8.2%** (2023-24). **UPI** 100 lakh crore record. GST avg **1.8 lakh crore/month**. India **5th largest economy**.",
-   mcqs:[
-    {q:"RBI ki repo rate 2024?",opts:["(A) 6.5%","(B) 6.0%","(C) 7.0%","(D) 5.5%"],ans:0,exp:"RBI ne 2024 mein 6.5% par stable rakha."},
-    {q:"India ki GDP 2023-24?",opts:["(A) 8.2%","(B) 7.2%","(C) 6.8%","(D) 9.0%"],ans:0,exp:"India sabse tej badhne wali major economy — 8.2%."},
-    {q:"GST kab lagu hua?",opts:["(A) 1 July 2017","(B) 1 April 2017","(C) 1 Jan 2018","(D) 1 April 2016"],ans:0,exp:"1 July 2017 se — One Nation One Tax."}
-  ]},
-  {name:"Polity 2024",theory:"**18vi Lok Sabha** — NDA ko **293 seats**. **Modi 3.0** June 2024. **Om Birla** phir Speaker. **BNS, BNSS, BSA — 1 July 2024** se lagu.",
-   mcqs:[
-    {q:"18vi Lok Sabha mein NDA seats?",opts:["(A) 293","(B) 303","(C) 272","(D) 315"],ans:0,exp:"NDA ko 293 seats, BJP akele 240."},
-    {q:"BNS kab lagu hua?",opts:["(A) 1 July 2024","(B) 26 Jan 2024","(C) 15 Aug 2024","(D) 1 Jan 2024"],ans:0,exp:"1 July 2024 se — IPC replace hua."},
-    {q:"18vi Lok Sabha ke Speaker?",opts:["(A) Om Birla","(B) Manohar Lal","(C) Rajnath Singh","(D) Nitin Gadkari"],ans:0,exp:"Om Birla lagatar doosri baar Speaker."}
-  ]},
-  {name:"Science 2024",theory:"**Aditya-L1** Jan 2024 — **L1 point** par. **Gaganyaan 2025**. **Tata** Gujarat mein semiconductor fab. **INS Arighaat** Aug 2024. **5G** 700+ cities.",
-   mcqs:[
-    {q:"Aditya-L1 kis point par?",opts:["(A) L1","(B) L2","(C) L3","(D) L4"],ans:0,exp:"L1 Lagrange point — 15 lakh km door."},
-    {q:"Chandrayaan-3 landing date?",opts:["(A) 23 Aug 2023","(B) 14 July 2023","(C) 1 Sep 2023","(D) 15 Aug 2023"],ans:0,exp:"23 August 2023 — Dakshini Dhruv."},
-    {q:"Gaganyaan kab?",opts:["(A) 2025","(B) 2024","(C) 2026","(D) 2027"],ans:0,exp:"2025 mein scheduled — 3 astronauts."}
-  ]},
-  {name:"Sports 2024",theory:"**Paris Olympics 2024** — India **6 medals** (1 Silver + 5 Bronze). **Neeraj Chopra** Silver. **Manu Bhaker** 2 Bronze. **T20 WC** India ne jeeta.",
-   mcqs:[
-    {q:"Paris 2024 mein India medals?",opts:["(A) 6","(B) 4","(C) 8","(D) 5"],ans:0,exp:"1 Silver + 5 Bronze = 6 medals."},
-    {q:"Neeraj Chopra ka medal?",opts:["(A) Silver","(B) Gold","(C) Bronze","(D) Koi nahi"],ans:0,exp:"89.45m ke saath Silver. Gold Arshad Nadeem."},
-    {q:"T20 WC 2024 final mein?",opts:["(A) South Africa","(B) England","(C) Australia","(D) Pakistan"],ans:0,exp:"India ne South Africa ko 7 wickets se haraya."}
-  ]},
-  {name:"Bihar Special",theory:"**Bihar Police 2024** — 21391 posts. **Nitish Kumar** 9vi baar CM. **Nalanda University** reopen 2024. **BPSC 70vi** exam schedule.",
-   mcqs:[
-    {q:"Bihar ke CM 2024?",opts:["(A) Nitish Kumar","(B) Tejashwi Yadav","(C) Sushil Modi","(D) Jitan Ram Manjhi"],ans:0,exp:"Nitish Kumar 9vi baar — Feb 2024 mein NDA ke saath."},
-    {q:"Bihar Police vacancy 2024?",opts:["(A) 21391","(B) 15000","(C) 25000","(D) 10000"],ans:0,exp:"21391 constable posts."},
-    {q:"Nalanda University reopen?",opts:["(A) 2024","(B) 2022","(C) 2023","(D) 2025"],ans:0,exp:"PM Modi ne 2024 mein inaugurate kiya."}
-  ]}
-];
+var CA_DATA=[];
 
 var YOGA_STEPS=[
   {name:"🙏 Pranayam Taiyari",desc:"Seedhe baitho. 3 gehri sansein lo.",dur:60,color:"#7c6fff"},
@@ -764,23 +670,10 @@ function openChapter(ch,lvl){
     })
     .catch(function(e){
       console.log('Practice AI error:',e);
-      // Fallback to offline
-      var all=QB[curSubj.id]||[];
-      var qs=all.filter(function(q){return q.level===lvl;});
-      if(qs.length<3)qs=all.slice();
-      pracQs=shuffle(qs).slice(0,8);
-      if(!pracQs.length){document.getElementById('qList').innerHTML='<div class="empty">❌ Questions nahi mili. Groq key check karo!</div>';return;}
-      renderPracQs();
-      toast('Offline questions load!','i');
+      document.getElementById('qList').innerHTML='<div class="empty">❌ AI error! Dobara try karo.<br><br>'+e.message+'</div>';
     });
   } else {
-    // Offline mode
-    var all=QB[curSubj.id]||[];
-    var qs=all.filter(function(q){return q.level===lvl;});
-    if(qs.length<3)qs=all.slice();
-    pracQs=shuffle(qs).slice(0,8);
-    if(!pracQs.length){document.getElementById('qList').innerHTML='<div class="empty">🔑 Settings mein Groq key daalo ya offline questions nahi hain!</div>';return;}
-    renderPracQs();
+    document.getElementById('qList').innerHTML='<div class="empty" style="padding:30px">🔑 Settings mein Groq key daalo!</div>';
   }
 }
 function renderPracQs(){
@@ -815,11 +708,10 @@ function startMock(){
 }
 
 function startMockOffline(){
-  var pool=[];
-  MC.subjs.forEach(function(sid){var qs=QB[sid]||[];qs.forEach(function(q){pool.push(Object.assign({},q,{sname:(SUBJS.filter(function(s){return s.id===sid;})[0]||{}).name||sid}));});});
-  if(!pool.length){toast('Gemini key daalo ya questions add karo!','e');return;}
-  MS.qs=shuffle(pool).slice(0,MC.qCount);MS.ans={};MS.skip={};MS.cur=0;MS.left=MC.mins*60;
-  launchMock();
+  toast('🔑 Settings mein Groq key daalo — AI questions ke liye!','e');
+  document.getElementById('mv1').style.display='block';
+  document.getElementById('mv2').style.display='none';
+  document.getElementById('mv3').style.display='none';
 }
 
 function startMockAI(key){
@@ -960,54 +852,139 @@ function yogaToggle(){
 function yogaReset(){clearInterval(yInt);yRun=false;yIdx=0;yLeft=YOGA_STEPS[0].dur;document.getElementById('yBtn').textContent='▶ Start';renderYogaUI();}
 
 // CURRENT AFFAIRS
-function loadCA(force){
-  var d=new Date();var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('caDate').textContent=d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
+function initCA(){
+  var topics=[
+    {id:1,icon:'🗺️',name:'कौन, क्या, कहाँ?'},
+    {id:2,icon:'🏛️',name:'मोदी मंत्रिमंडल 3.0'},
+    {id:3,icon:'🏙️',name:'राज्यों की राजधानी, राज्यपाल एवं मुख्यमंत्री'},
+    {id:4,icon:'⚖️',name:'भारत के उच्च न्यायालय'},
+    {id:5,icon:'🌍',name:'विश्व के देश: कौन, क्या, कहाँ?'},
+    {id:6,icon:'🥇',name:'भारत एवं विश्व में प्रथम 2024-25'},
+    {id:7,icon:'🤝',name:'प्रमुख समझौता ज्ञापन 2024-25'},
+    {id:8,icon:'📱',name:'प्रमुख मोबाइल ऐप एवं पोर्टल 2024-25'},
+    {id:9,icon:'🎙️',name:'ब्रांड एंबेसडर (अभियान एवं संस्थाएं)'},
+    {id:10,icon:'🎉',name:'प्रमुख त्योहार, उत्सव एवं महोत्सव'},
+    {id:11,icon:'🪖',name:'संयुक्त सैन्य अभ्यास 2024-25'},
+    {id:12,icon:'🗳️',name:'बिहार विधान सभा चुनाव 2025'},
+    {id:13,icon:'🌐',name:'अंतराष्ट्रीय संगठन: एक दृष्टि में'},
+    {id:14,icon:'🏟️',name:'प्रमुख अंतराष्ट्रीय सम्मेलन 2024-25'},
+    {id:15,icon:'🏟️',name:'प्रमुख राष्ट्रीय सम्मेलन 2024-25'},
+    {id:16,icon:'🛡️',name:'वर्ष 2023-25 के प्रमुख ऑपरेशन'},
+    {id:17,icon:'📋',name:'भारत सरकार के प्रमुख रिपोर्ट'},
+    {id:18,icon:'📊',name:'विभिन्न सूचकांक/रिपोर्ट 2024-25'},
+    {id:19,icon:'💹',name:'आर्थिक समीक्षा 2024-25'},
+    {id:20,icon:'💰',name:'केन्द्रीय बजट 2025-26'},
+    {id:21,icon:'🏗️',name:'केंद्र सरकार की योजनाएँ 2014-25'},
+    {id:22,icon:'🏘️',name:'राज्य सरकार की योजनाएँ 2023-24'},
+    {id:23,icon:'📈',name:'आर्थिक परिदृश्य'},
+    {id:24,icon:'🔬',name:'विज्ञान एवं प्रौद्योगिकी'},
+    {id:25,icon:'🛡️',name:'रक्षा एवं प्रतिरक्षा'},
+    {id:26,icon:'🚀',name:'अंतरिक्ष प्रौद्योगिकी'},
+    {id:27,icon:'🌿',name:'पर्यावरण एवं पारिस्थितिकी'},
+    {id:28,icon:'🏅',name:'राष्ट्रीय खेल पुरस्कार 2024'},
+    {id:29,icon:'🏆',name:'पुरस्कार/पदक/सम्मान'},
+    {id:30,icon:'⚽',name:'खेल परिदृश्य'},
+    {id:31,icon:'📚',name:'नवीनतम पुस्तकें एवं लेखक'},
+    {id:32,icon:'📅',name:'महत्वपूर्ण दिवस'},
+    {id:33,icon:'🎭',name:'महत्वपूर्ण दिवस एवं विषय/थीम'},
+    {id:34,icon:'🎪',name:'महत्वपूर्ण सम्मेलन एवं समारोह'},
+    {id:35,icon:'🔤',name:'नवीनतम शब्द संक्षेप'},
+    {id:36,icon:'📰',name:'समसामयिकी विविध'},
+    {id:37,icon:'❓',name:'करेंट अफेयर्स: प्रश्नोत्तर-संग्रह (One Liner)'},
+    {id:38,icon:'📝',name:'वस्तुनिष्ठ करेंट अफेयर्स'}
+  ];
+  
+  var html='';
+  topics.forEach(function(t){
+    var div=document.createElement('div');
+    div.className='chi';
+    div.style.cssText='border-left:3px solid var(--ac)';
+    div.dataset.tid=t.id;
+    div.dataset.tname=t.name;
+    div.addEventListener('click',function(){openCATopic(this.dataset.tid,this.dataset.tname);});
+    div.innerHTML='<span style="font-size:1.2rem">'+t.icon+'</span>'
+      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+t.name+'</div>'
+      +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">AI Questions • 2024-25</div></div>'
+      +'<span style="font-size:.7rem;color:var(--t2)">▶</span>';
+    document.getElementById('ca-sections').appendChild(div);
+  });}
+
+function openCATopic(id, name){
+  document.getElementById('ca-list').style.display='none';
+  document.getElementById('ca-detail').style.display='block';
+  document.getElementById('ca-detail-title').textContent=name;
+  document.getElementById('ca-detail-content').innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:2.5rem">🤖</div><div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">AI Questions Ban Rahi Hain...</div><div style="font-size:.7rem;color:var(--t2)">'+name+'</div></div>';
+  
   var key=getGKey();
-  var hr=Math.floor(new Date().getHours()/3);var ck='ca3_'+today()+'_'+hr;
-  if(!force){var cached=localStorage.getItem(ck);if(cached){try{var cd=JSON.parse(cached);caAns={};caC=0;caT=0;renderCAData(cd);return;}catch(e){}}}
-  if(!key){caAns={};caC=0;caT=0;renderCAData(CA_DATA);return;}
-  document.getElementById('caContent').innerHTML='<div style="text-align:center;padding:28px;color:var(--t2)">🔄 Groq AI se load ho rahi hai...</div>';
-  var caTopics=['कौन क्या कहाँ','मोदी मंत्रिमंडल 3.0','राज्यों की राजधानी राज्यपाल मुख्यमंत्री','भारत के उच्च न्यायालय','विश्व के देश कौन क्या कहाँ','भारत एवं विश्व में प्रथम 2024-25','प्रमुख समझौता ज्ञापन 2024-25','प्रमुख मोबाइल ऐप एवं पोर्टल 2024-25','ब्रांड एंबेसडर अभियान संस्थाएं','प्रमुख त्योहार उत्सव महोत्सव','संयुक्त सैन्य अभ्यास 2024-25','बिहार विधान सभा चुनाव 2025','अंतराष्ट्रीय संगठन','प्रमुख अंतराष्ट्रीय सम्मेलन 2024-25','प्रमुख राष्ट्रीय सम्मेलन 2024-25','प्रमुख ऑपरेशन 2023-25','भारत सरकार की प्रमुख रिपोर्ट','विभिन्न सूचकांक रिपोर्ट 2024-25','आर्थिक समीक्षा 2024-25','केन्द्रीय बजट 2025-26','केंद्र सरकार की योजनाएं','राज्य सरकार की योजनाएं','आर्थिक परिदृश्य','विज्ञान एवं प्रौद्योगिकी','रक्षा एवं प्रतिरक्षा','अंतरिक्ष प्रौद्योगिकी','पर्यावरण एवं पारिस्थितिकी','राष्ट्रीय खेल पुरस्कार 2024','पुरस्कार पदक सम्मान','खेल परिदृश्य','नवीनतम पुस्तकें एवं लेखक','महत्वपूर्ण दिवस','महत्वपूर्ण सम्मेलन एवं समारोह','नवीनतम शब्द संक्षेप','समसामयिकी विविध'];
-var rndTopics=[];var used={};for(var i=0;i<5;i++){var idx=Math.floor(Math.random()*caTopics.length);while(used[idx])idx=(idx+1)%caTopics.length;used[idx]=1;rndTopics.push(caTopics[idx]);}
-var prompt='Generate current affairs for '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear()+' on these topics: '+rndTopics.join(', ')+'. For SSC/Bihar Police/RRB exams. IMPORTANT: Write ALL text in Hindi Devanagari script. Return ONLY this JSON: {"topics":[{"name":"विषय नाम","theory":"3-4 lines with **bold** key facts in Hindi Devanagari","mcqs":[{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"exp":"व्याख्या"}]}]}. 5 topics, 2-3 MCQs each. 2024-2025 facts only. No markdown. Only JSON.';
+  if(!key){
+    document.getElementById('ca-detail-content').innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
+    return;
+  }
+  
+  var prompt='You are an Indian competitive exam expert. Generate 10 MCQ questions on "'+name+'" topic for SSC/RRB/Bihar Police 2024-25. IMPORTANT: Write ALL text in Hindi Devanagari script only. Return ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या","theory":"2-3 line fact Hindi mein"}]. ans=0-3. 2024-2025 facts. No markdown. Only JSON.';
+  
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
       model:'llama-3.1-8b-instant',
       messages:[
-        {role:'system',content:'You are a JSON generator. Always respond with only valid JSON, no markdown, no explanation.'},
+        {role:'system',content:'You are a JSON generator for Indian exams. Return only valid JSON. All text in Hindi Devanagari. No markdown.'},
         {role:'user',content:prompt}
       ],
       max_tokens:3000,
-      temperature:0.5
+      temperature:0.6
     })
   })
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.error) throw new Error(data.error.message);
     var txt=data.choices[0].message.content;
-    console.log('CA Response:',txt.substring(0,200));
     txt=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
+    var s=txt.indexOf('['),e=txt.lastIndexOf(']');
     if(s===-1) throw new Error('No JSON');
-    var parsed=JSON.parse(txt.substring(s,e));
-    if(!parsed.topics||!parsed.topics.length) throw new Error('No topics');
-    localStorage.setItem(ck,JSON.stringify(parsed.topics));
-    caAns={};caC=0;caT=0;renderCAData(parsed.topics);toast('CA ready! 📰','i');
+    var arr=JSON.parse(txt.substring(s,e+1));
+    if(!arr.length) throw new Error('Empty');
+    
+    // Render topic content
+    var cAns={};
+    var out='';
+    arr.forEach(function(q,i){
+      if(q.theory){
+        out+='<div class="tbox" style="margin-bottom:8px"><div style="font-size:.72rem;font-weight:800;color:var(--ac);margin-bottom:3px">📌 '+name+'</div><div class="tcont">'+q.theory+'</div></div>';
+      }
+      out+='<div class="qcard" id="caq'+i+'">'
+        +'<div class="qtxt">Q'+(i+1)+'. '+q.q+'</div>';
+      (q.opts||[]).forEach(function(o,j){
+        out+='<button class="opt" id="cao'+i+'_'+j+'" onclick="pickCA('+i+','+j+','+q.ans+')">'+(o||'')+'</button>';
+      });
+      if(q.sol) out+='<div class="sol" id="casol'+i+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
+      out+='</div>';
+    });
+    document.getElementById('ca-detail-content').innerHTML=out;
+    toast('✅ '+arr.length+' questions ready!','i');
   })
   .catch(function(e){
-    console.log('CA Error:',e);
-    caAns={};caC=0;caT=0;renderCAData(CA_DATA);
-    toast('Offline CA load','i');
+    console.log('CA topic error:',e);
+    document.getElementById('ca-detail-content').innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><br>Dobara try karo!</div>';
   });
 }
-function renderCAData(topics){
-  document.getElementById('caTopics').innerHTML='<button class="chip on" onclick="renderCAContent(-1,this)">🌟 Sab</button>'+topics.map(function(t,i){return '<button class="chip" onclick="renderCAContent('+i+',this)">'+t.name+'</button>';}).join('');
-  renderCAContent(-1,null,topics);
+
+function pickCA(qi,oi,correct){
+  var opts=document.querySelectorAll('[id^="cao'+qi+'_"]');
+  opts.forEach(function(o){o.disabled=true;});
+  document.getElementById('cao'+qi+'_'+oi).className='opt '+(oi===correct?'c':'w');
+  if(oi!==correct) document.getElementById('cao'+qi+'_'+correct).className='opt c';
+  var sol=document.getElementById('casol'+qi);
+  if(sol) sol.style.display='block';
 }
-var _caTopics=CA_DATA;
+
+function loadCA(force){
+  // kept for compatibility - now just reinit
+  initCA();
+}
+
+
 function renderCAContent(ti,el,topics){
   if(topics)_caTopics=topics;
   if(el){document.querySelectorAll('#caTopics .chip').forEach(function(c){c.classList.remove('on');});el.classList.add('on');}
