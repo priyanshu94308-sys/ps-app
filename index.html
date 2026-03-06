@@ -627,7 +627,7 @@ function saveGKey(){
   var st=document.getElementById('gkStatus');
   if(st){st.textContent='⏳ Testing key...';st.style.color='var(--ye)';}
   // Test key with real API call
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+k,{
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+k,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({contents:[{parts:[{text:'Say OK'}]}],generationConfig:{maxOutputTokens:5}})
@@ -636,7 +636,7 @@ function saveGKey(){
   .then(function(data){
     if(data.error){
       if(st){st.textContent='❌ '+data.error.message;st.style.color='var(--a2)';}
-      toast('Key invalid: '+data.error.message,'e');
+      toast('Error: '+data.error.message.substring(0,40),'e');console.log('Gemini Error:',data.error);
       return;
     }
     // Key works! Save it
@@ -792,7 +792,7 @@ function startMockAI(key){
   
   var prompt = 'Generate exactly '+MC.qCount+' MCQ questions for Indian competitive exams SSC RRB Bihar Police UPSC. Subjects: '+subjNames+'. Difficulty: '+MC.level+'. Return ONLY a JSON array like this: [{"q":"Hindi question?","opts":["(A) opt1","(B) opt2","(C) opt3","(D) opt4"],"ans":0,"sol":"Hindi explanation","subj":"subject"}]. ans=index of correct option 0-3. Hindi medium. No extra text.';
 
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
@@ -889,7 +889,7 @@ function loadCA(force){
   if(!key){caAns={};caC=0;caT=0;renderCAData(CA_DATA);return;}
   document.getElementById('caContent').innerHTML='<div style="text-align:center;padding:28px;color:var(--t2)">🔄 Gemini se load ho rahi hai...</div>';
   var prompt='Aaj '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear()+' ke liye SSC/Bihar Police exam current affairs. ONLY valid JSON: {"topics":[{"name":"Topic","theory":"3-4 lines. **bold** key facts.","mcqs":[{"q":"Hindi question?","opts":["(A)...","(B)...","(C)...","(D)..."],"ans":0,"exp":"explanation"}]}]} 5 topics, 2-3 MCQs. Hindi medium. Recent 2024-2025. ONLY JSON nothing else.';
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.5}})})
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.5}})})
   .then(function(r){return r.json();})
   .then(function(data){
     var txt=data.candidates[0].content.parts[0].text;
@@ -936,7 +936,7 @@ function askQ(msg){
   }
   area.innerHTML+='<div class="cmsg a" id="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   area.scrollTop=area.scrollHeight;
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Tum expert Indian exam tutor ho — SSC, RRB, UPSC, Bihar Police specialist. Hindi mein short clear answers do. Bullet points use karo.\n\nSawaal: '+msg}]}],generationConfig:{maxOutputTokens:600,temperature:0.7}})})
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Tum expert Indian exam tutor ho — SSC, RRB, UPSC, Bihar Police specialist. Hindi mein short clear answers do. Bullet points use karo.\n\nSawaal: '+msg}]}],generationConfig:{maxOutputTokens:600,temperature:0.7}})})
   .then(function(r){return r.json();})
   .then(function(data){
     var reply='';
