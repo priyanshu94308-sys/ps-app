@@ -768,9 +768,7 @@ function startMockAI(key){
   
   var subjNames = MC.subjs.map(function(sid){return (SUBJS.filter(function(s){return s.id===sid;})[0]||{}).name||sid;}).join(', ');
   
-  var prompt = 'Generate exactly '+MC.qCount+' MCQ questions for Indian competitive exams (SSC/RRB/Bihar Police/UPSC). Subjects: '+subjNames+'. Difficulty: '+MC.level+'. Mix all subjects equally. ONLY return valid JSON array, nothing else:
-[{"q":"question in Hindi","opts":["(A) option1","(B) option2","(C) option3","(D) option4"],"ans":0,"sol":"explanation in Hindi","subj":"subject name"}]
-Rules: ans is index 0-3 of correct option. Questions must be factual and accurate. Hindi medium preferred. No markdown, only pure JSON array.';
+  var prompt = 'Generate exactly '+MC.qCount+' MCQ questions for Indian competitive exams SSC RRB Bihar Police UPSC. Subjects: '+subjNames+'. Difficulty: '+MC.level+'. Return ONLY a JSON array like this: [{"q":"Hindi question?","opts":["(A) opt1","(B) opt2","(C) opt3","(D) opt4"],"ans":0,"sol":"Hindi explanation","subj":"subject"}]. ans=index of correct option 0-3. Hindi medium. No extra text.';
 
   fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
     method:'POST',
