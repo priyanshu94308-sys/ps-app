@@ -733,11 +733,87 @@ function setMT(m,el){MC.mins=m;document.querySelectorAll('#mTC .chip').forEach(f
 function toggleMS(id,el){var idx=MC.subjs.indexOf(id);if(idx>=0){if(MC.subjs.length===1){toast('Min 1!','e');return;}MC.subjs.splice(idx,1);el.classList.remove('on');}else{MC.subjs.push(id);el.classList.add('on');}}
 function renderRecentTests(){var el=document.getElementById('recentTests');if(!el)return;if(!S.mocks.length){el.innerHTML='<div class="empty">Koi test nahi</div>';return;}el.innerHTML=S.mocks.slice(0,5).map(function(h){var d=new Date(h.date);var c=h.pct>=80?'var(--gr)':h.pct>=60?'var(--ye)':'var(--a2)';return '<div style="background:var(--cd2);border-radius:8px;padding:7px 10px;margin-bottom:5px;border:1px solid var(--br);display:flex;align-items:center;gap:8px"><div style="font-size:.9rem;font-weight:800;color:'+c+'">'+h.pct+'%</div><div style="flex:1"><div style="font-size:.75rem;font-weight:700">'+h.level+' · '+h.qCount+'Q</div><div style="font-size:.59rem;color:var(--t2)">'+d.toLocaleDateString('hi-IN')+'</div></div><div style="font-size:.63rem;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(74,222,128,.1);color:var(--gr)">'+h.grade+'</div></div>';}).join('');}
 function startMock(){
+  var key=getGKey();
+  if(key){
+    startMockAI(key);
+  } else {
+    startMockOffline();
+  }
+}
+
+function startMockOffline(){
   var pool=[];
   MC.subjs.forEach(function(sid){var qs=QB[sid]||[];qs.forEach(function(q){pool.push(Object.assign({},q,{sname:(SUBJS.filter(function(s){return s.id===sid;})[0]||{}).name||sid}));});});
-  if(!pool.length){toast('Questions nahi!','e');return;}
+  if(!pool.length){toast('Gemini key daalo ya questions add karo!','e');return;}
   MS.qs=shuffle(pool).slice(0,MC.qCount);MS.ans={};MS.skip={};MS.cur=0;MS.left=MC.mins*60;
-  document.getElementById('mv1').style.display='none';document.getElementById('mv2').style.display='block';document.getElementById('mv3').style.display='none';
+  launchMock();
+}
+
+function startMockAI(key){
+  // Show loading screen
+  document.getElementById('mv1').style.display='none';
+  document.getElementById('mv2').style.display='none';
+  document.getElementById('mv3').style.display='none';
+  
+  var loadDiv = document.getElementById('mv_load');
+  if(!loadDiv){
+    loadDiv = document.createElement('div');
+    loadDiv.id = 'mv_load';
+    document.getElementById('tab-mock').appendChild(loadDiv);
+  }
+  loadDiv.style.display='block';
+  loadDiv.innerHTML = '<div style="text-align:center;padding:40px 20px"><div style="font-size:3rem;margin-bottom:12px">🤖</div><div style="font-size:1rem;font-weight:800;color:var(--ac);margin-bottom:6px">AI Questions Generate Ho Rahi Hain...</div><div style="font-size:.75rem;color:var(--t2);margin-bottom:20px">'+MC.qCount+' questions · '+MC.level+' · '+MC.subjs.join(", ")+'</div><div style="background:var(--br);border-radius:99px;height:6px;overflow:hidden;width:80%;margin:0 auto"><div id="aiProgress" style="height:100%;background:linear-gradient(90deg,var(--ac),var(--a2));border-radius:99px;width:0%;transition:width .5s"></div></div><div style="font-size:.65rem;color:var(--t2);margin-top:10px" id="aiLoadTxt">Connecting to Gemini...</div></div>';
+  
+  setTimeout(function(){document.getElementById('aiProgress').style.width='30%';document.getElementById('aiLoadTxt').textContent='Questions ban rahi hain...';},300);
+  
+  var subjNames = MC.subjs.map(function(sid){return (SUBJS.filter(function(s){return s.id===sid;})[0]||{}).name||sid;}).join(', ');
+  
+  var prompt = 'Generate exactly '+MC.qCount+' MCQ questions for Indian competitive exams (SSC/RRB/Bihar Police/UPSC). Subjects: '+subjNames+'. Difficulty: '+MC.level+'. Mix all subjects equally. ONLY return valid JSON array, nothing else:
+[{"q":"question in Hindi","opts":["(A) option1","(B) option2","(C) option3","(D) option4"],"ans":0,"sol":"explanation in Hindi","subj":"subject name"}]
+Rules: ans is index 0-3 of correct option. Questions must be factual and accurate. Hindi medium preferred. No markdown, only pure JSON array.';
+
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{maxOutputTokens:4000,temperature:0.7}
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    document.getElementById('aiProgress').style.width='80%';
+    document.getElementById('aiLoadTxt').textContent='Parsing questions...';
+    
+    var txt = data.candidates[0].content.parts[0].text;
+    var s = txt.indexOf('['), e = txt.lastIndexOf(']')+1;
+    var parsed = JSON.parse(txt.substring(s,e));
+    
+    document.getElementById('aiProgress').style.width='100%';
+    
+    MS.qs = parsed.map(function(q){
+      return {q:q.q, opts:q.opts, ans:q.ans||0, sol:q.sol||'', sname:q.subj||subjNames};
+    });
+    MS.ans={};MS.skip={};MS.cur=0;MS.left=MC.mins*60;
+    
+    setTimeout(function(){
+      loadDiv.style.display='none';
+      launchMock();
+      toast('✅ AI ne '+MS.qs.length+' questions banaye!','i');
+    },500);
+  })
+  .catch(function(e){
+    loadDiv.style.display='none';
+    toast('AI error! Offline mode...','e');
+    startMockOffline();
+  });
+}
+
+function launchMock(){
+  document.getElementById('mv1').style.display='none';
+  document.getElementById('mv2').style.display='block';
+  document.getElementById('mv3').style.display='none';
+  var ld=document.getElementById('mv_load');if(ld)ld.style.display='none';
   clearInterval(MS.tInt);
   MS.tInt=setInterval(function(){MS.left--;var m=Math.floor(MS.left/60),s=MS.left%60;var el=document.getElementById('mTimer');if(el){el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;el.className='mtimer'+(MS.left<60?' danger':MS.left<300?' warn':'');}if(MS.left<=0){clearInterval(MS.tInt);submitMock();}},1000);
   renderMQ();
@@ -793,7 +869,7 @@ function loadCA(force){
   if(!key){caAns={};caC=0;caT=0;renderCAData(CA_DATA);return;}
   document.getElementById('caContent').innerHTML='<div style="text-align:center;padding:28px;color:var(--t2)">🔄 Gemini se load ho rahi hai...</div>';
   var prompt='Aaj '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear()+' ke liye SSC/Bihar Police exam current affairs. ONLY valid JSON: {"topics":[{"name":"Topic","theory":"3-4 lines. **bold** key facts.","mcqs":[{"q":"Hindi question?","opts":["(A)...","(B)...","(C)...","(D)..."],"ans":0,"exp":"explanation"}]}]} 5 topics, 2-3 MCQs. Hindi medium. Recent 2024-2025. ONLY JSON nothing else.';
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.5}})})
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.5}})})
   .then(function(r){return r.json();})
   .then(function(data){
     var txt=data.candidates[0].content.parts[0].text;
@@ -840,15 +916,16 @@ function askQ(msg){
   }
   area.innerHTML+='<div class="cmsg a" id="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   area.scrollTop=area.scrollHeight;
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Tum expert Indian exam tutor ho — SSC, RRB, UPSC, Bihar Police specialist. Hindi mein short clear answers do. Bullet points use karo.\n\nSawaal: '+msg}]}],generationConfig:{maxOutputTokens:600,temperature:0.7}})})
+  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Tum expert Indian exam tutor ho — SSC, RRB, UPSC, Bihar Police specialist. Hindi mein short clear answers do. Bullet points use karo.\n\nSawaal: '+msg}]}],generationConfig:{maxOutputTokens:600,temperature:0.7}})})
   .then(function(r){return r.json();})
   .then(function(data){
-    var reply=data.candidates[0].content.parts[0].text;
-    document.getElementById('typing').remove();
+    var reply='';
+    try{reply=data.candidates[0].content.parts[0].text;}catch(e){reply='Error: '+(data.error?data.error.message:'Unknown');}
+    var tp=document.getElementById('typing');if(tp)tp.remove();
     area.innerHTML+='<div class="cmsg a">'+bold(reply).split('\n').join('<br>')+'</div>';
     area.scrollTop=area.scrollHeight;
   })
-  .catch(function(){document.getElementById('typing').remove();area.innerHTML+='<div class="cmsg a">❌ Error. Key check karo.</div>';area.scrollTop=area.scrollHeight;});
+  .catch(function(e){var tp=document.getElementById('typing');if(tp)tp.remove();area.innerHTML+='<div class="cmsg a">❌ '+e.message+'</div>';area.scrollTop=area.scrollHeight;});
 }
 function getOfflineReply(msg){
   msg=msg.toLowerCase();
@@ -876,6 +953,129 @@ function renderTestHist(){var el=document.getElementById('testHist');if(!el)retu
 
 function calcStreak(){var s=0;for(var i=0;i<365;i++){var d=new Date();d.setDate(d.getDate()-i);var k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());var log=S.log[k];if(!log||!log.tasks||!S.tasks.length){if(i===0)continue;break;}var done=Object.values(log.tasks).filter(function(v){return v===true;}).length;if(S.tasks.length&&done/S.tasks.length>=0.5)s++;else if(i>0)break;}return s;}
 function calcMonthAvg(){var now=new Date(),y=now.getFullYear(),m=now.getMonth()+1,sum=0,cnt=0;for(var d=1;d<=now.getDate();d++){var k=y+'-'+pad(m)+'-'+pad(d);var log=S.log[k];if(!log||!log.tasks||!S.tasks.length)continue;var done=Object.values(log.tasks).filter(function(v){return v===true;}).length;sum+=done/S.tasks.length*100;cnt++;}return cnt?Math.round(sum/cnt):0;}
+
+// MASSIVE QUESTION BANK - PYQ SSC/RRB/POLICE/UPSC
+var QB_EXTRA = {
+
+science_biology: [
+  // Class 6
+  {q:"पौधों में भोजन बनाने की प्रक्रिया को क्या कहते हैं?",opts:["(A) प्रकाश संश्लेषण","(B) श्वसन","(C) वाष्पोत्सर्जन","(D) अवशोषण"],ans:0,sol:"प्रकाश संश्लेषण — सूर्य प्रकाश + CO2 + H2O → ग्लूकोज + O2",level:"easy",exam:"SSC",ch:"Class 6",type:"Biology"},
+  {q:"मानव शरीर की सबसे बड़ी कोशिका?",opts:["(A) तंत्रिका कोशिका","(B) RBC","(C) WBC","(D) अंडाणु"],ans:0,sol:"तंत्रिका कोशिका (Neuron) — 1 मीटर तक लंबी।",level:"easy",exam:"RRB",ch:"Class 6",type:"Biology"},
+  {q:"पत्ती का हरा रंग किसके कारण?",opts:["(A) क्लोरोफिल","(B) कैरोटीन","(C) एंथोसायनिन","(D) जैंथोफिल"],ans:0,sol:"क्लोरोफिल — Mg युक्त वर्णक।",level:"easy",exam:"Police",ch:"Class 6",type:"Biology"},
+  {q:"रक्त में ऑक्सीजन ले जाने वाला प्रोटीन?",opts:["(A) हीमोग्लोबिन","(B) एल्बुमिन","(C) फाइब्रिन","(D) ग्लोबुलिन"],ans:0,sol:"हीमोग्लोबिन — लौह युक्त।",level:"easy",exam:"SSC",ch:"Class 7",type:"Biology"},
+  {q:"मनुष्य में पाचन की शुरुआत कहाँ से होती है?",opts:["(A) मुँह","(B) आमाशय","(C) छोटी आंत","(D) यकृत"],ans:0,sol:"मुँह — लार में एमाइलेज।",level:"easy",exam:"Police",ch:"Class 7",type:"Biology"},
+  {q:"मानव हृदय में कितने कक्ष होते हैं?",opts:["(A) 4","(B) 2","(C) 3","(D) 6"],ans:0,sol:"4 — 2 आलिंद + 2 निलय।",level:"easy",exam:"SSC",ch:"Class 7",type:"Biology"},
+  {q:"डेंगू बुखार किस मच्छर से फैलता है?",opts:["(A) एडीज","(B) एनोफिलीज","(C) क्यूलेक्स","(D) मैन्सोनिया"],ans:0,sol:"एडीज एजिप्टी — दिन में काटता है।",level:"easy",exam:"Police",ch:"Class 8",type:"Biology"},
+  {q:"मलेरिया किस परजीवी से होता है?",opts:["(A) प्लाज्मोडियम","(B) एंटअमीबा","(C) ट्रिपैनोसोमा","(D) लीशमानिया"],ans:0,sol:"प्लाज्मोडियम — एनोफिलीज से।",level:"easy",exam:"SSC",ch:"Class 8",type:"Biology"},
+  {q:"मनुष्य में गुणसूत्र कितने?",opts:["(A) 46","(B) 48","(C) 44","(D) 23"],ans:0,sol:"46 (23 जोड़े)।",level:"easy",exam:"RRB",ch:"Class 9",type:"Biology"},
+  {q:"DNA की Double Helix संरचना किसने दी?",opts:["(A) वाटसन-क्रिक","(B) मेंडल","(C) पाश्चर","(D) रॉबर्ट हुक"],ans:0,sol:"वाटसन-क्रिक 1953 — नोबेल 1962।",level:"moderate",exam:"SSC",ch:"Class 9",type:"Biology"},
+  {q:"कोशिका का पावरहाउस कौन है?",opts:["(A) माइटोकॉन्ड्रिया","(B) नाभिक","(C) राइबोसोम","(D) गॉल्जी काय"],ans:0,sol:"माइटोकॉन्ड्रिया — ATP उत्पादन।",level:"easy",exam:"Police",ch:"Class 9",type:"Biology"},
+  {q:"प्रकाश संश्लेषण में कौन सी गैस निकलती है?",opts:["(A) O2","(B) CO2","(C) N2","(D) H2"],ans:0,sol:"O2 — पानी के विखंडन से।",level:"easy",exam:"SSC",ch:"Class 10",type:"Biology"},
+  {q:"मानव शरीर की सबसे बड़ी ग्रंथि?",opts:["(A) यकृत","(B) अग्न्याशय","(C) थायरॉइड","(D) अधिवृक्क"],ans:0,sol:"यकृत (Liver) — 1.5 kg।",level:"easy",exam:"RRB",ch:"Class 10",type:"Biology"},
+  {q:"इंसुलिन कहाँ बनता है?",opts:["(A) अग्न्याशय","(B) यकृत","(C) थायरॉइड","(D) वृक्क"],ans:0,sol:"अग्न्याशय — बीटा कोशिकाएं।",level:"easy",exam:"Police",ch:"Class 10",type:"Biology"},
+  {q:"AIDS किससे होता है?",opts:["(A) HIV वायरस","(B) बैक्टीरिया","(C) कवक","(D) प्रोटोजोआ"],ans:0,sol:"Human Immunodeficiency Virus।",level:"easy",exam:"SSC",ch:"Class 10",type:"Biology"},
+  {q:"रक्त का थक्का बनाने में कौन सहायक?",opts:["(A) प्लेटलेट","(B) WBC","(C) RBC","(D) प्लाज्मा"],ans:0,sol:"प्लेटलेट (Thrombocyte)।",level:"easy",exam:"Police",ch:"Class 11",type:"Biology"},
+  {q:"'जीवन की इकाई' किसे कहते हैं?",opts:["(A) कोशिका","(B) ऊतक","(C) अंग","(D) अणु"],ans:0,sol:"कोशिका — Robert Hooke 1665।",level:"easy",exam:"SSC",ch:"Class 11",type:"Biology"},
+  {q:"श्वसन में कितने ATP बनते हैं?",opts:["(A) 38","(B) 36","(C) 32","(D) 40"],ans:0,sol:"38 ATP — ग्लूकोज के एरोबिक श्वसन से।",level:"hard",exam:"UPSC",ch:"Class 11",type:"Biology"},
+  {q:"मानव मस्तिष्क का सबसे बड़ा भाग?",opts:["(A) प्रमस्तिष्क","(B) अनुमस्तिष्क","(C) मेडुला","(D) पोंस"],ans:0,sol:"प्रमस्तिष्क (Cerebrum) — 2/3 भाग।",level:"moderate",exam:"RRB",ch:"Class 12",type:"Biology"},
+  {q:"शरीर में विटामिन D कहाँ बनता है?",opts:["(A) त्वचा","(B) यकृत","(C) वृक्क","(D) आंत"],ans:0,sol:"त्वचा में — सूर्य प्रकाश से।",level:"moderate",exam:"SSC",ch:"Class 12",type:"Biology"},
+  {q:"रतौंधी किस विटामिन की कमी से?",opts:["(A) विटामिन A","(B) विटामिन B","(C) विटामिन C","(D) विटामिन D"],ans:0,sol:"विटामिन A (रेटिनॉल)।",level:"easy",exam:"Police",ch:"Class 12",type:"Biology"},
+],
+
+science_chemistry: [
+  {q:"परमाणु का केंद्र क्या कहलाता है?",opts:["(A) नाभिक","(B) इलेक्ट्रॉन","(C) प्रोटॉन","(D) न्यूट्रॉन"],ans:0,sol:"नाभिक — प्रोटॉन + न्यूट्रॉन।",level:"easy",exam:"SSC",ch:"Class 9",type:"Chemistry"},
+  {q:"pH 7 से कम का अर्थ?",opts:["(A) अम्लीय","(B) क्षारीय","(C) उदासीन","(D) कोई नहीं"],ans:0,sol:"अम्लीय। pH<7=अम्ल।",level:"easy",exam:"Police",ch:"Class 10",type:"Chemistry"},
+  {q:"सबसे हल्ला धातु?",opts:["(A) लिथियम","(B) सोडियम","(C) पोटेशियम","(D) मैग्नीशियम"],ans:0,sol:"लिथियम — 0.534 g/cm³।",level:"easy",exam:"SSC",ch:"Class 10",type:"Chemistry"},
+  {q:"हीरा और ग्रेफाइट किसके अपरूप?",opts:["(A) कार्बन","(B) सल्फर","(C) फॉस्फोरस","(D) नाइट्रोजन"],ans:0,sol:"कार्बन — हीरा कठोरतम।",level:"easy",exam:"Police",ch:"Class 10",type:"Chemistry"},
+  {q:"'हास्य गैस' कौन सी?",opts:["(A) N2O","(B) NO2","(C) CO2","(D) SO2"],ans:0,sol:"N2O — Nitrous Oxide।",level:"easy",exam:"SSC",ch:"Class 11",type:"Chemistry"},
+  {q:"जंग लगना किस अभिक्रिया का उदाहरण?",opts:["(A) ऑक्सीकरण","(B) अवकरण","(C) विस्थापन","(D) संयोजन"],ans:0,sol:"ऑक्सीकरण — Fe + O2 + H2O → Fe2O3।",level:"easy",exam:"RRB",ch:"Class 10",type:"Chemistry"},
+  {q:"सोडियम का प्रतीक?",opts:["(A) Na","(B) So","(C) Sd","(D) Sn"],ans:0,sol:"Na — Natrium से।",level:"easy",exam:"Police",ch:"Class 9",type:"Chemistry"},
+  {q:"सबसे अधिक विद्युत चालक धातु?",opts:["(A) चांदी","(B) तांबा","(C) सोना","(D) एल्युमीनियम"],ans:0,sol:"चांदी (Silver) — सर्वोत्तम चालक।",level:"moderate",exam:"SSC",ch:"Class 10",type:"Chemistry"},
+  {q:"बेकिंग सोडा का रासायनिक नाम?",opts:["(A) सोडियम बाइकार्बोनेट","(B) सोडियम कार्बोनेट","(C) सोडियम क्लोराइड","(D) सोडियम हाइड्रॉक्साइड"],ans:0,sol:"NaHCO3 — सोडियम बाइकार्बोनेट।",level:"easy",exam:"Police",ch:"Class 10",type:"Chemistry"},
+  {q:"कठोर जल में कौन सा लवण होता है?",opts:["(A) कैल्शियम बाइकार्बोनेट","(B) सोडियम क्लोराइड","(C) पोटेशियम नाइट्रेट","(D) मैग्नीशियम सल्फेट"],ans:0,sol:"Ca(HCO3)2 और MgSO4।",level:"moderate",exam:"SSC",ch:"Class 11",type:"Chemistry"},
+  {q:"विद्युत अपघटन में ऑक्सीकरण कहाँ होता है?",opts:["(A) एनोड","(B) कैथोड","(C) दोनों","(D) कहीं नहीं"],ans:0,sol:"एनोड पर ऑक्सीकरण — कैथोड पर अवकरण।",level:"hard",exam:"UPSC",ch:"Class 12",type:"Chemistry"},
+  {q:"ओजोन परत किस गैस से नष्ट होती है?",opts:["(A) CFC","(B) CO2","(C) SO2","(D) NO2"],ans:0,sol:"CFC — Chlorofluorocarbon।",level:"easy",exam:"SSC",ch:"Class 11",type:"Chemistry"},
+  {q:"गैसोलीन किसका मिश्रण है?",opts:["(A) हाइड्रोकार्बन","(B) अल्कोहल","(C) एस्टर","(D) एल्डिहाइड"],ans:0,sol:"C7-C11 हाइड्रोकार्बन।",level:"moderate",exam:"RRB",ch:"Class 11",type:"Chemistry"},
+  {q:"'अम्लराज' (Aqua Regia) में क्या होता है?",opts:["(A) HCl + HNO3 (3:1)","(B) H2SO4 + HNO3","(C) HCl + H2SO4","(D) HF + HCl"],ans:0,sol:"HCl:HNO3 = 3:1 — सोना घोलता है।",level:"hard",exam:"UPSC",ch:"Class 12",type:"Chemistry"},
+  {q:"नाभिकीय विखंडन में कौन सा ईंधन?",opts:["(A) U-235","(B) U-238","(C) Th-232","(D) Pu-239"],ans:0,sol:"U-235 — Uranium-235।",level:"moderate",exam:"SSC",ch:"Class 12",type:"Chemistry"},
+  {q:"साबुन किसका सोडियम लवण है?",opts:["(A) वसीय अम्ल","(B) कार्बनिक अम्ल","(C) खनिज अम्ल","(D) एमिनो अम्ल"],ans:0,sol:"उच्च वसीय अम्लों का Na/K लवण।",level:"moderate",exam:"Police",ch:"Class 10",type:"Chemistry"},
+],
+
+science_physics: [
+  {q:"प्रकाश की गति?",opts:["(A) 3×10⁸ m/s","(B) 3×10⁶ m/s","(C) 3×10¹⁰ m/s","(D) 3×10⁴ m/s"],ans:0,sol:"3×10⁸ m/s वैक्यूम में।",level:"easy",exam:"SSC",ch:"Class 10",type:"Physics"},
+  {q:"ओम का नियम?",opts:["(A) V = IR","(B) V = I/R","(C) V = I²R","(D) V = IR²"],ans:0,sol:"V = IR — जॉर्ज ओम 1827।",level:"easy",exam:"RRB",ch:"Class 10",type:"Physics"},
+  {q:"न्यूटन का प्रथम नियम?",opts:["(A) जड़त्व","(B) त्वरण","(C) क्रिया-प्रतिक्रिया","(D) गुरुत्व"],ans:0,sol:"जड़त्व का नियम।",level:"easy",exam:"Police",ch:"Class 9",type:"Physics"},
+  {q:"LASER का पूर्ण रूप?",opts:["(A) Light Amplification by Stimulated Emission of Radiation","(B) Light Absorption Stimulated Emission","(C) Large Amplification Standard Energy","(D) Light Amplification Standard Emission"],ans:0,sol:"Light Amplification by Stimulated Emission of Radiation।",level:"moderate",exam:"SSC",ch:"Class 12",type:"Physics"},
+  {q:"ध्वनि की गति सबसे अधिक?",opts:["(A) ठोस","(B) द्रव","(C) गैस","(D) निर्वात"],ans:0,sol:"ठोस में सबसे अधिक।",level:"easy",exam:"SSC",ch:"Class 9",type:"Physics"},
+  {q:"1 HP (अश्व शक्ति) = ?",opts:["(A) 746 W","(B) 746 J","(C) 100 W","(D) 1000 W"],ans:0,sol:"1 HP = 746 Watt।",level:"moderate",exam:"RRB",ch:"Class 11",type:"Physics"},
+  {q:"विद्युत चुंबकीय तरंगें किसने खोजीं?",opts:["(A) हेनरिक हर्ट्ज","(B) मैक्सवेल","(C) फैराडे","(D) एंपियर"],ans:0,sol:"मैक्सवेल ने सिद्धांत दिया, हर्ट्ज ने प्रमाणित किया।",level:"hard",exam:"UPSC",ch:"Class 12",type:"Physics"},
+  {q:"दर्पण की फोकस दूरी और वक्रता त्रिज्या का संबंध?",opts:["(A) f = R/2","(B) f = R","(C) f = 2R","(D) f = R/3"],ans:0,sol:"f = R/2।",level:"moderate",exam:"SSC",ch:"Class 10",type:"Physics"},
+  {q:"परमाणु बम किस सिद्धांत पर?",opts:["(A) नाभिकीय विखंडन","(B) नाभिकीय संलयन","(C) रेडियोसक्रियता","(D) ऑक्सीकरण"],ans:0,sol:"नाभिकीय विखंडन — U-235।",level:"easy",exam:"Police",ch:"Class 12",type:"Physics"},
+  {q:"X-किरणें किसने खोजीं?",opts:["(A) रोएंटजेन","(B) क्यूरी","(C) बेकेरल","(D) थॉमसन"],ans:0,sol:"विल्हेम रोएंटजेन 1895।",level:"easy",exam:"SSC",ch:"Class 12",type:"Physics"},
+  {q:"आर्किमिडीज का सिद्धांत किससे संबंधित?",opts:["(A) उत्प्लावन","(B) गुरुत्व","(C) घर्षण","(D) दाब"],ans:0,sol:"उत्प्लावन बल = विस्थापित द्रव का भार।",level:"easy",exam:"RRB",ch:"Class 9",type:"Physics"},
+  {q:"इंद्रधनुष में कितने रंग?",opts:["(A) 7","(B) 6","(C) 8","(D) 5"],ans:0,sol:"7 — VIBGYOR।",level:"easy",exam:"Police",ch:"Class 10",type:"Physics"},
+  {q:"तरंगदैर्ध्य और आवृत्ति का गुणनफल?",opts:["(A) तरंग वेग","(B) आयाम","(C) तीव्रता","(D) ऊर्जा"],ans:0,sol:"v = fλ — तरंग वेग।",level:"moderate",exam:"SSC",ch:"Class 11",type:"Physics"},
+  {q:"परमाणु का नाभिकीय मॉडल किसने दिया?",opts:["(A) रदरफोर्ड","(B) बोर","(C) थॉमसन","(D) डाल्टन"],ans:0,sol:"रदरफोर्ड 1911 — गोल्ड फॉयल।",level:"moderate",exam:"SSC",ch:"Class 11",type:"Physics"},
+  {q:"SI में बल की इकाई?",opts:["(A) न्यूटन","(B) डाइन","(C) जूल","(D) वॉट"],ans:0,sol:"न्यूटन (N) = kg·m/s²।",level:"easy",exam:"Police",ch:"Class 9",type:"Physics"},
+],
+
+static_gk: [
+  // Geography
+  {q:"भारत की सबसे लंबी नदी?",opts:["(A) गंगा","(B) गोदावरी","(C) सिंधु","(D) यमुना"],ans:0,sol:"गंगा — 2525 km।",level:"easy",exam:"SSC",ch:"Geography",type:"GK"},
+  {q:"काली मिट्टी किस फसल के लिए?",opts:["(A) कपास","(B) गेहूँ","(C) चावल","(D) जूट"],ans:0,sol:"कपास — रेगड़ मिट्टी।",level:"easy",exam:"RRB",ch:"Geography",type:"GK"},
+  {q:"भारत का सबसे बड़ा राज्य (क्षेत्रफल)?",opts:["(A) राजस्थान","(B) मध्य प्रदेश","(C) महाराष्ट्र","(D) उत्तर प्रदेश"],ans:0,sol:"राजस्थान — 342239 km²।",level:"easy",exam:"SSC",ch:"Geography",type:"GK"},
+  {q:"भारत की सबसे ऊंची चोटी?",opts:["(A) K2","(B) कंचनजंगा","(C) माउंट एवरेस्ट","(D) नंदा देवी"],ans:0,sol:"K2 (8611m) — गॉडविन ऑस्टिन।",level:"moderate",exam:"SSC",ch:"Geography",type:"GK"},
+  {q:"मानसून किस दिशा से आता है?",opts:["(A) दक्षिण-पश्चिम","(B) उत्तर-पूर्व","(C) दक्षिण-पूर्व","(D) उत्तर-पश्चिम"],ans:0,sol:"दक्षिण-पश्चिम — जून-सितंबर।",level:"easy",exam:"SSC",ch:"Geography",type:"GK"},
+  {q:"भारत का सबसे लंबा बांध?",opts:["(A) हीराकुड","(B) भाखड़ा नांगल","(C) नागार्जुन","(D) टिहरी"],ans:0,sol:"हीराकुड — 4.8 km (ओडिशा)।",level:"moderate",exam:"RRB",ch:"Geography",type:"GK"},
+  {q:"सुंदरबन किस राज्य में?",opts:["(A) पश्चिम बंगाल","(B) ओडिशा","(C) आंध्र प्रदेश","(D) तमिलनाडु"],ans:0,sol:"पश्चिम बंगाल — मैंग्रोव वन।",level:"easy",exam:"Police",ch:"Geography",type:"GK"},
+  {q:"भारत का सबसे बड़ा मरुस्थल?",opts:["(A) थार","(B) कच्छ","(C) लद्दाख","(D) दक्कन"],ans:0,sol:"थार — राजस्थान।",level:"easy",exam:"SSC",ch:"Geography",type:"GK"},
+  {q:"चिल्का झील किस राज्य में?",opts:["(A) ओडिशा","(B) आंध्र प्रदेश","(C) तमिलनाडु","(D) केरल"],ans:0,sol:"ओडिशा — खारे पानी की झील।",level:"easy",exam:"Police",ch:"Geography",type:"GK"},
+  {q:"भारत का सबसे बड़ा बंदरगाह?",opts:["(A) मुंबई","(B) कोलकाता","(C) चेन्नई","(D) विशाखापत्तनम"],ans:0,sol:"मुंबई — प्राकृतिक बंदरगाह।",level:"easy",exam:"RRB",ch:"Geography",type:"GK"},
+  // National Symbols
+  {q:"भारत का राष्ट्रीय पशु?",opts:["(A) बाघ","(B) शेर","(C) हाथी","(D) गाय"],ans:0,sol:"बंगाल टाइगर — 1973 से।",level:"easy",exam:"Police",ch:"National Symbols",type:"GK"},
+  {q:"भारत का राष्ट्रीय पक्षी?",opts:["(A) मोर","(B) तोता","(C) हंस","(D) कोयल"],ans:0,sol:"मोर (Indian Peacock)।",level:"easy",exam:"SSC",ch:"National Symbols",type:"GK"},
+  {q:"भारत का राष्ट्रीय फूल?",opts:["(A) कमल","(B) गुलाब","(C) गेंदा","(D) चमेली"],ans:0,sol:"कमल (Lotus) — Nelumbo nucifera।",level:"easy",exam:"Police",ch:"National Symbols",type:"GK"},
+  {q:"भारत का राष्ट्रीय वृक्ष?",opts:["(A) बरगद","(B) नीम","(C) पीपल","(D) आम"],ans:0,sol:"बरगद (Banyan) — Ficus benghalensis।",level:"easy",exam:"SSC",ch:"National Symbols",type:"GK"},
+  {q:"भारत का राष्ट्रीय खेल?",opts:["(A) हॉकी","(B) क्रिकेट","(C) कबड्डी","(D) कुश्ती"],ans:0,sol:"हॉकी — फील्ड हॉकी।",level:"easy",exam:"Police",ch:"National Symbols",type:"GK"},
+  {q:"भारत का राष्ट्रगान किसने लिखा?",opts:["(A) रवींद्रनाथ टैगोर","(B) बंकिमचंद्र","(C) महात्मा गांधी","(D) सुभाष चंद्र बोस"],ans:0,sol:"रवींद्रनाथ टैगोर — 'जन गण मन'।",level:"easy",exam:"SSC",ch:"National Symbols",type:"GK"},
+  {q:"भारत का राष्ट्रगीत?",opts:["(A) वंदे मातरम","(B) जन गण मन","(C) सारे जहाँ से अच्छा","(D) भारत माता की जय"],ans:0,sol:"वंदे मातरम — बंकिमचंद्र।",level:"easy",exam:"Police",ch:"National Symbols",type:"GK"},
+  // International Organizations
+  {q:"UNO की स्थापना?",opts:["(A) 24 October 1945","(B) 26 June 1945","(C) 14 August 1945","(D) 1 January 1942"],ans:0,sol:"24 October 1945 — UN Day।",level:"easy",exam:"Police",ch:"International Org",type:"GK"},
+  {q:"WHO का मुख्यालय?",opts:["(A) जिनेवा","(B) न्यूयॉर्क","(C) पेरिस","(D) लंदन"],ans:0,sol:"जिनेवा, स्विट्जरलैंड।",level:"easy",exam:"SSC",ch:"International Org",type:"GK"},
+  {q:"INTERPOL का मुख्यालय?",opts:["(A) लियोन","(B) पेरिस","(C) ब्रसेल्स","(D) लंदन"],ans:0,sol:"लियोन, फ्रांस।",level:"moderate",exam:"Police",ch:"International Org",type:"GK"},
+  {q:"SAARC में कितने सदस्य?",opts:["(A) 8","(B) 7","(C) 9","(D) 6"],ans:0,sol:"8 — भारत, पाक, बांग्लादेश, नेपाल, भूटान, श्रीलंका, मालदीव, अफगानिस्तान।",level:"easy",exam:"SSC",ch:"International Org",type:"GK"},
+  {q:"G20 की स्थापना कब?",opts:["(A) 1999","(B) 2000","(C) 1997","(D) 2008"],ans:0,sol:"1999 में।",level:"moderate",exam:"SSC",ch:"International Org",type:"GK"},
+  // Awards
+  {q:"भारत रत्न किस वर्ष शुरू हुआ?",opts:["(A) 1954","(B) 1950","(C) 1947","(D) 1960"],ans:0,sol:"1954 — प्रथम पुरस्कार C. राजगोपालाचारी।",level:"moderate",exam:"SSC",ch:"Awards",type:"GK"},
+  {q:"नोबेल पुरस्कार किस देश से?",opts:["(A) स्वीडन","(B) नॉर्वे","(C) डेनमार्क","(D) फिनलैंड"],ans:0,sol:"स्वीडन — शांति पुरस्कार नॉर्वे से।",level:"easy",exam:"Police",ch:"Awards",type:"GK"},
+  {q:"भारत का पहला नोबेल पुरस्कार विजेता?",opts:["(A) रवींद्रनाथ टैगोर","(B) CV रमन","(C) मदर टेरेसा","(D) अमर्त्य सेन"],ans:0,sol:"रवींद्रनाथ टैगोर 1913 — साहित्य।",level:"easy",exam:"SSC",ch:"Awards",type:"GK"},
+  // Important Days
+  {q:"विश्व पर्यावरण दिवस?",opts:["(A) 5 June","(B) 22 April","(C) 16 September","(D) 21 March"],ans:0,sol:"5 June — 1972 से।",level:"easy",exam:"Police",ch:"Important Days",type:"GK"},
+  {q:"राष्ट्रीय खेल दिवस?",opts:["(A) 29 August","(B) 15 August","(C) 26 January","(D) 2 October"],ans:0,sol:"29 August — मेजर ध्यानचंद जन्मदिन।",level:"easy",exam:"SSC",ch:"Important Days",type:"GK"},
+  {q:"अंतर्राष्ट्रीय महिला दिवस?",opts:["(A) 8 March","(B) 8 April","(C) 8 February","(D) 8 May"],ans:0,sol:"8 March — 1910 से।",level:"easy",exam:"Police",ch:"Important Days",type:"GK"},
+  // Books & Authors
+  {q:"'डिस्कवरी ऑफ इंडिया' किसने लिखी?",opts:["(A) जवाहरलाल नेहरू","(B) महात्मा गांधी","(C) डॉ. अंबेडकर","(D) सरदार पटेल"],ans:0,sol:"नेहरू — 1946 में जेल में।",level:"easy",exam:"SSC",ch:"Books",type:"GK"},
+  {q:"'My Experiments with Truth' किसकी?",opts:["(A) गांधी","(B) नेहरू","(C) तिलक","(D) गोखले"],ans:0,sol:"महात्मा गांधी की आत्मकथा।",level:"easy",exam:"Police",ch:"Books",type:"GK"},
+  // Bihar Special
+  {q:"बिहार की राजधानी?",opts:["(A) पटना","(B) गया","(C) भागलपुर","(D) मुजफ्फरपुर"],ans:0,sol:"पटना — पाटलिपुत्र।",level:"easy",exam:"Police",ch:"Bihar",type:"GK"},
+  {q:"बिहार का गठन कब हुआ?",opts:["(A) 1912","(B) 1905","(C) 1920","(D) 1947"],ans:0,sol:"22 March 1912।",level:"easy",exam:"Police",ch:"Bihar",type:"GK"},
+  {q:"नालंदा विश्वविद्यालय किस राज्य में?",opts:["(A) बिहार","(B) उत्तर प्रदेश","(C) मध्य प्रदेश","(D) ओडिशा"],ans:0,sol:"बिहार — राजगीर के पास।",level:"easy",exam:"Police",ch:"Bihar",type:"GK"},
+  {q:"बोधगया किसके लिए प्रसिद्ध?",opts:["(A) बुद्ध को ज्ञान प्राप्ति","(B) महावीर जन्म","(C) अशोक का महल","(D) विक्रमशिला विश्वविद्यालय"],ans:0,sol:"गौतम बुद्ध को बोधि वृक्ष के नीचे ज्ञान।",level:"easy",exam:"Police",ch:"Bihar",type:"GK"},
+  {q:"बिहार दिवस कब मनाया जाता है?",opts:["(A) 22 March","(B) 15 August","(C) 26 January","(D) 1 November"],ans:0,sol:"22 March — 1912 में बिहार बना।",level:"easy",exam:"Police",ch:"Bihar",type:"GK"},
+  // Science & Tech 2024
+  {q:"Chandrayaan-3 landing date?",opts:["(A) 23 Aug 2023","(B) 14 July 2023","(C) 1 Sep 2023","(D) 15 Aug 2023"],ans:0,sol:"23 August 2023 — दक्षिणी धुव।",level:"easy",exam:"SSC",ch:"Science Tech",type:"GK"},
+  {q:"Aditya-L1 किस point पर?",opts:["(A) L1","(B) L2","(C) L3","(D) L4"],ans:0,sol:"L1 Lagrange point — 15 लाख km।",level:"easy",exam:"SSC",ch:"Science Tech",type:"GK"},
+  {q:"UPI किसने लॉन्च किया?",opts:["(A) NPCI","(B) RBI","(C) SBI","(D) HDFC"],ans:0,sol:"NPCI — National Payments Corporation of India।",level:"easy",exam:"RRB",ch:"Science Tech",type:"GK"},
+  {q:"5G भारत में कब लॉन्च हुआ?",opts:["(A) October 2022","(B) January 2022","(C) August 2023","(D) March 2021"],ans:0,sol:"October 2022 — PM Modi ने लॉन्च किया।",level:"moderate",exam:"SSC",ch:"Science Tech",type:"GK"},
+]
+};
+
+// Merge with QB
+Object.keys(QB_EXTRA).forEach(function(k) {
+  var mainKey = k.replace('science_','').replace('static_','');
+  if(!QB[mainKey]) QB[mainKey] = [];
+  QB[mainKey] = QB[mainKey].concat(QB_EXTRA[k]);
+});
 
 window.addEventListener('DOMContentLoaded',function(){initApp();});
 </script>
