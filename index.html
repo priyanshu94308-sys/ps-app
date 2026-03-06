@@ -373,7 +373,7 @@ body{display:block;height:100vh;background:var(--bg);}
     <div class="tab" id="tab-ask">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
         <div style="width:35px;height:35px;background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem">🤖</div>
-        <div><div style="font-size:.86rem;font-weight:800">PS AI Tutor</div><div style="font-size:.62rem;color:var(--t2)" id="aiStatus">Settings mein Gemini key daalo</div></div>
+        <div><div style="font-size:.86rem;font-weight:800">PS AI Tutor</div><div style="font-size:.62rem;color:var(--t2)" id="aiStatus">Settings mein Groq key daalo</div></div>
         <button class="ibtn" style="margin-left:auto" onclick="document.getElementById('chatArea').innerHTML='';toast('Clear!')">🗑️</button>
       </div>
       <div class="chips">
@@ -409,14 +409,14 @@ body{display:block;height:100vh;background:var(--bg);}
         <div style="display:flex;gap:5px"><input type="text" class="fi" id="nameInp" placeholder="Apna naam..."><button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveName()">Save</button></div>
       </div>
       <div class="scard">
-        <div class="sec">🤖 Gemini AI Key (Free)</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">aistudio.google.com se FREE key lo</div>
+        <div class="sec">🤖 Groq AI Key (FREE)</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">console.groq.com se FREE key lo — No quota!</div>
         <div style="display:flex;gap:5px;margin-bottom:5px">
-          <input type="text" class="fi" id="geminiKey" placeholder="AIzaSy...">
+          <input type="text" class="fi" id="geminiKey" placeholder="gsk_...">
           <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveGKey()">Save</button>
         </div>
         <div style="font-size:.63rem;font-weight:700" id="gkStatus">⚪ Key nahi hai</div>
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#4285f4,#34a853);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 Free Key Lo</a>
+        <a href="https://console.groq.com/keys" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Groq Key Lo</a>
       </div>
       <div class="scard">
         <div class="sec">📢 WhatsApp Channel</div>
@@ -625,33 +625,32 @@ function saveGKey(){
   var k=document.getElementById('geminiKey').value.trim();
   if(!k){toast('Key daalo!','e');return;}
   var st=document.getElementById('gkStatus');
-  if(st){st.textContent='⏳ Testing key...';st.style.color='var(--ye)';}
-  // Test key with real API call
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+k,{
+  if(st){st.textContent='⏳ Testing...';st.style.color='var(--ye)';}
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({contents:[{parts:[{text:'Say OK'}]}],generationConfig:{maxOutputTokens:5}})
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+k},
+    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:'Say OK'}],max_tokens:5})
   })
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.error){
-      if(st){st.textContent='❌ '+data.error.message;st.style.color='var(--a2)';}
-      toast('Error: '+data.error.message.substring(0,40),'e');console.log('Gemini Error:',data.error);
-      return;
+      if(st){st.textContent='❌ '+data.error.message.substring(0,50);st.style.color='var(--a2)';}
+      toast('Key invalid!','e');return;
     }
-    // Key works! Save it
     try{localStorage.setItem('ps_gkey',k);}catch(e){}
     try{sessionStorage.setItem('ps_gkey',k);}catch(e){}
     var d=new Date();d.setTime(d.getTime()+(30*24*60*60*1000));
     document.cookie='ps_gkey='+k+';expires='+d.toUTCString()+';path=/;SameSite=Lax';
-    if(st){st.textContent='✅ AI Active!';st.style.color='#4ade80';}
+    if(st){st.textContent='✅ Groq AI Active!';st.style.color='#4ade80';}
     var ai=document.getElementById('aiStatus');
-    if(ai)ai.textContent='Gemini AI Connected ✅';
-    toast('Gemini key saved! 🤖','i');
+    if(ai)ai.textContent='Groq AI Connected ✅';
+    toast('Groq key saved! 🤖','i');
   })
-  .catch(function(e){
-    if(st){st.textContent='❌ Network error';st.style.color='var(--a2)';}
-    toast('Network error! GitHub link pe try karo','e');
+  .catch(function(){
+    // Save anyway if network issue
+    try{localStorage.setItem('ps_gkey',k);}catch(e){}
+    if(st){st.textContent='✅ Key Saved!';st.style.color='#4ade80';}
+    toast('Key saved!','i');
   });
 }
 
@@ -667,7 +666,7 @@ function getGKey(){
   if(k){try{localStorage.setItem('ps_gkey',k);}catch(e){}}
   return k;
 }
-function updateGKStatus(){var k=getGKey();var el=document.getElementById('gkStatus');var inp=document.getElementById('geminiKey');if(el){el.textContent=k?'✅ AI Active!':'⚪ Key nahi hai';el.style.color=k?'#4ade80':'#6b72a0';}if(inp&&k)inp.value=k.substring(0,8)+'...';var ai=document.getElementById('aiStatus');if(ai)ai.textContent=k?'Gemini AI Connected ✅':'Settings mein Gemini key daalo';}
+function updateGKStatus(){var k=getGKey();var el=document.getElementById('gkStatus');var inp=document.getElementById('geminiKey');if(el){el.textContent=k?'✅ AI Active!':'⚪ Key nahi hai';el.style.color=k?'#4ade80':'#6b72a0';}if(inp&&k)inp.value=k.substring(0,8)+'...';var ai=document.getElementById('aiStatus');if(ai)ai.textContent=k?'Groq AI Connected ✅':'Settings mein Groq key daalo';}
 
 // HOME
 function renderHome(){renderTasks();updateProgress();renderMood();renderWater();updateHeader();}
@@ -792,13 +791,10 @@ function startMockAI(key){
   
   var prompt = 'Generate exactly '+MC.qCount+' MCQ questions for Indian competitive exams SSC RRB Bihar Police UPSC. Subjects: '+subjNames+'. Difficulty: '+MC.level+'. Return ONLY a JSON array like this: [{"q":"Hindi question?","opts":["(A) opt1","(B) opt2","(C) opt3","(D) opt4"],"ans":0,"sol":"Hindi explanation","subj":"subject"}]. ans=index of correct option 0-3. Hindi medium. No extra text.';
 
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      contents:[{parts:[{text:prompt}]}],
-      generationConfig:{maxOutputTokens:4000,temperature:0.7}
-    })
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:4000,temperature:0.7})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -889,10 +885,14 @@ function loadCA(force){
   if(!key){caAns={};caC=0;caT=0;renderCAData(CA_DATA);return;}
   document.getElementById('caContent').innerHTML='<div style="text-align:center;padding:28px;color:var(--t2)">🔄 Gemini se load ho rahi hai...</div>';
   var prompt='Aaj '+d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear()+' ke liye SSC/Bihar Police exam current affairs. ONLY valid JSON: {"topics":[{"name":"Topic","theory":"3-4 lines. **bold** key facts.","mcqs":[{"q":"Hindi question?","opts":["(A)...","(B)...","(C)...","(D)..."],"ans":0,"exp":"explanation"}]}]} 5 topics, 2-3 MCQs. Hindi medium. Recent 2024-2025. ONLY JSON nothing else.';
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.5}})})
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'user',content:prompt}],max_tokens:3000,temperature:0.5})
+  })
   .then(function(r){return r.json();})
   .then(function(data){
-    var txt=data.candidates[0].content.parts[0].text;
+    var txt=data.choices[0].message.content;
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     var parsed=JSON.parse(txt.substring(s,e));
     localStorage.setItem(ck,JSON.stringify(parsed.topics));
@@ -936,11 +936,15 @@ function askQ(msg){
   }
   area.innerHTML+='<div class="cmsg a" id="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
   area.scrollTop=area.scrollHeight;
-  fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Tum expert Indian exam tutor ho — SSC, RRB, UPSC, Bihar Police specialist. Hindi mein short clear answers do. Bullet points use karo.\n\nSawaal: '+msg}]}],generationConfig:{maxOutputTokens:600,temperature:0.7}})})
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'system',content:'Tum expert Indian exam tutor ho — SSC, RRB, UPSC, Bihar Police specialist. Hindi mein short clear answers do. Bullet points use karo.'},{role:'user',content:msg}],max_tokens:600,temperature:0.7})
+  })
   .then(function(r){return r.json();})
   .then(function(data){
     var reply='';
-    try{reply=data.candidates[0].content.parts[0].text;}catch(e){reply='Error: '+(data.error?data.error.message:'Unknown');}
+    try{reply=data.choices[0].message.content;}catch(e){reply='Error: '+(data.error?data.error.message:'Unknown');}
     var tp=document.getElementById('typing');if(tp)tp.remove();
     area.innerHTML+='<div class="cmsg a">'+bold(reply).split('\n').join('<br>')+'</div>';
     area.scrollTop=area.scrollHeight;
