@@ -657,7 +657,7 @@ var EXAM_PATTERNS={
 var mockType='full';
 function setMockType(t,el){
   mockType=t;
-  document.querySelectorAll('[id^="mt-"]').forEach(function(b){b.className='chip';});
+  document.querySelectorAll('#examBtns button,[id^="mt-"]').forEach(function(b){if(b.id&&b.id.startsWith('mt-'))b.className='chip';});
   el.className='chip on';
   document.getElementById('subjSelDiv').style.display=t==='subject'?'block':'none';
 }
@@ -689,7 +689,7 @@ function setExam(name,el){
     });
     document.getElementById('examPatSections').innerHTML=secHtml;
   }
-  document.querySelectorAll('#examBtns .chip').forEach(function(b){b.className='chip';});
+  document.querySelectorAll('#examBtns button').forEach(function(b){b.className='chip';});
   el.className='chip on';
 }
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
@@ -1145,7 +1145,7 @@ function loadDailyCA(force){
   var dateStr=d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
   var dateHi=d.getDate()+' '+mn2[d.getMonth()]+' '+d.getFullYear();
 
-  var allTopics=['कौन क्या कहाँ','मोदी मंत्रिमंडल 3.0','राज्यों की राजधानी राज्यपाल मुख्यमंत्री','भारत के उच्च न्यायालय','विश्व के देश कौन क्या कहाँ','भारत एवं विश्व में प्रथम 2024-25','प्रमुख समझौता ज्ञापन 2024-25','प्रमुख मोबाइल ऐप एवं पोर्टल 2024-25','ब्रांड एंबेसडर अभियान संस्थाएं','प्रमुख त्योहार उत्सव महोत्सव','संयुक्त सैन्य अभ्यास 2024-25','बिहार विधान सभा चुनाव 2025','अंतराष्ट्रीय संगठन','प्रमुख अंतराष्ट्रीय सम्मेलन 2024-25','प्रमुख राष्ट्रीय सम्मेलन 2024-25','प्रमुख ऑपरेशन 2023-25','भारत सरकार की प्रमुख रिपोर्ट','विभिन्न सूचकांक रिपोर्ट 2024-25','आर्थिक समीक्षा 2024-25','केन्द्रीय बजट 2025-26','केंद्र सरकार की योजनाएं','राज्य सरकार की योजनाएं','आर्थिक परिदृश्य','विज्ञान एवं प्रौद्योगिकी','रक्षा एवं प्रतिरक्षा','अंतरिक्ष प्रौद्योगिकी','पर्यावरण एवं पारिस्थितिकी','राष्ट्रीय खेल पुरस्कार 2024','पुरस्कार पदक सम्मान','खेल परिदृश्य','नवीनतम पुस्तकें एवं लेखक','महत्वपूर्ण दिवस','महत्वपूर्ण सम्मेलन एवं समारोह','नवीनतम शब्द संक्षेप','समसामयिकी विविध','करेंट अफेयर्स प्रश्नोत्तर One Liner','वस्तुनिष्ठ करेंट अफेयर्स'];
+  var allTopics=['कौन क्या कहाँ','मोदी मंत्रिमंडल 3.0','राज्यों की राजधानी राज्यपाल मुख्यमंत्री','भारत के उच्च न्यायालय','विश्व के देश कौन क्या कहाँ','भारत एवं विश्व में प्रथम '+yRange,'प्रमुख समझौता ज्ञापन '+yRange,'प्रमुख मोबाइल ऐप एवं पोर्टल '+yRange,'ब्रांड एंबेसडर अभियान संस्थाएं','प्रमुख त्योहार उत्सव महोत्सव','संयुक्त सैन्य अभ्यास '+yRange,'बिहार विधान सभा चुनाव 2025','अंतराष्ट्रीय संगठन','प्रमुख अंतराष्ट्रीय सम्मेलन '+yRange,'प्रमुख राष्ट्रीय सम्मेलन '+yRange,'प्रमुख ऑपरेशन 2023-25','भारत सरकार की प्रमुख रिपोर्ट','विभिन्न सूचकांक रिपोर्ट '+yRange,'आर्थिक समीक्षा '+yRange,'केन्द्रीय बजट '+curYr+'-'+(curYr+1-2000+2000),'केंद्र सरकार की योजनाएं','राज्य सरकार की योजनाएं','आर्थिक परिदृश्य','विज्ञान एवं प्रौद्योगिकी','रक्षा एवं प्रतिरक्षा','अंतरिक्ष प्रौद्योगिकी','पर्यावरण एवं पारिस्थितिकी','राष्ट्रीय खेल पुरस्कार '+curYr,'पुरस्कार पदक सम्मान','खेल परिदृश्य','नवीनतम पुस्तकें एवं लेखक','महत्वपूर्ण दिवस','महत्वपूर्ण सम्मेलन एवं समारोह','नवीनतम शब्द संक्षेप','समसामयिकी विविध','करेंट अफेयर्स प्रश्नोत्तर One Liner','वस्तुनिष्ठ करेंट अफेयर्स'];
 
   // Pick 6 topics based on day of year (same day = same topics, different day = different topics)
   var dayOfYear=Math.floor((d-new Date(d.getFullYear(),0,0))/(1000*60*60*24));
@@ -1239,35 +1239,38 @@ function pickDCA2(btn){
 }
 
 function initCA(){
+  var curYr=new Date().getFullYear();
+  var prevYr=curYr-1;
+  var yRange=prevYr+'-'+curYr;
   var topics=[
-    {id:1,icon:'🗺️',name:'कौन, क्या, कहाँ?'},
+    {id:1,icon:'🗺️',name:'कौन, क्या, कहाँ? '+curYr},
     {id:2,icon:'🏛️',name:'मोदी मंत्रिमंडल 3.0'},
     {id:3,icon:'🏙️',name:'राज्यों की राजधानी, राज्यपाल एवं मुख्यमंत्री'},
     {id:4,icon:'⚖️',name:'भारत के उच्च न्यायालय'},
     {id:5,icon:'🌍',name:'विश्व के देश: कौन, क्या, कहाँ?'},
-    {id:6,icon:'🥇',name:'भारत एवं विश्व में प्रथम 2024-25'},
-    {id:7,icon:'🤝',name:'प्रमुख समझौता ज्ञापन 2024-25'},
-    {id:8,icon:'📱',name:'प्रमुख मोबाइल ऐप एवं पोर्टल 2024-25'},
+    {id:6,icon:'🥇',name:'भारत एवं विश्व में प्रथम '+yRange},
+    {id:7,icon:'🤝',name:'प्रमुख समझौता ज्ञापन '+yRange},
+    {id:8,icon:'📱',name:'प्रमुख मोबाइल ऐप एवं पोर्टल '+yRange},
     {id:9,icon:'🎙️',name:'ब्रांड एंबेसडर (अभियान एवं संस्थाएं)'},
     {id:10,icon:'🎉',name:'प्रमुख त्योहार, उत्सव एवं महोत्सव'},
-    {id:11,icon:'🪖',name:'संयुक्त सैन्य अभ्यास 2024-25'},
+    {id:11,icon:'🪖',name:'संयुक्त सैन्य अभ्यास '+yRange},
     {id:12,icon:'🗳️',name:'बिहार विधान सभा चुनाव 2025'},
     {id:13,icon:'🌐',name:'अंतराष्ट्रीय संगठन: एक दृष्टि में'},
-    {id:14,icon:'🏟️',name:'प्रमुख अंतराष्ट्रीय सम्मेलन 2024-25'},
-    {id:15,icon:'🏟️',name:'प्रमुख राष्ट्रीय सम्मेलन 2024-25'},
+    {id:14,icon:'🏟️',name:'प्रमुख अंतराष्ट्रीय सम्मेलन '+yRange},
+    {id:15,icon:'🏟️',name:'प्रमुख राष्ट्रीय सम्मेलन '+yRange},
     {id:16,icon:'🛡️',name:'वर्ष 2023-25 के प्रमुख ऑपरेशन'},
     {id:17,icon:'📋',name:'भारत सरकार के प्रमुख रिपोर्ट'},
     {id:18,icon:'📊',name:'विभिन्न सूचकांक/रिपोर्ट 2024-25'},
-    {id:19,icon:'💹',name:'आर्थिक समीक्षा 2024-25'},
-    {id:20,icon:'💰',name:'केन्द्रीय बजट 2025-26'},
-    {id:21,icon:'🏗️',name:'केंद्र सरकार की योजनाएँ 2014-25'},
-    {id:22,icon:'🏘️',name:'राज्य सरकार की योजनाएँ 2023-24'},
+    {id:19,icon:'💹',name:'आर्थिक समीक्षा '+yRange},
+    {id:20,icon:'💰',name:'केन्द्रीय बजट '+curYr+'-'+(curYr+1-2000+2000)},
+    {id:21,icon:'🏗️',name:'केंद्र सरकार की योजनाएँ '+curYr},
+    {id:22,icon:'🏘️',name:'राज्य सरकार की योजनाएँ '+yRange},
     {id:23,icon:'📈',name:'आर्थिक परिदृश्य'},
     {id:24,icon:'🔬',name:'विज्ञान एवं प्रौद्योगिकी'},
     {id:25,icon:'🛡️',name:'रक्षा एवं प्रतिरक्षा'},
     {id:26,icon:'🚀',name:'अंतरिक्ष प्रौद्योगिकी'},
     {id:27,icon:'🌿',name:'पर्यावरण एवं पारिस्थितिकी'},
-    {id:28,icon:'🏅',name:'राष्ट्रीय खेल पुरस्कार 2024'},
+    {id:28,icon:'🏅',name:'राष्ट्रीय खेल पुरस्कार '+curYr},
     {id:29,icon:'🏆',name:'पुरस्कार/पदक/सम्मान'},
     {id:30,icon:'⚽',name:'खेल परिदृश्य'},
     {id:31,icon:'📚',name:'नवीनतम पुस्तकें एवं लेखक'},
@@ -1290,7 +1293,7 @@ function initCA(){
     div.addEventListener('click',function(){openCATopic(this.dataset.tid,this.dataset.tname);});
     div.innerHTML='<span style="font-size:1.2rem">'+t.icon+'</span>'
       +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+t.name+'</div>'
-      +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">AI Questions • 2024-25</div></div>'
+      +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">AI Questions • '+new Date().getFullYear()+'</div></div>'
       +'<span style="font-size:.7rem;color:var(--t2)">▶</span>';
     document.getElementById('ca-sections').appendChild(div);
   });}
@@ -1311,7 +1314,7 @@ function openCATopic(id, name){
   
   var seeds=['set-A','set-B','set-C','set-D','set-E','set-F'];
   var seed=seeds[Math.floor(Math.random()*seeds.length)];
-  var prompt='Bihar Police/SSC/RRB exam expert. Generate 10 unique MCQ questions ('+seed+') on "'+name+'". 2024-2025 current affairs only. Exam PYQ style — direct, factual. Each call must generate DIFFERENT questions. Hindi Devanagari script only. ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या"}]. ans=0-3. No markdown. Only JSON.';
+  var cyear=new Date().getFullYear();var prompt='Bihar Police/SSC/RRB exam expert. Generate 10 unique MCQ questions ('+seed+') on "'+name+'". Latest '+cyear+' current affairs only. Exam PYQ style — direct, factual. Each call must generate DIFFERENT questions. Hindi Devanagari script only. ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या"}]. ans=0-3. No markdown. Only JSON.';
   
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
