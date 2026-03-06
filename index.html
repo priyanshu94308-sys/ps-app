@@ -284,43 +284,72 @@ body{display:block;height:100vh;background:var(--bg);}
     <!-- MOCK -->
     <div class="tab" id="tab-mock">
       <div id="mv1">
-        <div style="font-size:.9rem;font-weight:800;margin-bottom:8px">⏱️ Mock Test</div>
-        <div class="card">
-          <div class="sec">📊 Level</div>
-          <div class="chips" id="mLvlC">
-            <button class="chip on" onclick="setML('easy',this)">🟢 Easy</button>
-            <button class="chip" onclick="setML('moderate',this)">🟡 Moderate</button>
-            <button class="chip" onclick="setML('hard',this)">🟠 Hard</button>
+        <div style="font-size:.9rem;font-weight:800;margin-bottom:10px">📝 Mock Test</div>
+        
+        <!-- EXAM SELECT -->
+        <div class="card" style="margin-bottom:8px">
+          <div class="sec">🎯 Exam Select Karo</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap" id="examBtns">
+            <button class="chip on" onclick="setExam('Bihar Police',this)">Bihar Police</button>
+            <button class="chip" onclick="setExam('BSSC',this)">BSSC</button>
+            <button class="chip" onclick="setExam('BPSC',this)">BPSC</button>
+            <button class="chip" onclick="setExam('SSC CGL',this)">SSC CGL</button>
+            <button class="chip" onclick="setExam('SSC CHSL',this)">SSC CHSL</button>
+            <button class="chip" onclick="setExam('SSC GD',this)">SSC GD</button>
+            <button class="chip" onclick="setExam('RRB NTPC',this)">RRB NTPC</button>
+            <button class="chip" onclick="setExam('RRB Group D',this)">RRB Group D</button>
+            <button class="chip" onclick="setExam('BSF',this)">BSF</button>
+            <button class="chip" onclick="setExam('CRPF',this)">CRPF</button>
+            <button class="chip" onclick="setExam('UPSC',this)">UPSC</button>
           </div>
         </div>
-        <div class="card">
-          <div class="sec">📚 Subjects</div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px" id="mSubjC"></div>
-        </div>
-        <div class="card">
-          <div class="sec">🔢 Questions</div>
-          <div class="chips" id="mQC">
-            <button class="chip on" onclick="setMQ(10,this)">10</button>
-            <button class="chip" onclick="setMQ(25,this)">25</button>
-            <button class="chip" onclick="setMQ(50,this)">50</button>
+
+        <!-- EXAM PAPER INFO CARD -->
+        <div id="examPatternCard" style="background:var(--cd2);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--br)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:.85rem;font-weight:800" id="examPatTitle">Bihar Police Constable</div>
+            <div style="font-size:.6rem;background:rgba(124,111,255,.15);color:var(--ac);padding:3px 8px;border-radius:99px;font-weight:800" id="examPatYear">2024-25</div>
           </div>
-          <div class="sec" style="margin-top:6px">⏰ Time</div>
-          <div class="chips" id="mTC">
-            <button class="chip on" onclick="setMT(10,this)">10 min</button>
-            <button class="chip" onclick="setMT(20,this)">20 min</button>
-            <button class="chip" onclick="setMT(30,this)">30 min</button>
-            <button class="chip" onclick="setMT(60,this)">1 hr</button>
-          </div>
-          <div class="srow" style="margin-top:6px">
-            <div style="font-size:.78rem;font-weight:700">Negative Marking (-0.25)</div>
-            <button class="tog" id="negBtn" onclick="MC.neg=!MC.neg;this.className='tog'+(MC.neg?' on':'')"></button>
+          <div id="examPatSections" style="display:flex;flex-direction:column;gap:5px"></div>
+          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--br);display:flex;gap:12px">
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ac)" id="patTotalQ">100</div><div style="font-size:.52rem;color:var(--t2)">प्रश्न</div></div>
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ye)" id="patTime">120</div><div style="font-size:.52rem;color:var(--t2)">मिनट</div></div>
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--a2)" id="patNeg">नहीं</div><div style="font-size:.52rem;color:var(--t2)">Negative</div></div>
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--gr)" id="patMarks">1</div><div style="font-size:.52rem;color:var(--t2)">अंक/प्रश्न</div></div>
           </div>
         </div>
-        <button class="btn" onclick="startMock()">🚀 Mock Test Shuru!</button>
+
+        <!-- MOCK TYPE -->
+        <div class="card" style="margin-bottom:8px">
+          <div class="sec">📋 Mock Type</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="chip on" id="mt-full" onclick="setMockType('full',this)">📄 Full Paper</button>
+            <button class="chip" id="mt-half" onclick="setMockType('half',this)">📃 Half Paper</button>
+            <button class="chip" id="mt-mini" onclick="setMockType('mini',this)">📝 Mini (25Q)</button>
+            <button class="chip" id="mt-subj" onclick="setMockType('subject',this)">📚 Subject-wise</button>
+          </div>
+          <!-- Subject selector - only for subject-wise -->
+          <div id="subjSelDiv" style="display:none;margin-top:8px">
+            <div class="sec">Subject Chuno</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px" id="mSubjC"></div>
+          </div>
+        </div>
+
+        <button class="btn" style="margin-bottom:8px" onclick="startMock()">🚀 Mock Test Shuru Karo</button>
         <div class="sec">📜 Recent Tests</div>
         <div id="recentTests"></div>
       </div>
       <div id="mv2" style="display:none">
+        <!-- Section indicator -->
+        <div id="sectionBar" style="display:none;background:var(--cd2);border-radius:10px;padding:7px 10px;margin-bottom:8px;border:1px solid var(--br)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div style="font-size:.68rem;font-weight:800;color:var(--ac)" id="curSectionName">Section 1</div>
+            <div style="font-size:.62rem;color:var(--t2)" id="curSectionProgress">0/0</div>
+          </div>
+          <div style="background:var(--br);border-radius:99px;height:4px;overflow:hidden">
+            <div id="sectionProgressBar" style="height:100%;background:var(--ac);border-radius:99px;width:0%;transition:width .3s"></div>
+          </div>
+        </div>
         <div class="card">
           <div class="mtimer" id="mTimer">10:00</div>
           <div style="display:flex;justify-content:space-between;font-size:.63rem;color:var(--t2);font-weight:700;margin-top:4px">
@@ -494,7 +523,7 @@ var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[]};
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
 var MC={level:'easy',subjs:['history','polity','gk'],qCount:10,mins:10,neg:false};
-var MS={qs:[],ans:{},skip:{},cur:0,left:0,tInt:null};
+var MS={qs:[],ans:{},skip:{},cur:0,left:0,tInt:null,sections:[],curSection:0};
 var pracQs=[],pracAns={},pracC=0,pracT=0;
 var charts={w:null,s:null,m:null};
 var caAns={},caC=0,caT=0;
@@ -509,82 +538,158 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function bold(s){var p=s.split('**');var o='';for(var i=0;i<p.length;i++)o+=i%2?'<strong>'+p[i]+'</strong>':p[i];return o;}
 var EXAM_PATTERNS={
   'Bihar Police':{
-    qs:100,mins:120,
-    subjects:['GK/GS','Science','Hindi','Maths','Current Affairs'],
-    info:'100 प्रश्न • 2 घंटे • GK+Science: 70-75 • Hindi: 15 • Maths: 5-7 • No Negative Marking',
-    prompt:'Bihar Police Constable previous year papers pattern. Focus on GK, Science (Biology/Chemistry/Physics), Hindi, Bihar special GK, Current Affairs 2024-25.'
+    title:'Bihar Police Constable',qs:100,mins:120,neg:false,marks:1,
+    sections:[
+      {name:'सामान्य ज्ञान / GK',q:50,color:'#7c6fff'},
+      {name:'विज्ञान (Science)',q:25,color:'#4ade80'},
+      {name:'हिंदी',q:15,color:'#fbbf24'},
+      {name:'गणित (Maths)',q:7,color:'#60a5fa'},
+      {name:'करेंट अफेयर्स',q:3,color:'#fb923c'}
+    ],
+    prompt:'Bihar Police Constable previous year exam. GK, Science (Biology Physics Chemistry), Hindi grammar, Elementary Maths, Current Affairs 2024-25.'
   },
   'BSSC':{
-    qs:120,mins:120,
-    subjects:['GK','Hindi','Maths','Science','Reasoning'],
-    info:'120 प्रश्न • 2 घंटे • GK: 40 • Hindi: 25 • Maths: 25 • Reasoning: 20 • No Negative',
-    prompt:'BSSC (Bihar Staff Selection Commission) previous year papers pattern. General Studies, Hindi, Maths, Reasoning.'
+    title:'BSSC Stenographer/Clerk',qs:120,mins:120,neg:false,marks:1,
+    sections:[
+      {name:'सामान्य अध्ययन (GK)',q:40,color:'#7c6fff'},
+      {name:'हिंदी',q:25,color:'#fbbf24'},
+      {name:'गणित',q:25,color:'#60a5fa'},
+      {name:'तार्किक क्षमता (Reasoning)',q:20,color:'#4ade80'},
+      {name:'सामान्य विज्ञान',q:10,color:'#fb923c'}
+    ],
+    prompt:'BSSC Bihar Staff Selection Commission previous year papers. GK, Hindi, Maths, Reasoning, Science.'
   },
   'BPSC':{
-    qs:150,mins:120,
-    subjects:['GK','History','Polity','Geography','Science','Bihar GK'],
-    info:'150 प्रश्न • 2 घंटे • General Studies • Bihar Special Focus • 1/3 Negative',
-    prompt:'BPSC 70th/69th exam pattern. Bihar history, polity, geography, economy, national GK, science.'
+    title:'BPSC 70th Integrated',qs:150,mins:120,neg:true,marks:1,
+    sections:[
+      {name:'सामान्य विज्ञान',q:30,color:'#4ade80'},
+      {name:'राष्ट्रीय/अंतर्राष्ट्रीय GK',q:30,color:'#7c6fff'},
+      {name:'बिहार विशेष GK',q:30,color:'#fbbf24'},
+      {name:'भूगोल',q:20,color:'#60a5fa'},
+      {name:'इतिहास (भारत/बिहार)',q:20,color:'#fb923c'},
+      {name:'राजव्यवस्था',q:20,color:'#c084fc'}
+    ],
+    prompt:'BPSC 70th integrated exam pattern. Bihar special GK, History, Geography, Polity, Science, Economy.'
   },
   'SSC CGL':{
-    qs:100,mins:60,
-    subjects:['GK','Maths','Reasoning','English'],
-    info:'100 प्रश्न • 60 मिनट • Tier 1: GK+Maths+Reasoning+English 25-25 • 0.5 Negative',
-    prompt:'SSC CGL Tier-1 previous year papers. General Awareness, Quantitative Aptitude, Reasoning, English.'
+    title:'SSC CGL Tier-1',qs:100,mins:60,neg:true,marks:2,
+    sections:[
+      {name:'सामान्य बुद्धि/Reasoning',q:25,color:'#7c6fff'},
+      {name:'सामान्य जागरूकता (GK)',q:25,color:'#4ade80'},
+      {name:'मात्रात्मक योग्यता (Maths)',q:25,color:'#fbbf24'},
+      {name:'English Comprehension',q:25,color:'#60a5fa'}
+    ],
+    prompt:'SSC CGL Tier-1 previous year papers. Reasoning, General Awareness, Quantitative Aptitude, English.'
   },
   'SSC CHSL':{
-    qs:100,mins:60,
-    subjects:['GK','Maths','Reasoning','English'],
-    info:'100 प्रश्न • 60 मिनट • GK+Maths+Reasoning+English 25-25 • 0.5 Negative',
-    prompt:'SSC CHSL Tier-1 previous year papers pattern. Easy to moderate level questions.'
+    title:'SSC CHSL Tier-1',qs:100,mins:60,neg:true,marks:2,
+    sections:[
+      {name:'Reasoning',q:25,color:'#7c6fff'},
+      {name:'General Awareness',q:25,color:'#4ade80'},
+      {name:'Maths',q:25,color:'#fbbf24'},
+      {name:'English',q:25,color:'#60a5fa'}
+    ],
+    prompt:'SSC CHSL Tier-1 exam pattern. Easy to moderate level questions on Reasoning, GK, Maths, English.'
   },
   'SSC GD':{
-    qs:80,mins:60,
-    subjects:['GK','Hindi','Maths','Reasoning'],
-    info:'80 प्रश्न • 60 मिनट • GK: 20 • Hindi: 20 • Maths: 20 • Reasoning: 20 • 0.5 Negative',
+    title:'SSC GD Constable',qs:80,mins:60,neg:true,marks:2,
+    sections:[
+      {name:'GK/GS',q:20,color:'#7c6fff'},
+      {name:'हिंदी/English',q:20,color:'#fbbf24'},
+      {name:'गणित',q:20,color:'#60a5fa'},
+      {name:'Reasoning',q:20,color:'#4ade80'}
+    ],
     prompt:'SSC GD Constable previous year papers. Easy level. GK, Hindi, Elementary Maths, Reasoning.'
   },
   'RRB NTPC':{
-    qs:100,mins:90,
-    subjects:['GK','Maths','Reasoning'],
-    info:'100 प्रश्न • 90 मिनट • GK: 40 • Maths: 30 • Reasoning: 30 • 1/3 Negative',
-    prompt:'RRB NTPC CBT-1 previous year papers. General Awareness, Mathematics, General Intelligence.'
+    title:'RRB NTPC CBT-1',qs:100,mins:90,neg:true,marks:1,
+    sections:[
+      {name:'सामान्य जागरूकता (GK)',q:40,color:'#7c6fff'},
+      {name:'गणित',q:30,color:'#fbbf24'},
+      {name:'सामान्य बुद्धि (Reasoning)',q:30,color:'#4ade80'}
+    ],
+    prompt:'RRB NTPC CBT-1 previous year papers. General Awareness, Mathematics, General Intelligence and Reasoning.'
   },
   'RRB Group D':{
-    qs:100,mins:90,
-    subjects:['GK','Science','Maths','Reasoning'],
-    info:'100 प्रश्न • 90 मिनट • GK: 20 • Science: 25 • Maths: 25 • Reasoning: 30 • 1/3 Negative',
-    prompt:'RRB Group D previous year papers. Science (Physics/Chemistry/Biology), GK, Maths, Reasoning. Easy-moderate level.'
+    title:'RRB Group D CBT',qs:100,mins:90,neg:true,marks:1,
+    sections:[
+      {name:'सामान्य विज्ञान',q:25,color:'#4ade80'},
+      {name:'गणित',q:25,color:'#fbbf24'},
+      {name:'Reasoning',q:30,color:'#7c6fff'},
+      {name:'GK/Current Affairs',q:20,color:'#60a5fa'}
+    ],
+    prompt:'RRB Group D CBT previous year papers. Science (Physics Chemistry Biology), Maths, Reasoning, GK.'
   },
   'BSF':{
-    qs:100,mins:120,
-    subjects:['GK','Hindi','Maths','Reasoning','Science'],
-    info:'100 प्रश्न • 2 घंटे • GK+Science+Hindi+Maths+Reasoning • No Negative',
-    prompt:'BSF (Border Security Force) Head Constable/Constable previous year papers. GK, Hindi, Science, Maths.'
+    title:'BSF Head Constable',qs:100,mins:120,neg:false,marks:1,
+    sections:[
+      {name:'सामान्य ज्ञान',q:25,color:'#7c6fff'},
+      {name:'सामान्य विज्ञान',q:25,color:'#4ade80'},
+      {name:'हिंदी',q:25,color:'#fbbf24'},
+      {name:'गणित/Reasoning',q:25,color:'#60a5fa'}
+    ],
+    prompt:'BSF Head Constable/Constable previous year papers. GK, Science, Hindi, Maths, Reasoning. No negative marking.'
   },
   'CRPF':{
-    qs:100,mins:120,
-    subjects:['GK','Hindi','Maths','Reasoning'],
-    info:'100 प्रश्न • 2 घंटे • General Duty exam pattern • No Negative Marking',
-    prompt:'CRPF Constable previous year papers. GK, Hindi, Elementary Maths, Reasoning. Easy level.'
+    title:'CRPF Constable GD',qs:100,mins:120,neg:false,marks:1,
+    sections:[
+      {name:'सामान्य ज्ञान',q:25,color:'#7c6fff'},
+      {name:'हिंदी',q:25,color:'#fbbf24'},
+      {name:'गणित',q:25,color:'#60a5fa'},
+      {name:'Reasoning',q:25,color:'#4ade80'}
+    ],
+    prompt:'CRPF Constable previous year papers. Easy level. GK, Hindi, Elementary Maths, Reasoning.'
   },
   'UPSC':{
-    qs:100,mins:120,
-    subjects:['History','Polity','Geography','Economy','Science','Environment'],
-    info:'100 प्रश्न • 2 घंटे • Prelims GS Paper-1 • 1/3 Negative Marking',
-    prompt:'UPSC Civil Services Prelims GS Paper-1 previous year papers. History, Polity, Geography, Economy, Environment, Science. High difficulty.'
+    title:'UPSC Civil Services Prelims',qs:100,mins:120,neg:true,marks:2,
+    sections:[
+      {name:'इतिहास',q:15,color:'#fb923c'},
+      {name:'भूगोल',q:15,color:'#4ade80'},
+      {name:'राजव्यवस्था',q:15,color:'#7c6fff'},
+      {name:'अर्थव्यवस्था',q:15,color:'#fbbf24'},
+      {name:'पर्यावरण',q:15,color:'#60a5fa'},
+      {name:'विज्ञान/प्रौद्योगिकी',q:15,color:'#c084fc'},
+      {name:'करेंट अफेयर्स',q:10,color:'#a2ff6b'}
+    ],
+    prompt:'UPSC Civil Services Prelims GS Paper-1. History, Polity, Geography, Economy, Environment, Science, Current Affairs. High difficulty analytical questions.'
   }
 };
+var mockType='full';
+function setMockType(t,el){
+  mockType=t;
+  document.querySelectorAll('[id^="mt-"]').forEach(function(b){b.className='chip';});
+  el.className='chip on';
+  document.getElementById('subjSelDiv').style.display=t==='subject'?'block':'none';
+}
 
 function setExam(name,el){
   MC.exam=name;
   var pat=EXAM_PATTERNS[name];
   if(pat){
-    MC.qCount=Math.min(pat.qs,50);
+    MC.qCount=pat.qs;
     MC.mins=pat.mins;
-    document.getElementById('exam-info').textContent=pat.info;
+    MC.neg=pat.neg;
+    // Update pattern card
+    document.getElementById('examPatTitle').textContent=pat.title;
+    document.getElementById('patTotalQ').textContent=pat.qs;
+    document.getElementById('patTime').textContent=pat.mins;
+    document.getElementById('patNeg').textContent=pat.neg?'-0.25':'नहीं';
+    document.getElementById('patMarks').textContent=pat.marks||1;
+    // Draw sections
+    var secHtml='';
+    (pat.sections||[]).forEach(function(s){
+      var pct=Math.round((s.q/pat.qs)*100);
+      secHtml+='<div style="display:flex;align-items:center;gap:6px">'
+        +'<div style="width:10px;height:10px;border-radius:2px;background:'+s.color+';flex-shrink:0"></div>'
+        +'<div style="font-size:.68rem;flex:1">'+s.name+'</div>'
+        +'<div style="font-size:.68rem;font-weight:800;color:'+s.color+'">'+s.q+' Q</div>'
+        +'<div style="flex:2;background:var(--br);border-radius:99px;height:5px;overflow:hidden">'
+        +'<div style="width:'+pct+'%;height:100%;background:'+s.color+';border-radius:99px"></div></div>'
+        +'</div>';
+    });
+    document.getElementById('examPatSections').innerHTML=secHtml;
   }
-  document.querySelectorAll('[id^="ex-"]').forEach(function(b){b.className='chip';});
+  document.querySelectorAll('#examBtns .chip').forEach(function(b){b.className='chip';});
   el.className='chip on';
 }
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
@@ -820,9 +925,18 @@ function startMockAI(key){
   var subjNames=MC.subjs.map(function(sid){return(SUBJS.filter(function(s){return s.id===sid;})[0]||{}).name||sid;}).join(', ');
   
   var examName=MC.exam||'Bihar Police';
-  var pat=EXAM_PATTERNS[examName]||{};
+  var pat=EXAM_PATTERNS[examName]||EXAM_PATTERNS['Bihar Police'];
   var examPrompt=pat.prompt||'Bihar Police previous year papers pattern';
-  var prompt='You are a '+examName+' exam expert. Generate exactly '+MC.qCount+' MCQ questions on topics: '+subjNames+'. Pattern: '+examPrompt+'. Questions must be exactly like real '+examName+' PYQ — direct, factual, exam-style. Write ALL text in Hindi Devanagari script only. Return ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या","subj":"विषय"}]. ans=0-3. No markdown. Only JSON.';
+  // Build section-wise question distribution
+  var sections=pat.sections||[];
+  var totalQ=pat.qs||100;
+  var qCount=mockType==='full'?totalQ:mockType==='half'?Math.round(totalQ/2):mockType==='mini'?25:MC.qCount;
+  MC.qCount=qCount;MC.mins=mockType==='full'?pat.mins:mockType==='half'?Math.round(pat.mins/2):mockType==='mini'?30:pat.mins;
+  var sectionDesc=sections.map(function(s){
+    var ratio=mockType==='full'?s.q:Math.round(s.q*(qCount/totalQ));
+    return s.name+': '+ratio+' questions';
+  }).join(', ');
+  var prompt='You are a '+examName+' exam expert. Generate exactly '+qCount+' MCQ questions following EXACT '+examName+' paper pattern: '+sectionDesc+'. Pattern: '+examPrompt+'. Generate questions section-wise in exact proportions. Questions must be exactly like real '+examName+' PYQ — direct, factual. Write ALL text in Hindi Devanagari script. Return ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या","subj":"विषय"}]. ans=0-3. No markdown. Only JSON.';
 
   setTimeout(function(){
     var p=document.getElementById('aiProgress');
@@ -913,16 +1027,51 @@ function launchMock(){
   document.getElementById('mv2').style.display='block';
   document.getElementById('mv3').style.display='none';
   var ld=document.getElementById('mv_load');if(ld)ld.style.display='none';
+  
+  // Build section boundaries
+  var pat=EXAM_PATTERNS[MC.exam]||EXAM_PATTERNS['Bihar Police'];
+  var secs=pat.sections||[];
+  var total=MS.qs.length;
+  MS.sections=[];
+  var idx=0;
+  secs.forEach(function(s){
+    var cnt=Math.round(s.q*(total/(pat.qs||100)));
+    if(cnt>0&&idx<total){
+      MS.sections.push({name:s.name,start:idx,end:Math.min(idx+cnt,total),color:s.color});
+      idx+=cnt;
+    }
+  });
+  if(MS.sections.length>0){
+    document.getElementById('sectionBar').style.display='block';
+    updateSectionBar();
+  }
+  
   clearInterval(MS.tInt);
   MS.tInt=setInterval(function(){MS.left--;var m=Math.floor(MS.left/60),s=MS.left%60;var el=document.getElementById('mTimer');if(el){el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;el.className='mtimer'+(MS.left<60?' danger':MS.left<300?' warn':'');}if(MS.left<=0){clearInterval(MS.tInt);submitMock();}},1000);
   renderMQ();
 }
+
+function updateSectionBar(){
+  if(!MS.sections.length) return;
+  var cur=MS.cur;
+  var sec=MS.sections.find(function(s){return cur>=s.start&&cur<s.end;})||MS.sections[MS.sections.length-1];
+  if(!sec) return;
+  var secQ=cur-sec.start+1;
+  var secTotal=sec.end-sec.start;
+  var pct=Math.round((secQ/secTotal)*100);
+  var el=document.getElementById('curSectionName');
+  var pr=document.getElementById('curSectionProgress');
+  var pb=document.getElementById('sectionProgressBar');
+  if(el) el.textContent=sec.name;
+  if(pr) pr.textContent=secQ+'/'+secTotal;
+  if(pb){pb.style.width=pct+'%';pb.style.background=sec.color||'var(--ac)';}
+}
 function renderMQ(){var q=MS.qs[MS.cur];if(!q)return;document.getElementById('mProg').textContent='Q '+(MS.cur+1)+'/'+MS.qs.length;document.getElementById('mDone').textContent=Object.keys(MS.ans).length+' Done';document.getElementById('mPbf').style.width=(Object.keys(MS.ans).length/MS.qs.length*100)+'%';document.getElementById('mqbox').innerHTML='<div style="font-size:.69rem;color:var(--t2);margin-bottom:6px">Q'+(MS.cur+1)+' · '+(q.sname||'')+'</div><div class="qtxt">'+esc(q.q)+'</div><div style="margin-top:7px">'+q.opts.map(function(o,oi){return '<button class="opt'+(MS.ans[MS.cur]===oi?' c':'')+'" onclick="ansM('+oi+')" '+(MS.ans[MS.cur]!==undefined?'disabled':'')+'>'+esc(o)+'</button>';}).join('')+'</div>';document.getElementById('qnav').innerHTML=MS.qs.map(function(_,i){var c='qnd';if(MS.ans[i]!==undefined)c+=' a';else if(MS.skip[i])c+=' sk';if(i===MS.cur)c+=' cur';return '<div class="'+c+'" onclick="MS.cur='+i+';renderMQ()">'+(i+1)+'</div>';}).join('');}
 function ansM(oi){if(MS.ans[MS.cur]!==undefined)return;MS.ans[MS.cur]=oi;delete MS.skip[MS.cur];renderMQ();setTimeout(function(){if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();}},400);}
-function nextQ(){if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();}}
-function prevQ(){if(MS.cur>0){MS.cur--;renderMQ();}}
+function nextQ(){if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();updateSectionBar();}}
+function prevQ(){if(MS.cur>0){MS.cur--;renderMQ();updateSectionBar();}}
 function skipQ(){MS.skip[MS.cur]=true;if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();}}
-function submitMock(){
+function submitMock(){document.getElementById('sectionBar').style.display='none';
   clearInterval(MS.tInt);
   var correct=0,wrong=0,skip=0,marks=0,sw={};
   MS.qs.forEach(function(q,i){var sn=q.sname||'Other';if(!sw[sn])sw[sn]={c:0,t:0};sw[sn].t++;if(MS.ans[i]!==undefined){if(MS.ans[i]===q.ans){correct++;marks++;sw[sn].c++;}else{wrong++;if(MC.neg)marks-=0.25;}}else skip++;});
@@ -959,25 +1108,53 @@ function yogaToggle(){
 function yogaReset(){clearInterval(yInt);yRun=false;yIdx=0;yLeft=YOGA_STEPS[0].dur;document.getElementById('yBtn').textContent='▶ Start';renderYogaUI();}
 
 // CURRENT AFFAIRS
-function loadDailyCA(){
+function loadDailyCA(force){
   var key=getGKey();
   if(!key){
     document.getElementById('daily-ca-content').innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
     return;
   }
-  document.getElementById('daily-ca-content').innerHTML='<div style="text-align:center;padding:15px;color:var(--t2);font-size:.75rem">🤖 AI se load ho raha hai...</div>';
-  
+
+  // Cache key = today's date only — fresh every new day
   var d=new Date();
+  var cacheKey='dailyCA_'+d.getFullYear()+'_'+d.getMonth()+'_'+d.getDate();
+
+  // Clear all old cache keys (previous days)
+  try{
+    Object.keys(localStorage).forEach(function(k){
+      if(k.startsWith('dailyCA_') && k!==cacheKey) localStorage.removeItem(k);
+    });
+  }catch(e){}
+
+  // Use cache if same day and not forced
+  if(!force){
+    try{
+      var cached=localStorage.getItem(cacheKey);
+      if(cached){
+        document.getElementById('daily-ca-content').innerHTML=cached;
+        addDCAListeners();
+        return;
+      }
+    }catch(e){}
+  }
+
+  document.getElementById('daily-ca-content').innerHTML='<div style="text-align:center;padding:15px;color:var(--t2);font-size:.75rem">🤖 Aaj ki CA load ho rahi hai...</div>';
+
   var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var mn2=['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
   var dateStr=d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
   var dateHi=d.getDate()+' '+mn2[d.getMonth()]+' '+d.getFullYear();
-  
-  // Pick 6 random topics from 38 topic list
+
   var allTopics=['कौन क्या कहाँ','मोदी मंत्रिमंडल 3.0','राज्यों की राजधानी राज्यपाल मुख्यमंत्री','भारत के उच्च न्यायालय','विश्व के देश कौन क्या कहाँ','भारत एवं विश्व में प्रथम 2024-25','प्रमुख समझौता ज्ञापन 2024-25','प्रमुख मोबाइल ऐप एवं पोर्टल 2024-25','ब्रांड एंबेसडर अभियान संस्थाएं','प्रमुख त्योहार उत्सव महोत्सव','संयुक्त सैन्य अभ्यास 2024-25','बिहार विधान सभा चुनाव 2025','अंतराष्ट्रीय संगठन','प्रमुख अंतराष्ट्रीय सम्मेलन 2024-25','प्रमुख राष्ट्रीय सम्मेलन 2024-25','प्रमुख ऑपरेशन 2023-25','भारत सरकार की प्रमुख रिपोर्ट','विभिन्न सूचकांक रिपोर्ट 2024-25','आर्थिक समीक्षा 2024-25','केन्द्रीय बजट 2025-26','केंद्र सरकार की योजनाएं','राज्य सरकार की योजनाएं','आर्थिक परिदृश्य','विज्ञान एवं प्रौद्योगिकी','रक्षा एवं प्रतिरक्षा','अंतरिक्ष प्रौद्योगिकी','पर्यावरण एवं पारिस्थितिकी','राष्ट्रीय खेल पुरस्कार 2024','पुरस्कार पदक सम्मान','खेल परिदृश्य','नवीनतम पुस्तकें एवं लेखक','महत्वपूर्ण दिवस','महत्वपूर्ण सम्मेलन एवं समारोह','नवीनतम शब्द संक्षेप','समसामयिकी विविध','करेंट अफेयर्स प्रश्नोत्तर One Liner','वस्तुनिष्ठ करेंट अफेयर्स'];
-  var shuffled=allTopics.slice().sort(function(){return 0.5-Math.random();});
-  var todayTopics=shuffled.slice(0,6);
-  var prompt='You are Bihar Police/SSC/RRB/BSSC exam expert. Generate daily current affairs for '+dateStr+'. Cover exactly these topics: '+todayTopics.join(', ')+'. For each topic give 1 headline and 1-2 MCQs based on 2024-2025 real facts. Write ALL text in Hindi Devanagari only. Return ONLY JSON: {"date":"'+dateHi+'","items":[{"cat":"विषय नाम","headline":"एक पंक्ति में मुख्य तथ्य","mcqs":[{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या"}]}]}. No markdown. Only JSON.';
+
+  // Pick 6 topics based on day of year (same day = same topics, different day = different topics)
+  var dayOfYear=Math.floor((d-new Date(d.getFullYear(),0,0))/(1000*60*60*24));
+  var todayTopics=[];
+  for(var i=0;i<6;i++) todayTopics.push(allTopics[(dayOfYear*7+i*5)%allTopics.length]);
+
+  var curYear=d.getFullYear();
+  var prevYear=curYear-1;
+  var prompt='You are an expert for Bihar Police/SSC/RRB/BSSC exams. Generate current affairs for '+dateStr+' on topics: '+todayTopics.join(', ')+'. IMPORTANT: Use the most RECENT and LATEST facts from '+prevYear+'-'+curYear+' only — not old data. Include new appointments, new schemes, new records, new summits, new awards of '+curYear+'. Each item must have a fresh headline and 1-2 exam-style MCQs. Write ALL text in Hindi Devanagari. Return ONLY JSON: {"date":"'+dateHi+'","year":"'+curYear+'","items":[{"cat":"विषय","headline":"नवीनतम तथ्य एक पंक्ति में","mcqs":[{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या"}]}]}. No markdown. Only JSON.';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -985,11 +1162,11 @@ function loadDailyCA(){
     body:JSON.stringify({
       model:'llama-3.3-70b-versatile',
       messages:[
-        {role:'system',content:'JSON generator. Hindi Devanagari only. No markdown. Return only valid JSON.'},
+        {role:'system',content:'JSON generator. Hindi Devanagari only. No markdown. Valid JSON only.'},
         {role:'user',content:prompt}
       ],
       max_tokens:3000,
-      temperature:0.7
+      temperature:0.6
     })
   })
   .then(function(r){return r.json();})
@@ -999,15 +1176,20 @@ function loadDailyCA(){
     txt=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     var parsed=JSON.parse(txt.substring(s,e));
-    
-    var out='<div style="font-size:.65rem;color:var(--ac);font-weight:800;margin-bottom:8px">📅 '+parsed.date+'</div>';
+
+    var out='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      +'<div style="font-size:.65rem;color:var(--ac);font-weight:800">📅 '+parsed.date+'</div>'
+      +'<button onclick="loadDailyCA(true)" style="background:transparent;border:1px solid var(--br);border-radius:6px;color:var(--t2);font-size:.55rem;padding:2px 7px;cursor:pointer">🔄 Refresh</button>'
+      +'</div>';
+
     (parsed.items||[]).forEach(function(item,i){
       out+='<div style="background:var(--bg2);border-radius:9px;padding:9px;margin-bottom:7px;border-left:3px solid var(--ac)">'
-        +'<div style="font-size:.55rem;font-weight:800;color:var(--ac);text-transform:uppercase;letter-spacing:.5px">'+item.cat+'</div>'
-        +'<div style="font-size:.75rem;font-weight:700;margin:3px 0 7px">'+item.headline+'</div>';
+        +'<div style="font-size:.55rem;font-weight:800;color:var(--ac);margin-bottom:2px">'+item.cat+'</div>'
+        +'<div style="font-size:.75rem;font-weight:700;margin-bottom:6px">'+item.headline+'</div>';
       (item.mcqs||[]).forEach(function(q,j){
-        var qid='dca'+i+'_'+j;
-        out+='<div class="qcard" style="margin:0 0 5px;border-left:2px solid var(--a2)">'
+        var qid='dca'+i+'x'+j;
+        var correct=q.ans; var total=(q.opts||[]).length;
+        out+='<div class="qcard" style="margin:0 0 5px;padding:7px;border-left:2px solid var(--a2)">'
           +'<div class="qtxt" style="font-size:.73rem">'+q.q+'</div>';
         (q.opts||[]).forEach(function(o,k){
           out+='<button class="opt" id="'+qid+'k'+k+'" data-qid="'+qid+'" data-k="'+k+'" data-correct="'+correct+'" data-total="'+total+'" onclick="pickDCA2(this)">'+(o||'')+'</button>';
@@ -1017,13 +1199,23 @@ function loadDailyCA(){
       });
       out+='</div>';
     });
+
     document.getElementById('daily-ca-content').innerHTML=out;
-    toast('✅ Daily CA ready!','i');
+    // Cache today's CA
+    try{localStorage.setItem(cacheKey,out);}catch(e){}
+    toast('✅ Aaj ki CA ready!','i');
   })
   .catch(function(e){
-    document.getElementById('daily-ca-content').innerHTML='<div class="empty">❌ Error: '+e.message+'<br><button class="btn" style="margin-top:8px" onclick="loadDailyCA()">Retry</button></div>';
+    document.getElementById('daily-ca-content').innerHTML='<div class="empty">❌ '+e.message+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="loadDailyCA(true)">🔄 Retry</button></div>';
   });
 }
+
+function addDCAListeners(){
+  document.querySelectorAll('[data-qid]').forEach(function(btn){
+    btn.onclick=function(){pickDCA2(this);};
+  });
+}
+
 
 function pickDCA(qid,sel,correct,total){
   for(var k=0;k<total;k++){
