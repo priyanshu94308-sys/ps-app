@@ -819,13 +819,28 @@ function setLvl(l,el){curLvl=l;document.querySelectorAll('#lvlC .chip').forEach(
 function renderChapters(){
   if(!curSubj)return;
   var dm=(S.sStats[curSubj.id]||{}).chs||{};
-  var html=curSubj.ch.map(function(ch,i){
+  var container=document.getElementById('chList');
+  if(!container)return;
+  container.innerHTML='';
+  curSubj.ch.forEach(function(ch,i){
     var lvl=LVLARR[i%LVLARR.length];
-    if(curLvl!=='all'&&curLvl!==lvl)return '';
+    if(curLvl!=='all'&&curLvl!==lvl)return;
     var d=dm[ch]||0;
-    return '<div class="chi" onclick="openChapter('+JSON.stringify(ch)+',\''+lvl+'\')"><div style="font-size:1.1rem">'+curSubj.icon+'</div><div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+ch+'</div><div style="display:flex;gap:4px;margin-top:2px"><span class="lbg '+LVLCLS[lvl]+'">'+LVLLBL[lvl]+'</span>'+(d?'<span style="font-size:.56rem;color:var(--gr)">✅ '+d+'</span>':'')+'</div></div><div style="color:var(--t2)">›</div></div>';
-  }).filter(Boolean).join('');
-  document.getElementById('chList').innerHTML=html||'<div class="empty">Koi chapter nahi</div>';
+    var div=document.createElement('div');
+    div.className='chi';
+    div.dataset.ch=ch;
+    div.dataset.lvl=lvl;
+    div.innerHTML='<div style="font-size:1.1rem">'+curSubj.icon+'</div>'
+      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+ch+'</div>'
+      +'<div style="display:flex;gap:4px;margin-top:2px"><span class="lbg '+LVLCLS[lvl]+'">'+LVLLBL[lvl]+'</span>'
+      +(d?'<span style="font-size:.56rem;color:var(--gr)">✓ '+d+' done</span>':'')
+      +'</div></div>'
+      +'<span style="color:var(--t2);font-size:.8rem">›</span>';
+    div.addEventListener('click',function(){
+      openChapter(this.dataset.ch, this.dataset.lvl);
+    });
+    container.appendChild(div);
+  });
 }
 function openChapter(ch,lvl){
   pracQs=[];pracAns={};pracC=0;pracT=0;
