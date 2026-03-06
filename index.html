@@ -290,17 +290,17 @@ body{display:block;height:100vh;background:var(--bg);}
         <div class="card" style="margin-bottom:8px">
           <div class="sec">🎯 Exam Select Karo</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap" id="examBtns">
-            <button class="chip on" onclick="setExam('Bihar Police',this)">Bihar Police</button>
-            <button class="chip" onclick="setExam('BSSC',this)">BSSC</button>
-            <button class="chip" onclick="setExam('BPSC',this)">BPSC</button>
-            <button class="chip" onclick="setExam('SSC CGL',this)">SSC CGL</button>
-            <button class="chip" onclick="setExam('SSC CHSL',this)">SSC CHSL</button>
-            <button class="chip" onclick="setExam('SSC GD',this)">SSC GD</button>
-            <button class="chip" onclick="setExam('RRB NTPC',this)">RRB NTPC</button>
-            <button class="chip" onclick="setExam('RRB Group D',this)">RRB Group D</button>
-            <button class="chip" onclick="setExam('BSF',this)">BSF</button>
-            <button class="chip" onclick="setExam('CRPF',this)">CRPF</button>
-            <button class="chip" onclick="setExam('UPSC',this)">UPSC</button>
+            <button class="chip on" data-exam="Bihar Police" onclick="setExam('Bihar Police',this)">Bihar Police</button>
+            <button class="chip" data-exam="BSSC" onclick="setExam('BSSC',this)">BSSC</button>
+            <button class="chip" data-exam="BPSC" onclick="setExam('BPSC',this)">BPSC</button>
+            <button class="chip" data-exam="SSC CGL" onclick="setExam('SSC CGL',this)">SSC CGL</button>
+            <button class="chip" data-exam="SSC CHSL" onclick="setExam('SSC CHSL',this)">SSC CHSL</button>
+            <button class="chip" data-exam="SSC GD" onclick="setExam('SSC GD',this)">SSC GD</button>
+            <button class="chip" data-exam="RRB NTPC" onclick="setExam('RRB NTPC',this)">RRB NTPC</button>
+            <button class="chip" data-exam="RRB Group D" onclick="setExam('RRB Group D',this)">RRB Group D</button>
+            <button class="chip" data-exam="BSF" onclick="setExam('BSF',this)">BSF</button>
+            <button class="chip" data-exam="CRPF" onclick="setExam('CRPF',this)">CRPF</button>
+            <button class="chip" data-exam="UPSC" onclick="setExam('UPSC',this)">UPSC</button>
           </div>
         </div>
 
@@ -308,7 +308,7 @@ body{display:block;height:100vh;background:var(--bg);}
         <div id="examPatternCard" style="background:var(--cd2);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--br)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div style="font-size:.85rem;font-weight:800" id="examPatTitle">Bihar Police Constable</div>
-            <div style="font-size:.6rem;background:rgba(124,111,255,.15);color:var(--ac);padding:3px 8px;border-radius:99px;font-weight:800" id="examPatYear">2024-25</div>
+            <div style="font-size:.6rem;background:rgba(124,111,255,.15);color:var(--ac);padding:3px 8px;border-radius:99px;font-weight:800" id="examPatYear"></div>
           </div>
           <div id="examPatSections" style="display:flex;flex-direction:column;gap:5px"></div>
           <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--br);display:flex;gap:12px">
@@ -657,8 +657,7 @@ var EXAM_PATTERNS={
 var mockType='full';
 function setMockType(t,el){
   mockType=t;
-  document.querySelectorAll('#examBtns button,[id^="mt-"]').forEach(function(b){if(b.id&&b.id.startsWith('mt-'))b.className='chip';});
-  el.className='chip on';
+  ['mt-full','mt-half','mt-mini','mt-subj'].forEach(function(id){var b=document.getElementById(id);if(b)b.className='chip';});el.className='chip on';
   document.getElementById('subjSelDiv').style.display=t==='subject'?'block':'none';
 }
 
@@ -668,29 +667,32 @@ function setExam(name,el){
   if(pat){
     MC.qCount=pat.qs;
     MC.mins=pat.mins;
-    MC.neg=pat.neg;
+    MC.neg=pat.neg||false;
+    var cy=new Date().getFullYear();
+    var py=cy-1;
     // Update pattern card
-    document.getElementById('examPatTitle').textContent=pat.title;
+    document.getElementById('examPatTitle').textContent=pat.title||name;
+    document.getElementById('examPatYear').textContent=py+'-'+cy;
     document.getElementById('patTotalQ').textContent=pat.qs;
     document.getElementById('patTime').textContent=pat.mins;
     document.getElementById('patNeg').textContent=pat.neg?'-0.25':'नहीं';
     document.getElementById('patMarks').textContent=pat.marks||1;
-    // Draw sections
-    var secHtml='';
+    // Draw sections with progress bars
+    var secEl=document.getElementById('examPatSections');
+    secEl.innerHTML='';
     (pat.sections||[]).forEach(function(s){
-      var pct=Math.round((s.q/pat.qs)*100);
-      secHtml+='<div style="display:flex;align-items:center;gap:6px">'
-        +'<div style="width:10px;height:10px;border-radius:2px;background:'+s.color+';flex-shrink:0"></div>'
-        +'<div style="font-size:.68rem;flex:1">'+s.name+'</div>'
-        +'<div style="font-size:.68rem;font-weight:800;color:'+s.color+'">'+s.q+' Q</div>'
-        +'<div style="flex:2;background:var(--br);border-radius:99px;height:5px;overflow:hidden">'
-        +'<div style="width:'+pct+'%;height:100%;background:'+s.color+';border-radius:99px"></div></div>'
-        +'</div>';
+      var pct=Math.round((s.q/(pat.qs||100))*100);
+      var row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:2px';
+      row.innerHTML='<div style="width:8px;height:8px;border-radius:2px;background:'+s.color+';flex-shrink:0"></div>'
+        +'<div style="font-size:.65rem;flex:1;color:var(--t1)">'+s.name+'</div>'
+        +'<div style="font-size:.65rem;font-weight:800;color:'+s.color+';min-width:28px;text-align:right">'+s.q+'Q</div>'
+        +'<div style="flex:2;background:var(--br);border-radius:99px;height:4px;overflow:hidden;min-width:50px">'
+        +'<div style="width:'+pct+'%;height:100%;background:'+s.color+';border-radius:99px"></div></div>';
+      secEl.appendChild(row);
     });
-    document.getElementById('examPatSections').innerHTML=secHtml;
   }
-  document.querySelectorAll('#examBtns button').forEach(function(b){b.className='chip';});
-  el.className='chip on';
+  var eb=document.getElementById('examBtns');if(eb)eb.querySelectorAll('button').forEach(function(b){b.className='chip';});el.className='chip on';
 }
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
