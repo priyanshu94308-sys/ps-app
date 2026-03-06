@@ -290,17 +290,17 @@ body{display:block;height:100vh;background:var(--bg);}
         <div class="card" style="margin-bottom:8px">
           <div class="sec">🎯 Exam Select Karo</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap" id="examBtns">
-            <button class="chip on" data-exam="Bihar Police" onclick="setExam('Bihar Police',this)">Bihar Police</button>
-            <button class="chip" data-exam="BSSC" onclick="setExam('BSSC',this)">BSSC</button>
-            <button class="chip" data-exam="BPSC" onclick="setExam('BPSC',this)">BPSC</button>
-            <button class="chip" data-exam="SSC CGL" onclick="setExam('SSC CGL',this)">SSC CGL</button>
-            <button class="chip" data-exam="SSC CHSL" onclick="setExam('SSC CHSL',this)">SSC CHSL</button>
-            <button class="chip" data-exam="SSC GD" onclick="setExam('SSC GD',this)">SSC GD</button>
-            <button class="chip" data-exam="RRB NTPC" onclick="setExam('RRB NTPC',this)">RRB NTPC</button>
-            <button class="chip" data-exam="RRB Group D" onclick="setExam('RRB Group D',this)">RRB Group D</button>
-            <button class="chip" data-exam="BSF" onclick="setExam('BSF',this)">BSF</button>
-            <button class="chip" data-exam="CRPF" onclick="setExam('CRPF',this)">CRPF</button>
-            <button class="chip" data-exam="UPSC" onclick="setExam('UPSC',this)">UPSC</button>
+            <button class="chip on" data-exam="Bihar Police">Bihar Police</button>
+            <button class="chip" data-exam="BSSC">BSSC</button>
+            <button class="chip" data-exam="BPSC">BPSC</button>
+            <button class="chip" data-exam="SSC CGL">SSC CGL</button>
+            <button class="chip" data-exam="SSC CHSL">SSC CHSL</button>
+            <button class="chip" data-exam="SSC GD">SSC GD</button>
+            <button class="chip" data-exam="RRB NTPC">RRB NTPC</button>
+            <button class="chip" data-exam="RRB Group D">RRB Group D</button>
+            <button class="chip" data-exam="BSF">BSF</button>
+            <button class="chip" data-exam="CRPF">CRPF</button>
+            <button class="chip" data-exam="UPSC">UPSC</button>
           </div>
         </div>
 
@@ -322,11 +322,11 @@ body{display:block;height:100vh;background:var(--bg);}
         <!-- MOCK TYPE -->
         <div class="card" style="margin-bottom:8px">
           <div class="sec">📋 Mock Type</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap">
-            <button class="chip on" id="mt-full" onclick="setMockType('full',this)">📄 Full Paper</button>
-            <button class="chip" id="mt-half" onclick="setMockType('half',this)">📃 Half Paper</button>
-            <button class="chip" id="mt-mini" onclick="setMockType('mini',this)">📝 Mini (25Q)</button>
-            <button class="chip" id="mt-subj" onclick="setMockType('subject',this)">📚 Subject-wise</button>
+          <div style="display:flex;gap:5px;flex-wrap:wrap" id="mockTypeBtns">
+            <button class="chip on" id="mt-full" data-type="full">📄 Full Paper</button>
+            <button class="chip" id="mt-half" data-type="half">📃 Half Paper</button>
+            <button class="chip" id="mt-mini" data-type="mini">📝 Mini (25Q)</button>
+            <button class="chip" id="mt-subj" data-type="subject">📚 Subject-wise</button>
           </div>
           <!-- Subject selector - only for subject-wise -->
           <div id="subjSelDiv" style="display:none;margin-top:8px">
@@ -657,7 +657,7 @@ var EXAM_PATTERNS={
 var mockType='full';
 function setMockType(t,el){
   mockType=t;
-  ['mt-full','mt-half','mt-mini','mt-subj'].forEach(function(id){var b=document.getElementById(id);if(b)b.className='chip';});el.className='chip on';
+  // selection handled by event delegation
   document.getElementById('subjSelDiv').style.display=t==='subject'?'block':'none';
 }
 
@@ -692,7 +692,7 @@ function setExam(name,el){
       secEl.appendChild(row);
     });
   }
-  var eb=document.getElementById('examBtns');if(eb)eb.querySelectorAll('button').forEach(function(b){b.className='chip';});el.className='chip on';
+  // selection handled by event delegation
 }
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
