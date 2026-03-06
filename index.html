@@ -956,12 +956,13 @@ function setMT(m,el){MC.mins=m;document.querySelectorAll('#mTC .chip').forEach(f
 function toggleMS(id){var idx=MC.subjs.indexOf(id);if(idx>=0){if(MC.subjs.length===1){toast('Min 1!','e');return;}MC.subjs.splice(idx,1);el.classList.remove('on');}else{MC.subjs.push(id);el.classList.add('on');}}
 function renderRecentTests(){var el=document.getElementById('recentTests');if(!el)return;if(!S.mocks.length){el.innerHTML='<div class="empty">Koi test nahi</div>';return;}el.innerHTML=S.mocks.slice(0,5).map(function(h){var d=new Date(h.date);var c=h.pct>=80?'var(--gr)':h.pct>=60?'var(--ye)':'var(--a2)';return '<div style="background:var(--cd2);border-radius:8px;padding:7px 10px;margin-bottom:5px;border:1px solid var(--br);display:flex;align-items:center;gap:8px"><div style="font-size:.9rem;font-weight:800;color:'+c+'">'+h.pct+'%</div><div style="flex:1"><div style="font-size:.75rem;font-weight:700">'+h.level+' · '+h.qCount+'Q</div><div style="font-size:.59rem;color:var(--t2)">'+d.toLocaleDateString('hi-IN')+'</div></div><div style="font-size:.63rem;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(74,222,128,.1);color:var(--gr)">'+h.grade+'</div></div>';}).join('');}
 function startMock(){
+  // Validate exam selected
+  if(!MC.exam){toast('Pehle exam select karo!','e');return;}
+  // Validate mock type
+  if(!mockType){toast('Mock type select karo!','e');return;}
   var key=getGKey();
-  if(key){
-    startMockAI(key);
-  } else {
-    startMockOffline();
-  }
+  if(!key){toast('Settings mein Groq API key daalo!','e');return;}
+  startMockAI(key);
 }
 
 function startMockOffline(){
@@ -972,113 +973,117 @@ function startMockOffline(){
 }
 
 function startMockAI(key){
+  var examName=MC.exam;
+  var pat=EXAM_PATTERNS[examName];
+  if(!pat){toast('Exam select karo!','e');return;}
+
   document.getElementById('mv1').style.display='none';
   document.getElementById('mv2').style.display='none';
   document.getElementById('mv3').style.display='none';
-  
+
   var loadDiv=document.getElementById('mv_load');
   if(!loadDiv){loadDiv=document.createElement('div');loadDiv.id='mv_load';document.getElementById('tab-mock').appendChild(loadDiv);}
   loadDiv.style.display='block';
-  loadDiv.innerHTML='<div style="text-align:center;padding:40px 20px"><div style="font-size:3rem;margin-bottom:12px">🤖</div><div style="font-size:1rem;font-weight:800;color:var(--ac);margin-bottom:8px">AI Questions Ban Rahi Hain...</div><div style="font-size:.75rem;color:var(--t2);margin-bottom:20px">'+MC.qCount+' questions · '+MC.level+'</div><div style="background:var(--br);border-radius:99px;height:6px;overflow:hidden;width:80%;margin:0 auto"><div id="aiProgress" style="height:100%;background:linear-gradient(90deg,var(--ac),var(--a2));border-radius:99px;width:10%;transition:width 1s"></div></div><div style="font-size:.65rem;color:var(--t2);margin-top:10px" id="aiLoadTxt">Groq AI se connect ho raha hai...</div></div>';
 
-  var subjNames=MC.subjs.map(function(sid){return(SUBJS.filter(function(s){return s.id===sid;})[0]||{}).name||sid;}).join(', ');
-  
-  var examName=MC.exam||'Bihar Police';
-  var pat=EXAM_PATTERNS[examName]||EXAM_PATTERNS['Bihar Police'];
-  var examPrompt=pat.prompt||'Bihar Police previous year papers pattern';
-  // Build section-wise question distribution
-  var sections=pat.sections||[];
+  // Determine counts based on mock type
   var totalQ=pat.qs||100;
-  var qCount=mockType==='full'?totalQ:mockType==='half'?Math.round(totalQ/2):mockType==='mini'?25:MC.qCount;
-  MC.qCount=qCount;MC.mins=mockType==='full'?pat.mins:mockType==='half'?Math.round(pat.mins/2):mockType==='mini'?30:pat.mins;
-  var sectionDesc=sections.map(function(s){
-    var ratio=mockType==='full'?s.q:Math.round(s.q*(qCount/totalQ));
-    return s.name+': '+ratio+' questions';
-  }).join(', ');
-  var prompt='You are a '+examName+' exam expert. Generate exactly '+qCount+' MCQ questions following EXACT '+examName+' paper pattern: '+sectionDesc+'. Pattern: '+examPrompt+'. Generate questions section-wise in exact proportions. Questions must be exactly like real '+examName+' PYQ — direct, factual. Write ALL text in Hindi Devanagari script. Return ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या","subj":"विषय"}]. ans=0-3. No markdown. Only JSON.';
+  var qCount=mockType==='full'?Math.min(totalQ,40):mockType==='half'?Math.min(Math.round(totalQ/2),30):mockType==='mini'?15:20;
+  var mins=mockType==='full'?pat.mins:mockType==='half'?Math.round(pat.mins/2):mockType==='mini'?20:pat.mins;
+  MC.qCount=qCount; MC.mins=mins;
 
-  setTimeout(function(){
-    var p=document.getElementById('aiProgress');
-    if(p)p.style.width='40%';
-    var t=document.getElementById('aiLoadTxt');
-    if(t)t.textContent='Questions generate ho rahi hain...';
-  },800);
+  // Build section ratios
+  var sections=pat.sections||[];
+  var allQs=[];
+  var pending=sections.length;
+  var totalLoaded=0;
 
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({
-      model:'llama-3.3-70b-versatile',
-      messages:[
-        {role:'system',content:'You are a JSON generator for Indian competitive exams. Always respond with only valid JSON arrays. Write all questions, options and explanations in Hindi Devanagari script. No markdown.'},
-        {role:'user',content:prompt}
-      ],
-      max_tokens:4000,
-      temperature:0.5
+  function updateLoad(msg){
+    loadDiv.innerHTML='<div style="text-align:center;padding:30px 20px">'
+      +'<div style="font-size:2.5rem;margin-bottom:10px">🤖</div>'
+      +'<div style="font-size:.9rem;font-weight:800;color:var(--ac);margin-bottom:6px">'+examName+' Mock</div>'
+      +'<div style="font-size:.72rem;color:var(--t2);margin-bottom:14px">'+msg+'</div>'
+      +'<div style="background:var(--br);border-radius:99px;height:5px;overflow:hidden;width:80%;margin:0 auto">'
+      +'<div style="height:100%;background:linear-gradient(90deg,var(--ac),var(--a2));border-radius:99px;width:'
+      +Math.round((totalLoaded/sections.length)*100)+'%;transition:width .5s"></div></div>'
+      +'<div style="font-size:.62rem;color:var(--t2);margin-top:8px">Section '+totalLoaded+'/'+sections.length+' done</div>'
+      +'</div>';
+  }
+
+  updateLoad('Loading...');
+
+  sections.forEach(function(sec,si){
+    var secQ=Math.max(2,Math.round(sec.q*(qCount/totalQ)));
+    var prompt='You are '+examName+' exam expert. Generate exactly '+secQ+' MCQ for section "'+sec.name+'". Topics: '+sec.topics+'. Style exactly like '+examName+' PYQ. Hindi Devanagari only. Return ONLY JSON array: [{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"brief"}]. No markdown.';
+
+    fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({
+        model:'llama-3.1-8b-instant',
+        messages:[{role:'system',content:'JSON array generator. Hindi Devanagari only. No markdown. Valid JSON only.'},{role:'user',content:prompt}],
+        max_tokens:2000,temperature:0.5
+      })
     })
-  })
-  .then(function(r){
-    if(r.status===429){
-      // Rate limit - wait and retry with smaller model
-      var ld=document.getElementById('aiLoadTxt');if(ld)ld.textContent='Rate limit — 10 sec wait...';
-      return new Promise(function(res){setTimeout(function(){
-        fetch('https://api.groq.com/openai/v1/chat/completions',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-          body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'system',content:'JSON generator for Indian exams. Hindi Devanagari only. No markdown.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.5})
-        }).then(res);
-      },10000);});
-    }
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json();
-  })
-  .then(function(data){
-    var p=document.getElementById('aiProgress');if(p)p.style.width='80%';
-    var t=document.getElementById('aiLoadTxt');if(t)t.textContent='Questions parse ho rahi hain...';
-    
-    if(data.error) throw new Error(data.error.message||'API Error');
-    
-    var txt=data.choices[0].message.content;
-    console.log('AI Response:',txt.substring(0,200));
-    
-    // Clean response
-    txt=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
-    
-    // Find JSON array
-    var s=txt.indexOf('[');
-    var e=txt.lastIndexOf(']');
-    if(s===-1||e===-1) throw new Error('No JSON array in response');
-    
-    var arr=JSON.parse(txt.substring(s,e+1));
-    if(!Array.isArray(arr)||arr.length===0) throw new Error('Empty questions array');
-    
-    MS.qs=arr.map(function(q,i){
-      var ans=parseInt(q.ans)||0;
-      if(ans<0||ans>3) ans=0;
-      return {
-        q:q.q||q.question||('Question '+(i+1)),
-        opts:q.opts||q.options||['(A) A','(B) B','(C) C','(D) D'],
-        ans:ans,
-        sol:q.sol||q.explanation||q.solution||'',
-        sname:q.subj||q.subject||subjNames
-      };
+    .then(function(r){
+      if(r.status===429) throw new Error('Rate limit');
+      return r.json();
+    })
+    .then(function(data){
+      if(data.error) throw new Error(data.error.message);
+      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var arr=safeParseJSON(txt);
+      arr.slice(0,secQ).forEach(function(q){
+        allQs.push({
+          q:q.q||'?',
+          opts:q.opts||['(A)','(B)','(C)','(D)'],
+          ans:parseInt(q.ans)||0,
+          sol:q.sol||'',
+          sname:sec.name,
+          secColor:sec.color,
+          secIdx:si
+        });
+      });
+      totalLoaded++;
+      updateLoad(sec.name+' done ✅');
+      if(totalLoaded===sections.length) finishMock();
+    })
+    .catch(function(e){
+      console.log('Section error:',sec.name,e.message);
+      totalLoaded++;
+      updateLoad(sec.name+' — error, skipped');
+      if(totalLoaded===sections.length) finishMock();
     });
-    
-    MS.ans={};MS.skip={};MS.cur=0;MS.left=MC.mins*60;
-    var p2=document.getElementById('aiProgress');if(p2)p2.style.width='100%';
-    
-    setTimeout(function(){
-      loadDiv.style.display='none';
-      launchMock();
-      toast('✅ '+MS.qs.length+' AI questions ready!','i');
-    },500);
-  })
-  .catch(function(err){
-    console.log('AI Mock Error:',err);
-    loadDiv.style.display='none';
-    toast('AI error — Offline mode! '+err.message,'e');
-    startMockOffline();
   });
+
+  function finishMock(){
+    if(allQs.length===0){
+      loadDiv.style.display='none';
+      document.getElementById('mv1').style.display='block';
+      toast('Questions load nahi hui! Retry karo.','e');
+      return;
+    }
+    MS.qs=allQs; MS.ans={}; MS.skip={}; MS.cur=0; MS.left=MC.mins*60;
+    setTimeout(function(){loadDiv.style.display='none';launchMock();toast('✅ '+allQs.length+' questions ready!','i');},500);
+  }
+}
+
+function safeParseJSON(txt){
+  var s=txt.indexOf('['); if(s===-1)return [];
+  try{var e=txt.lastIndexOf(']');return JSON.parse(txt.substring(s,e+1));}
+  catch(ex){
+    var objs=[],depth=0,start=-1,inStr=false,esc=false;
+    var partial=txt.substring(s);
+    for(var i=0;i<partial.length;i++){
+      var c=partial[i];
+      if(esc){esc=false;continue;}
+      if(c==='\\'&&inStr){esc=true;continue;}
+      if(c==='"'){inStr=!inStr;continue;}
+      if(inStr)continue;
+      if(c==='{'){if(depth===0)start=i;depth++;}
+      else if(c==='}'){depth--;if(depth===0&&start>=0){try{objs.push(JSON.parse(partial.substring(start,i+1)));}catch(e2){}start=-1;}}
+    }
+    return objs;
+  }
 }
 
 function launchMock(){
