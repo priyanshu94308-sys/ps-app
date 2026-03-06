@@ -290,7 +290,7 @@ body{display:block;height:100vh;background:var(--bg);}
         <div class="card" style="margin-bottom:8px">
           <div class="sec">🎯 Exam Select Karo</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap" id="examBtns">
-            <button class="chip on" data-exam="Bihar Police">Bihar Police</button>
+            <button class="chip" data-exam="Bihar Police">Bihar Police</button>
             <button class="chip" data-exam="BSSC">BSSC</button>
             <button class="chip" data-exam="BPSC">BPSC</button>
             <button class="chip" data-exam="SSC CGL">SSC CGL</button>
@@ -307,14 +307,14 @@ body{display:block;height:100vh;background:var(--bg);}
         <!-- EXAM PAPER INFO CARD -->
         <div id="examPatternCard" style="background:var(--cd2);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--br)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:.85rem;font-weight:800" id="examPatTitle">Bihar Police Constable</div>
+            <div style="font-size:.85rem;font-weight:800" id="examPatTitle">Exam Select Karo</div>
             <div style="font-size:.6rem;background:rgba(124,111,255,.15);color:var(--ac);padding:3px 8px;border-radius:99px;font-weight:800" id="examPatYear"></div>
           </div>
           <div id="examPatSections" style="display:flex;flex-direction:column;gap:5px"></div>
           <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--br);display:flex;gap:12px">
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ac)" id="patTotalQ">100</div><div style="font-size:.52rem;color:var(--t2)">प्रश्न</div></div>
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ye)" id="patTime">120</div><div style="font-size:.52rem;color:var(--t2)">मिनट</div></div>
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--a2)" id="patNeg">नहीं</div><div style="font-size:.52rem;color:var(--t2)">Negative</div></div>
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ac)" id="patTotalQ">-</div><div style="font-size:.52rem;color:var(--t2)">प्रश्न</div></div>
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ye)" id="patTime">-</div><div style="font-size:.52rem;color:var(--t2)">मिनट</div></div>
+            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--a2)" id="patNeg">-</div><div style="font-size:.52rem;color:var(--t2)">Negative</div></div>
             <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--gr)" id="patMarks">1</div><div style="font-size:.52rem;color:var(--t2)">अंक/प्रश्न</div></div>
           </div>
         </div>
@@ -323,7 +323,7 @@ body{display:block;height:100vh;background:var(--bg);}
         <div class="card" style="margin-bottom:8px">
           <div class="sec">📋 Mock Type</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap" id="mockTypeBtns">
-            <button class="chip on" id="mt-full" data-type="full">📄 Full Paper</button>
+            <button class="chip" id="mt-full" data-type="full">📄 Full Paper</button>
             <button class="chip" id="mt-half" data-type="half">📃 Half Paper</button>
             <button class="chip" id="mt-mini" data-type="mini">📝 Mini (25Q)</button>
             <button class="chip" id="mt-subj" data-type="subject">📚 Subject-wise</button>
@@ -655,13 +655,13 @@ var EXAM_PATTERNS={
   }
 };
 var mockType='full';
-function setMockType(t,el){
+function setMockType(t){
   mockType=t;
   // selection handled by event delegation
   document.getElementById('subjSelDiv').style.display=t==='subject'?'block':'none';
 }
 
-function setExam(name,el){
+function setExam(name){
   MC.exam=name;
   var pat=EXAM_PATTERNS[name];
   if(pat){
@@ -890,13 +890,55 @@ function ansP(qi,oi){if(pracAns[qi])return;var ok=oi===pracQs[qi].ans;pracAns[qi
 
 // MOCK
 function initMockSetup(){
-  document.getElementById('mSubjC').innerHTML=SUBJS.map(function(s){var on=MC.subjs.indexOf(s.id)>=0;return '<button class="chip'+(on?' on':'')+'" onclick="toggleMS(\''+s.id+'\',this)">'+s.icon+' '+s.name+'</button>';}).join('');
+  document.getElementById('mSubjC').innerHTML=SUBJS.map(function(s){var on=MC.subjs.indexOf(s.id)>=0;return '<button class="chip'+(on?' on':'')+'" data-subj="'+s.id+'">'+s.icon+' '+s.name+'</button>';}).join('');
+  
+  // Exam single-select
+  var eb=document.getElementById('examBtns');
+  if(eb&&!eb.dataset.init){
+    eb.dataset.init='1';
+    eb.addEventListener('click',function(e){
+      var btn=e.target.closest('button[data-exam]');
+      if(!btn)return;
+      eb.querySelectorAll('button').forEach(function(b){b.className='chip';});
+      btn.className='chip on';
+      setExam(btn.dataset.exam);
+    });
+
+  }
+
+  // Mock type single-select
+  var mb=document.getElementById('mockTypeBtns');
+  if(mb&&!mb.dataset.init){
+    mb.dataset.init='1';
+    mb.addEventListener('click',function(e){
+      var btn=e.target.closest('button[data-type]');
+      if(!btn)return;
+      mb.querySelectorAll('button').forEach(function(b){b.className='chip';});
+      btn.className='chip on';
+      setMockType(btn.dataset.type);
+    });
+  }
+
+  // Subject multi-select
+  var sc=document.getElementById('mSubjC');
+  if(sc&&!sc.dataset.init){
+    sc.dataset.init='1';
+    sc.addEventListener('click',function(e){
+      var btn=e.target.closest('button[data-subj]');
+      if(!btn)return;
+      var id=btn.dataset.subj;
+      var idx=MC.subjs.indexOf(id);
+      if(idx>=0){if(MC.subjs.length>1){MC.subjs.splice(idx,1);btn.className='chip';}}
+      else{MC.subjs.push(id);btn.className='chip on';}
+    });
+  }
+
   renderRecentTests();
 }
 function setML(l,el){MC.level=l;document.querySelectorAll('#mLvlC .chip').forEach(function(c){c.classList.remove('on');});if(el)el.classList.add('on');}
 function setMQ(n,el){MC.qCount=n;document.querySelectorAll('#mQC .chip').forEach(function(c){c.classList.remove('on');});if(el)el.classList.add('on');}
 function setMT(m,el){MC.mins=m;document.querySelectorAll('#mTC .chip').forEach(function(c){c.classList.remove('on');});if(el)el.classList.add('on');}
-function toggleMS(id,el){var idx=MC.subjs.indexOf(id);if(idx>=0){if(MC.subjs.length===1){toast('Min 1!','e');return;}MC.subjs.splice(idx,1);el.classList.remove('on');}else{MC.subjs.push(id);el.classList.add('on');}}
+function toggleMS(id){var idx=MC.subjs.indexOf(id);if(idx>=0){if(MC.subjs.length===1){toast('Min 1!','e');return;}MC.subjs.splice(idx,1);el.classList.remove('on');}else{MC.subjs.push(id);el.classList.add('on');}}
 function renderRecentTests(){var el=document.getElementById('recentTests');if(!el)return;if(!S.mocks.length){el.innerHTML='<div class="empty">Koi test nahi</div>';return;}el.innerHTML=S.mocks.slice(0,5).map(function(h){var d=new Date(h.date);var c=h.pct>=80?'var(--gr)':h.pct>=60?'var(--ye)':'var(--a2)';return '<div style="background:var(--cd2);border-radius:8px;padding:7px 10px;margin-bottom:5px;border:1px solid var(--br);display:flex;align-items:center;gap:8px"><div style="font-size:.9rem;font-weight:800;color:'+c+'">'+h.pct+'%</div><div style="flex:1"><div style="font-size:.75rem;font-weight:700">'+h.level+' · '+h.qCount+'Q</div><div style="font-size:.59rem;color:var(--t2)">'+d.toLocaleDateString('hi-IN')+'</div></div><div style="font-size:.63rem;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(74,222,128,.1);color:var(--gr)">'+h.grade+'</div></div>';}).join('');}
 function startMock(){
   var key=getGKey();
@@ -1068,8 +1110,72 @@ function updateSectionBar(){
   if(pr) pr.textContent=secQ+'/'+secTotal;
   if(pb){pb.style.width=pct+'%';pb.style.background=sec.color||'var(--ac)';}
 }
-function renderMQ(){var q=MS.qs[MS.cur];if(!q)return;document.getElementById('mProg').textContent='Q '+(MS.cur+1)+'/'+MS.qs.length;document.getElementById('mDone').textContent=Object.keys(MS.ans).length+' Done';document.getElementById('mPbf').style.width=(Object.keys(MS.ans).length/MS.qs.length*100)+'%';document.getElementById('mqbox').innerHTML='<div style="font-size:.69rem;color:var(--t2);margin-bottom:6px">Q'+(MS.cur+1)+' · '+(q.sname||'')+'</div><div class="qtxt">'+esc(q.q)+'</div><div style="margin-top:7px">'+q.opts.map(function(o,oi){return '<button class="opt'+(MS.ans[MS.cur]===oi?' c':'')+'" onclick="ansM('+oi+')" '+(MS.ans[MS.cur]!==undefined?'disabled':'')+'>'+esc(o)+'</button>';}).join('')+'</div>';document.getElementById('qnav').innerHTML=MS.qs.map(function(_,i){var c='qnd';if(MS.ans[i]!==undefined)c+=' a';else if(MS.skip[i])c+=' sk';if(i===MS.cur)c+=' cur';return '<div class="'+c+'" onclick="MS.cur='+i+';renderMQ()">'+(i+1)+'</div>';}).join('');}
-function ansM(oi){if(MS.ans[MS.cur]!==undefined)return;MS.ans[MS.cur]=oi;delete MS.skip[MS.cur];renderMQ();setTimeout(function(){if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();}},400);}
+function renderMQ(){
+  var q=MS.qs[MS.cur];
+  if(!q)return;
+  document.getElementById('mProg').textContent='Q '+(MS.cur+1)+'/'+MS.qs.length;
+  document.getElementById('mDone').textContent=Object.keys(MS.ans).length+' Done';
+  document.getElementById('mPbf').style.width=(Object.keys(MS.ans).length/MS.qs.length*100)+'%';
+  
+  // Find current section
+  var secName=q.sname||'';
+  var secColor='var(--ac)';
+  if(MS.sections&&MS.sections.length){
+    var sec=MS.sections.find(function(s){return MS.cur>=s.start&&MS.cur<s.end;});
+    if(sec){secName=sec.name;secColor=sec.color||'var(--ac)';}
+  }
+  
+  // Sol shown?
+  var solShown=MS.ans[MS.cur]!==undefined;
+  var solHtml='';
+  if(solShown&&q.sol){
+    var correct=q.ans;
+    var userAns=MS.ans[MS.cur];
+    var isRight=userAns===correct;
+    solHtml='<div style="margin-top:8px;padding:8px;border-radius:8px;background:'+(isRight?'rgba(74,222,128,.1)':'rgba(255,107,107,.1)')+';border-left:3px solid '+(isRight?'#4ade80':'#ff6b6b')+'">'
+      +'<div style="font-size:.65rem;font-weight:800;color:'+(isRight?'#4ade80':'#ff6b6b')+';">'+(isRight?'✅ सही!':'❌ गलत! सही: '+q.opts[correct])+'</div>'
+      +'<div style="font-size:.65rem;color:var(--t2);margin-top:3px">'+esc(q.sol)+'</div>'
+      +'</div>';
+  }
+  
+  document.getElementById('mqbox').innerHTML=
+    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+    +'<div style="background:'+secColor+';color:#fff;font-size:.52rem;font-weight:800;padding:2px 7px;border-radius:99px">'+secName+'</div>'
+    +'<div style="font-size:.6rem;color:var(--t2)">Q'+(MS.cur+1)+'/'+MS.qs.length+'</div>'
+    +'</div>'
+    +'<div class="qtxt">'+esc(q.q)+'</div>'
+    +'<div style="margin-top:7px">'
+    +q.opts.map(function(o,oi){
+      var cls='opt';
+      if(MS.ans[MS.cur]!==undefined){
+        if(oi===q.ans)cls='opt c';
+        else if(oi===MS.ans[MS.cur])cls='opt w';
+      }
+      return '<button class="'+cls+'" onclick="ansM('+oi+')" '+(MS.ans[MS.cur]!==undefined?'disabled':'')+'>'+esc(o)+'</button>';
+    }).join('')
+    +'</div>'
+    +solHtml;
+  
+  // Question navigator - color coded by section
+  document.getElementById('qnav').innerHTML=MS.qs.map(function(_,i){
+    var c='qnd';
+    if(MS.ans[i]!==undefined)c+=' a';
+    else if(MS.skip[i])c+=' sk';
+    if(i===MS.cur)c+=' cur';
+    // Section color dot
+    var sc='';
+    if(MS.sections&&MS.sections.length){
+      var s=MS.sections.find(function(s){return i>=s.start&&i<s.end;});
+      if(s)sc=' style="border-top:2px solid '+s.color+'"';
+    }
+    return '<div class="'+c+'"'+sc+' onclick="goQ('+i+')">'+(i+1)+'</div>';
+  }).join('');
+  
+  updateSectionBar();
+}
+
+function goQ(i){MS.cur=i;renderMQ();}
+function ansM(oi){if(MS.ans[MS.cur]!==undefined)return;MS.ans[MS.cur]=oi;delete MS.skip[MS.cur];renderMQ();setTimeout(function(){if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();updateSectionBar();}},900);}
 function nextQ(){if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();updateSectionBar();}}
 function prevQ(){if(MS.cur>0){MS.cur--;renderMQ();updateSectionBar();}}
 function skipQ(){MS.skip[MS.cur]=true;if(MS.cur<MS.qs.length-1){MS.cur++;renderMQ();}}
