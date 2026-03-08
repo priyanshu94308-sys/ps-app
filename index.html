@@ -3202,9 +3202,18 @@ function initFirebase(){
     firebase.initializeApp(firebaseConfig);
     db=firebase.firestore();
     auth=firebase.auth();
-    // Handle redirect result
-    auth.getRedirectResult().catch(function(e){console.error('Redirect error:',e);});
-    // Auth state listener
+    // Handle Google redirect result
+    auth.getRedirectResult().then(function(result){
+      if(result && result.user){
+        setLoginStatus('✅ Login ho gaya!','s');
+      }
+    }).catch(function(e){
+      console.error('Redirect error:',e);
+      if(e.code !== 'auth/no-current-user'){
+        setLoginStatus('❌ '+e.message,'e');
+      }
+    });
+    // onAuthStateChanged — single source of truth
     auth.onAuthStateChanged(function(user){
       if(user){
         currentUser=user;
