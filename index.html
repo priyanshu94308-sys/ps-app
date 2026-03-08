@@ -916,93 +916,7 @@ body::before{
       </div>
     </div>
     <!-- MOCK -->
-    <div class="tab" id="tab-mock">
-      <div id="mv1">
-        <div style="font-size:1rem;font-weight:900;margin-bottom:14px;letter-spacing:-.2px">📝 Mock Test <span style="font-size:.65rem;font-weight:700;color:var(--t2);letter-spacing:0">Real exam jaise practice karo</span></div>
-        
-        <!-- EXAM SELECT -->
-        <div class="card" style="margin-bottom:8px">
-          <div class="sec">🎯 Exam Select Karo</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap" id="examBtns">
-            <button class="chip" data-exam="Bihar Police">Bihar Police</button>
-            <button class="chip" data-exam="BSSC">BSSC</button>
-            <button class="chip" data-exam="BPSC">BPSC</button>
-            <button class="chip" data-exam="SSC CGL">SSC CGL</button>
-            <button class="chip" data-exam="SSC CHSL">SSC CHSL</button>
-            <button class="chip" data-exam="SSC GD">SSC GD</button>
-            <button class="chip" data-exam="RRB NTPC">RRB NTPC</button>
-            <button class="chip" data-exam="RRB Group D">RRB Group D</button>
-            <button class="chip" data-exam="BSF">BSF</button>
-            <button class="chip" data-exam="CRPF">CRPF</button>
-            <button class="chip" data-exam="UPSC">UPSC</button>
-          </div>
-        </div>
-
-        <!-- EXAM PAPER INFO CARD -->
-        <div id="examPatternCard" style="background:var(--cd2);border-radius:12px;padding:12px;margin-bottom:8px;border:1px solid var(--br)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:.85rem;font-weight:800" id="examPatTitle">Exam Select Karo</div>
-            <div style="font-size:.6rem;background:rgba(124,111,255,.15);color:var(--ac);padding:3px 8px;border-radius:99px;font-weight:800" id="examPatYear"></div>
-          </div>
-          <div id="examPatSections" style="display:flex;flex-direction:column;gap:5px"></div>
-          <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--br);display:flex;gap:12px">
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ac)" id="patTotalQ">-</div><div style="font-size:.52rem;color:var(--t2)">प्रश्न</div></div>
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--ye)" id="patTime">-</div><div style="font-size:.52rem;color:var(--t2)">मिनट</div></div>
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--a2)" id="patNeg">-</div><div style="font-size:.52rem;color:var(--t2)">Negative</div></div>
-            <div style="text-align:center"><div style="font-size:.95rem;font-weight:800;color:var(--gr)" id="patMarks">1</div><div style="font-size:.52rem;color:var(--t2)">अंक/प्रश्न</div></div>
-          </div>
-        </div>
-
-        <!-- MOCK TYPE -->
-        <div class="card" style="margin-bottom:8px">
-          <div class="sec">📋 Mock Type</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap" id="mockTypeBtns">
-            <button class="chip" id="mt-full" data-type="full">📄 Full Paper</button>
-            <button class="chip" id="mt-half" data-type="half">📃 Half Paper</button>
-            <button class="chip" id="mt-mini" data-type="mini">📝 Mini (25Q)</button>
-            <button class="chip" id="mt-subj" data-type="subject">📚 Subject-wise</button>
-          </div>
-          <!-- Subject selector - only for subject-wise -->
-          <div id="subjSelDiv" style="display:none;margin-top:8px">
-            <div class="sec">Subject Chuno</div>
-            <div style="display:flex;flex-wrap:wrap;gap:5px" id="mSubjC"></div>
-          </div>
-        </div>
-
-        <button class="btn" onclick="startMock()">🚀  Mock Test Shuru Karo</button>
-        <div class="sec">📜 Recent Tests</div>
-        <div id="recentTests"></div>
-      </div>
-      <div id="mv2" style="display:none">
-        <!-- Section indicator -->
-        <div id="sectionBar" style="display:none;background:var(--cd2);border-radius:10px;padding:7px 10px;margin-bottom:8px;border:1px solid var(--br)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <div style="font-size:.68rem;font-weight:800;color:var(--ac)" id="curSectionName">Section 1</div>
-            <div style="font-size:.62rem;color:var(--t2)" id="curSectionProgress">0/0</div>
-          </div>
-          <div style="background:var(--br);border-radius:99px;height:4px;overflow:hidden">
-            <div id="sectionProgressBar" style="height:100%;background:var(--ac);border-radius:99px;width:0%;transition:width .3s"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="mtimer" id="mTimer">10:00</div>
-          <div style="display:flex;justify-content:space-between;font-size:.63rem;color:var(--t2);font-weight:700;margin-top:4px">
-            <span id="mProg">Q 1/10</span><span id="mDone">0 Done</span>
-          </div>
-          <div class="mpb"><div class="mpbf" id="mPbf" style="width:0%"></div></div>
-          <div class="qnav" id="qnav"></div>
-        </div>
-        <div class="card" id="mqbox"></div>
-        <div style="display:flex;gap:6px;margin-bottom:7px">
-          <button class="nbtn s" onclick="skipQ()">⏭ Skip</button>
-          <button class="nbtn" onclick="prevQ()">← Prev</button>
-          <button class="nbtn p" onclick="nextQ()">Next →</button>
-        </div>
-        <button class="btn" style="background:linear-gradient(135deg,var(--gr),#16a34a)" onclick="submitMock()">✅ Submit</button>
-      </div>
-      <div id="mv3" style="display:none"><div id="resultContent"></div></div>
-    </div>
-    <!-- YOGA -->
+        <!-- YOGA -->
     <div class="tab" id="tab-yoga">
       <div class="yscene">
         <div style="width:100%;height:130px;position:relative;margin-bottom:8px">
@@ -1123,7 +1037,6 @@ body::before{
   <div class="tabbar">
     <button class="tb on" onclick="sw('home')" id="tb-home"><span>🏠</span>Home</button>
     <button class="tb" onclick="sw('practice')" id="tb-practice"><span>📚</span>Practice</button>
-    <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
     <button class="tb" onclick="sw('yoga')" id="tb-yoga"><span>🧘</span>Yoga</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
@@ -2492,6 +2405,15 @@ function initFirebase(){
     db = firebase.firestore();
     auth = firebase.auth();
 
+    // Handle redirect result (after signInWithRedirect)
+    auth.getRedirectResult().then(function(result){
+      if(result && result.user){
+        // Redirect login success - handled by onAuthStateChanged
+      }
+    }).catch(function(err){
+      console.error('Redirect result error:', err);
+    });
+
     // Listen to auth state
     auth.onAuthStateChanged(function(user){
       if(user){
@@ -2524,16 +2446,23 @@ function signInWithGoogle(){
   status.style.color = 'var(--ye)';
 
   var provider = new firebase.auth.GoogleAuthProvider();
+  // Try popup first, fallback to redirect
   auth.signInWithPopup(provider)
     .then(function(result){
-      status.textContent = '✅ Done!';
+      status.textContent = '✅ Login ho gaya!';
       status.style.color = 'var(--gr)';
     })
     .catch(function(err){
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      status.textContent = '❌ ' + (err.message || 'Error');
-      status.style.color = 'var(--a2)';
+      // Popup blocked or not supported - use redirect
+      if(err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request'){
+        status.textContent = '↩️ Redirect se try kar rahe hain...';
+        auth.signInWithRedirect(provider);
+      } else {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        status.textContent = '❌ ' + (err.message || 'Error');
+        status.style.color = 'var(--a2)';
+      }
     });
 }
 
