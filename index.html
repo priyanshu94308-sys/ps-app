@@ -2003,35 +2003,106 @@ function initCA(){
     document.getElementById('ca-sections').appendChild(div);
   });}
 
-function openCATopic(id, name){
+// ── CA QUESTION HISTORY (anti-repeat) ──
+var _caHistory={};
+function _getCAHistory(tid){
+  if(!_caHistory[tid]){try{var s=localStorage.getItem('ca_h_'+tid);_caHistory[tid]=s?JSON.parse(s):[];}catch(e){_caHistory[tid]=[];}}
+  return _caHistory[tid];
+}
+function _saveCAHistory(tid,arr){
+  var h=_getCAHistory(tid);
+  arr.forEach(function(q){var t=(q.q||'').substring(0,60);if(h.indexOf(t)===-1)h.push(t);});
+  if(h.length>150)h=h.slice(h.length-150);
+  _caHistory[tid]=h;
+  try{localStorage.setItem('ca_h_'+tid,JSON.stringify(h));}catch(e){}
+}
+
+function openCATopic(id,name){
   document.getElementById('ca-list').style.display='none';
   document.getElementById('ca-detail').style.display='block';
   document.getElementById('ca-detail-title').textContent=name;
   var rb=document.getElementById('ca-refresh-btn');
-  if(rb){rb.onclick=function(){openCATopic(id,name);};}
-  document.getElementById('ca-detail-content').innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:2.5rem">🤖</div><div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">AI Questions Ban Rahi Hain...</div><div style="font-size:.7rem;color:var(--t2)">'+name+'</div></div>';
-  
-  var key=getGKey();
-  if(!key){
-    document.getElementById('ca-detail-content').innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
-    return;
+  if(rb){rb.onclick=function(){
+    _caHistory[id]=[];
+    try{localStorage.removeItem('ca_h_'+id);}catch(e){}
+    _loadCAQ(id,name,false);
+  };}
+  _loadCAQ(id,name,false);
+}
+
+function _loadCAQ(id,name,more){
+  var cont=document.getElementById('ca-detail-content');
+  if(!more){
+    cont.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:2.5rem">🤖</div>'
+      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Questions Ban Rahi Hain...</div>'
+      +'<div style="font-size:.68rem;color:var(--t2)">'+name+'</div>'
+      +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
+  } else {
+    var ind=document.createElement('div');
+    ind.id='ca_ind';
+    ind.innerHTML='<div style="text-align:center;padding:10px;color:var(--t2);font-size:.72rem">⏳ Aur 15 questions aa rahe hain...</div>';
+    cont.appendChild(ind);
   }
-  
-  var seeds=['set-A','set-B','set-C','set-D','set-E','set-F'];
-  var seed=seeds[Math.floor(Math.random()*seeds.length)];
-  var cyear=new Date().getFullYear();var prompt='Bihar Police/SSC/RRB exam expert. Generate 10 unique MCQ questions ('+seed+') on "'+name+'". Latest '+cyear+' current affairs only. Exam PYQ style — direct, factual. Each call must generate DIFFERENT questions. Hindi Devanagari script only. ONLY JSON array: [{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":0,"sol":"व्याख्या"}]. ans=0-3. No markdown. Only JSON.';
-  
+
+  var key=getGKey();
+  if(!key){cont.innerHTML='<div class="empty">🔑 Groq key daalo Settings mein!</div>';return;}
+
+  var yr=new Date().getFullYear();
+  var hist=_getCAHistory(id);
+  var avoidList=hist.slice(-30);
+  var avoid=avoidList.length>0?'\n\nYE QUESTIONS ALREADY POOCHE JA CHUKE HAIN — INHE BILKUL REPEAT MAT KARO, NAYE ALAG QUESTIONS BANAO:\n'+avoidList.map(function(q,i){return (i+1)+'. '+q;}).join('\n'):'';
+
+  var topicHints={
+    'मोदी मंत्रिमंडल':'Cabinet ministers portfolios, राज्य मंत्री, स्वतंत्र प्रभार मंत्री, विभाग',
+    'कौन':'Latest appointments: राज्यपाल मुख्यमंत्री CJI RBI SEBI Army Navy Air Chief विभिन्न आयोग',
+    'राज्य':'CM Governor capital Vidhan Sabha Lok Sabha seats Rajya Sabha for each state',
+    'त्योहार':'GI tags, renamed places, cyclone names, festivals, melas, geographic indications',
+    'पुरस्कार सम्मान':'Modi foreign awards, Bharat Ratna, Padma, Nobel, Oscar, Pulitzer, भारतीय पुरस्कार',
+    'प्रथम':'First in India/World 2024-25: first woman/man, first in space, sports, science',
+    'मोबाइल ऐप पोर्टल':'Govt apps portals launched 2024-25, digital initiatives',
+    'ब्रांड एंबेसडर':'Brand ambassadors of govt schemes, companies, sports bodies 2024-25',
+    'सैन्य अभ्यास':'Joint military exercises 2024-25: name countries location थीम',
+    'अंतर्राष्ट्रीय संगठन':'UN WHO WTO IMF World Bank SCO BRICS headquarters, current heads/DGs',
+    'सम्मेलन':'G20 SCO BRICS COP summits 2024-25 location host country outcome',
+    'सूचकांक':'HDI Global Peace Hunger Press Freedom Ease of Doing Business India rank 2024-25',
+    'आर्थिक':'GDP growth rate, inflation, RBI repo rate, economic survey data 2024-25',
+    'राष्ट्रीय':'National schemes, new laws, bills passed, NITI Aayog reports 2024-25',
+    'अंतर्राष्ट्रीय परिदृश्य':'International elections, conflicts, treaties, new countries/capitals',
+    'रक्षा':'DRDO weapons missiles INS ships fighter jets defence deals 2024-25',
+    'विज्ञान प्रौद्योगिकी':'ISRO missions, AI breakthroughs, new discoveries, tech launches 2024-25',
+    'पुस्तक':'Books and authors 2024-25: complete title, author name, subject/genre',
+    'निधन':'Famous people who died 2024-25: name, field, known for',
+    'खेल':'Olympics Paris 2024 medals, Cricket WC, FIFA, records set 2024-25',
+    'दिवस थीम':'Important Days dates themes 2024-25 — UN days, National days',
+    'रामसर':'Ramsar wetland sites India: name state year added total count',
+    'यूनेस्को':'UNESCO World Heritage sites India 2024-25, Intangible heritage',
+    'बहुविकल्पीय':'Mixed one-liner MCQs: appointments awards schemes sports science all topics'
+  };
+
+  var hint='';
+  Object.keys(topicHints).forEach(function(k){if(name.indexOf(k)!==-1)hint=topicHints[k];});
+
+  var offset=cont.querySelectorAll('.qcard').length;
+
+  var prompt='Bihar Police/SSC GD/CGL/RRB NTPC exam expert. '
+    +'Topic: "'+name+'". '+(hint?'Subtopics to cover: '+hint+'. ':'')
+    +'Year: '+yr+'. Generate 15 UNIQUE MCQ questions. '
+    +'Rules: 1) Factual direct exam-style 2) All 15 different from each other 3) One correct answer 4) Realistic options 5) Sol explains why correct '
+    +avoid
+    +'\n\nReturn ONLY valid JSON array. No markdown. Hindi Devanagari only:\n'
+    +'[{"q":"प्रश्न?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"व्याख्या"}]';
+
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
-      model:'llama-3.1-8b-instant',
+      model:'llama-3.3-70b-versatile',
       messages:[
-        {role:'system',content:'You are a JSON generator for Indian exams. Return only valid JSON. All text in Hindi Devanagari. No markdown.'},
+        {role:'system',content:'JSON generator Indian competitive exams. ONLY valid JSON array. Hindi Devanagari. No markdown.'},
         {role:'user',content:prompt}
       ],
-      max_tokens:3000,
-      temperature:0.6
+      max_tokens:4500,
+      temperature:0.9
     })
   })
   .then(function(r){return r.json();})
@@ -2040,31 +2111,49 @@ function openCATopic(id, name){
     var txt=data.choices[0].message.content;
     txt=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']');
-    if(s===-1) throw new Error('No JSON');
+    if(s===-1) throw new Error('JSON nahi mila');
     var arr=JSON.parse(txt.substring(s,e+1));
-    if(!arr.length) throw new Error('Empty');
-    
-    // Render topic content
-    var cAns={};
+    if(!arr.length) throw new Error('Empty response');
+
+    var ind2=document.getElementById('ca_ind');
+    if(ind2)ind2.remove();
+
+    _saveCAHistory(id,arr);
+
     var out='';
     arr.forEach(function(q,i){
-      if(q.theory){
-        out+='<div class="tbox" style="margin-bottom:8px"><div style="font-size:.72rem;font-weight:800;color:var(--ac);margin-bottom:3px">📌 '+name+'</div><div class="tcont">'+q.theory+'</div></div>';
-      }
-      out+='<div class="qcard" id="caq'+i+'">'
-        +'<div class="qtxt">Q'+(i+1)+'. '+q.q+'</div>';
+      var idx=offset+i;
+      out+='<div class="qcard" id="caq'+idx+'" style="border-left:4px solid var(--in2);">'
+        +'<div class="qtxt">Q'+(idx+1)+'. '+q.q+'</div>';
       (q.opts||[]).forEach(function(o,j){
-        out+='<button class="opt" id="cao'+i+'_'+j+'" onclick="pickCA('+i+','+j+','+q.ans+')">'+(o||'')+'</button>';
+        out+='<button class="opt" id="cao'+idx+'_'+j+'" onclick="pickCA('+idx+','+j+','+q.ans+')">'+(o||'')+'</button>';
       });
-      if(q.sol) out+='<div class="sol" id="casol'+i+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
+      if(q.sol)out+='<div class="sol" id="casol'+idx+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
       out+='</div>';
     });
-    document.getElementById('ca-detail-content').innerHTML=out;
-    toast('✅ '+arr.length+' questions ready!','i');
+
+    // Load More button
+    out+='<button onclick="_loadCAQ(''+id.replace(/'/g,"\'")+'''+',''+name.replace(/'/g,"\'")+'''+',true)" '
+      +'style="width:100%;background:var(--cd2);border:1.5px dashed rgba(255,255,255,.15);border-radius:14px;color:var(--t3);font-family:inherit;font-size:.78rem;font-weight:700;padding:13px;cursor:pointer;margin-top:8px;">'
+      +'🔄 Aur 15 Questions Load Karo</button>';
+
+    if(more){
+      var oldBtn=cont.querySelector('button[onclick*="_loadCAQ"]');
+      if(oldBtn)oldBtn.remove();
+      cont.insertAdjacentHTML('beforeend',out);
+    } else {
+      cont.innerHTML=out;
+    }
+    toast('✅ '+arr.length+' naye questions!','i');
   })
   .catch(function(e){
-    console.log('CA topic error:',e);
-    document.getElementById('ca-detail-content').innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><br>Dobara try karo!</div>';
+    var ind2=document.getElementById('ca_ind');
+    if(ind2)ind2.remove();
+    if(!more){
+      cont.innerHTML='<div class="empty">❌ '+e.message.substring(0,80)+'<br><button class="btn" style="margin-top:10px;font-size:.78rem" onclick="_loadCAQ(''+id+'',''+name.replace(/'/g,"\'")+'',false)">🔄 Retry</button></div>';
+    } else {
+      cont.insertAdjacentHTML('beforeend','<div style="text-align:center;padding:10px;color:var(--a2);font-size:.72rem">❌ Error — Retry karo</div>');
+    }
   });
 }
 
