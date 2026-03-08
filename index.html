@@ -2494,13 +2494,16 @@ function initFirebase(){
     db = firebase.firestore();
     auth = firebase.auth();
 
-    // Handle redirect result (after signInWithRedirect)
+    // Handle redirect result
     auth.getRedirectResult().then(function(result){
       if(result && result.user){
-        // Redirect login success - handled by onAuthStateChanged
+        setLoginStatus('✅ Login ho gaya!','s');
       }
     }).catch(function(err){
       console.error('Redirect result error:', err);
+      if(err.code && err.code !== 'auth/no-current-user'){
+        setLoginStatus('❌ ' + (err.message||'Login error'), 'e');
+      }
     });
 
     // Listen to auth state
@@ -2607,29 +2610,17 @@ function setLoginStatus(msg, type){
 
 function signInWithGoogle(){
   var btn = document.getElementById('googleLoginBtn');
-  var status = document.getElementById('fbLoginStatus');
   btn.disabled = true;
   btn.style.opacity = '.7';
-  setLoginStatus('⏳ Login ho raha hai...','i');
-
+  btn.innerHTML = '<div style="display:flex;align-items:center;gap:8px;justify-content:center"><span style="animation:td 1s infinite;display:inline-block">⏳</span> Google pe ja rahe hain...</div>';
+  setLoginStatus('Ek second ruko...','i');
   var provider = new firebase.auth.GoogleAuthProvider();
-  // Try popup first, fallback to redirect
-  auth.signInWithPopup(provider)
-    .then(function(result){
-      setLoginStatus('✅ Login ho gaya!','s');
-    })
-    .catch(function(err){
-      // Popup blocked or not supported - use redirect
-      if(err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request'){
-        status.textContent = '↩️ Redirect se try kar rahe hain...';
-        auth.signInWithRedirect(provider);
-      } else {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        status.textContent = '❌ ' + (err.message || 'Error');
-        status.style.color = 'var(--a2)';
-      }
-    });
+  provider.addScope('profile');
+  provider.addScope('email');
+  // Direct redirect — works on GitHub Pages
+  setTimeout(function(){
+    auth.signInWithRedirect(provider);
+  }, 300);
 }
 
 function signOutUser(){
