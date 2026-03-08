@@ -2609,18 +2609,23 @@ function setLoginStatus(msg, type){
 }
 
 function signInWithGoogle(){
-  var btn = document.getElementById('googleLoginBtn');
-  btn.disabled = true;
-  btn.style.opacity = '.7';
-  btn.innerHTML = '<div style="display:flex;align-items:center;gap:8px;justify-content:center"><span style="animation:td 1s infinite;display:inline-block">⏳</span> Google pe ja rahe hain...</div>';
-  setLoginStatus('Ek second ruko...','i');
-  var provider = new firebase.auth.GoogleAuthProvider();
-  provider.addScope('profile');
-  provider.addScope('email');
-  // Direct redirect — works on GitHub Pages
-  setTimeout(function(){
-    auth.signInWithRedirect(provider);
-  }, 300);
+  try{
+    if(!auth){setLoginStatus('❌ Firebase load nahi hua — reload karo','e');return;}
+    var btn=document.getElementById('googleLoginBtn');
+    btn.disabled=true;btn.style.opacity='.7';
+    btn.textContent='⏳ Ja rahe hain Google pe...';
+    setLoginStatus('Ek second ruko...','i');
+    var provider=new firebase.auth.GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    auth.signInWithRedirect(provider).catch(function(err){
+      btn.disabled=false;btn.style.opacity='1';
+      btn.textContent='Google se Login Karo';
+      setLoginStatus('❌ '+err.code+': '+err.message,'e');
+    });
+  }catch(e){
+    setLoginStatus('❌ '+e.message,'e');
+  }
 }
 
 function signOutUser(){
