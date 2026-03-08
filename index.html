@@ -2919,24 +2919,7 @@ function loadCAQuestions(id,name,more){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']');
     if(s===-1) throw new Error('JSON nahi mila');
-    var raw=txt.substring(s,e+1);
-    // Clean common JSON issues from AI
-    raw=raw.replace(/,\s*}/g,'}').replace(/,\s*]/g,']');
-    raw=raw.replace(/[ -]/g,' ');
-    raw=raw.replace(/[\n\r]/g,' ');
-    var arr;
-    try{ arr=JSON.parse(raw); }
-    catch(je){
-      // Try extracting individual objects
-      var objs=[];
-      var depth=0,start=-1;
-      for(var ci=0;ci<raw.length;ci++){
-        if(raw[ci]==='{'){if(depth===0)start=ci;depth++;}
-        else if(raw[ci]==='}'){depth--;if(depth===0&&start>=0){try{objs.push(JSON.parse(raw.substring(start,ci+1)));}catch(x){}}}
-      }
-      if(!objs.length) throw new Error('JSON parse failed: '+je.message);
-      arr=objs;
-    }
+    var arr=JSON.parse(txt.substring(s,e+1));
     if(!arr.length) throw new Error('Empty');
 
     var ind=document.getElementById('ca_ind');
