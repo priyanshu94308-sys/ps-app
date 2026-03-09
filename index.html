@@ -1026,22 +1026,46 @@ body::before{
     <!-- REPORT -->
     <div class="tab" id="tab-mock">
       <div id="mock-home">
-        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">📝 MOCK TEST</div>
-        <div style="display:grid;gap:10px;">
-          <div onclick="startMock('ssc_gd')" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:14px;padding:16px;cursor:pointer">
-            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC GD / Bihar Police</div>
-            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">80 Qs · 60 min · GK+Reasoning+Maths+Hindi</div>
+        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">📝 MOCK TEST चुनो</div>
+        <div style="display:grid;gap:8px;">
+          <div onclick="startMock('ssc_gd')" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">🪖</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC GD Constable</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">80 Qs · 60 min · GK+Reasoning+Maths+Hindi</div></div>
           </div>
-          <div onclick="startMock('ssc_cgl')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:14px;padding:16px;cursor:pointer">
-            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC CGL Tier-1</div>
-            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 60 min · GK+Reasoning+Maths+English</div>
+          <div onclick="startMock('bihar_police')" style="background:linear-gradient(135deg,#059669,#0891b2);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">👮</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">Bihar Police Sipahi</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 120 min · GK+Hindi+Maths+Science</div></div>
           </div>
-          <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:14px;padding:16px;cursor:pointer">
-            <div style="font-size:.9rem;font-weight:900;color:var(--tx)">⚙️ Custom Mock</div>
-            <div style="font-size:.65rem;color:var(--t2);margin-top:4px">Khud set karo — subject, questions, time</div>
+          <div onclick="startMock('ssc_cgl')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">📊</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC CGL Tier-1</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 60 min · GK+Reasoning+Maths+English</div></div>
+          </div>
+          <div onclick="startMock('ssc_chsl')" style="background:linear-gradient(135deg,#7c3aed,#db2777);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">🖥️</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC CHSL Tier-1</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 60 min · GK+Reasoning+Maths+English</div></div>
+          </div>
+          <div onclick="startMock('rrb_ntpc')" style="background:linear-gradient(135deg,#0284c7,#0d9488);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">🚂</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">RRB NTPC</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 90 min · GK+Maths+Reasoning</div></div>
+          </div>
+          <div onclick="startMock('rrb_group_d')" style="background:linear-gradient(135deg,#b45309,#92400e);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">🔧</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">RRB Group D</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 90 min · GK+Maths+Reasoning+Science</div></div>
+          </div>
+          <div onclick="startMock('bssc')" style="background:linear-gradient(135deg,#be185d,#9333ea);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">📋</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">BSSC Inter Level</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">150 Qs · 135 min · GK+Hindi+Maths+Science</div></div>
+          </div>
+          <div onclick="startMock('bpsc')" style="background:linear-gradient(135deg,#1d4ed8,#065f46);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">🎖️</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:#fff">BPSC Prelims</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">150 Qs · 120 min · GK+History+Polity+Geography</div></div>
+          </div>
+          <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <div style="font-size:1.5rem">⚙️</div>
+            <div><div style="font-size:.82rem;font-weight:900;color:var(--tx)">Custom Mock</div><div style="font-size:.6rem;color:var(--t2)">Khud set karo — subject, questions, time</div></div>
           </div>
         </div>
-        <div style="margin-top:16px">
+        <div style="margin-top:14px">
           <div style="font-size:.66rem;font-weight:800;color:var(--t2);margin-bottom:8px">📊 Recent Mocks</div>
           <div id="mock-history-list"><div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div></div>
         </div>
@@ -4870,10 +4894,17 @@ var mockOpts={qcount:25,time:30,subjects:['gk','reasoning','maths','hindi']};
 function startMock(type){
   if(type==='custom'){showV('mock-setup','mock-home');renderMockHistory();return;}
   var configs={
-    ssc_gd:{name:'SSC GD / Bihar Police',qcount:80,time:60,subjects:['gk','reasoning','maths','hindi']},
-    ssc_cgl:{name:'SSC CGL Tier-1',qcount:100,time:60,subjects:['gk','reasoning','maths','english']}
+    ssc_gd:      {name:'SSC GD Constable',       qcount:80, time:60,  subjects:['gk','reasoning','maths','hindi']},
+    bihar_police:{name:'Bihar Police Sipahi',     qcount:100,time:120, subjects:['gk','hindi','maths','science']},
+    ssc_cgl:     {name:'SSC CGL Tier-1',          qcount:100,time:60,  subjects:['gk','reasoning','maths','english']},
+    ssc_chsl:    {name:'SSC CHSL Tier-1',         qcount:100,time:60,  subjects:['gk','reasoning','maths','english']},
+    rrb_ntpc:    {name:'RRB NTPC',                qcount:100,time:90,  subjects:['gk','maths','reasoning']},
+    rrb_group_d: {name:'RRB Group D',             qcount:100,time:90,  subjects:['gk','maths','reasoning','science']},
+    bssc:        {name:'BSSC Inter Level',        qcount:150,time:135, subjects:['gk','hindi','maths','science']},
+    bpsc:        {name:'BPSC Prelims',            qcount:150,time:120, subjects:['gk','history','polity','geography']}
   };
   var cfg=configs[type];
+  if(!cfg){toast('Exam nahi mila!');return;}
   mockOpts={qcount:cfg.qcount,time:cfg.time,subjects:cfg.subjects};
   launchMockWithConfig(cfg.name);
 }
@@ -4905,37 +4936,83 @@ function launchMockWithConfig(name){
   showV('mock-test','mock-setup');
   mockState={qs:[],cur:0,ans:{},timeLeft:mockOpts.time*60,timer:null,name:name,totalTime:mockOpts.time*60};
   document.getElementById('mock-question').innerHTML=
-    '<div style="text-align:center;padding:40px 20px"><div style="font-size:2rem">🤖</div><div style="font-size:.85rem;font-weight:700;margin-top:8px">AI mock paper bana raha hai...</div><div style="font-size:.65rem;color:var(--t2);margin-top:4px">'+name+' · '+mockOpts.qcount+' Qs · '+mockOpts.time+' min</div></div>';
+    '<div style="text-align:center;padding:40px 20px">'
+    +'<div style="font-size:2.5rem">🤖</div>'
+    +'<div style="font-size:.88rem;font-weight:800;color:var(--ac);margin:10px 0">Mock paper ban raha hai...</div>'
+    +'<div style="font-size:.68rem;color:var(--t2);margin-bottom:16px">'+name+' · '+mockOpts.qcount+' Qs · '+mockOpts.time+' min</div>'
+    +'<div style="display:flex;gap:8px;justify-content:center">'
+    +'<div style="width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
+    +'<div style="width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
+    +'<div style="width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
+    +'</div></div>';
   document.getElementById('mock-timer').textContent=mockOpts.time+':00';
-  // Fetch questions per subject
-  var subjNames={gk:'General Knowledge',reasoning:'Reasoning',maths:'Mathematics',hindi:'Hindi Grammar & Literature',english:'English Grammar',science:'General Science',history:'History',polity:'Polity',geography:'Geography'};
-  var perSubj=Math.ceil(mockOpts.qcount/mockOpts.subjects.length);
-  var systemMsg='Tu MCQ generator hai. SIRF valid JSON array output kar. No markdown.';
-  var prompt='Generate '+perSubj+' MCQ for each of these subjects: '+mockOpts.subjects.map(function(s){return subjNames[s]||s;}).join(', ')+'.\n\nTotal: '+mockOpts.qcount+' questions.\nMix karo: easy 40%, medium 40%, hard 20%.\nSSC/Bihar Police exam level.\n\nFORMAT ONLY:\n[{"q":"question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation","subj":"subject"}]\n\nRULES:\n- ans index 0/1/2/3 equally vary karo\n- Hindi mein (English ke liye English)\n- Realistic wrong options';
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:6000,temperature:0.7})
-  }).then(function(r){return r.json();}).then(function(data){
-    if(data.error){document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+data.error.message.substring(0,80)+'<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';return;}
-    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
-    var qs;
-    try{qs=JSON.parse(txt.substring(s,e));}catch(ex){document.getElementById('mock-question').innerHTML='<div class="empty">❌ Parse error<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';return;}
-    if(!qs||!qs.length){document.getElementById('mock-question').innerHTML='<div class="empty">❌ Questions nahi aaye<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';return;}
-    // Shuffle options
-    qs=qs.map(function(q){
-      if(!q.opts||q.opts.length<4) return q;
-      var ct=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
-      var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
-      var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===ct;});
-      return Object.assign({},q,{opts:sh,ans:na===-1?q.ans:na});
+  // Split questions across subjects - smaller batches to avoid timeout
+  var subjNames={
+    gk:'सामान्य ज्ञान (GK)',reasoning:'रीजनिंग (Reasoning)',
+    maths:'गणित (Maths)',hindi:'हिंदी व्याकरण',
+    english:'English Grammar',science:'सामान्य विज्ञान',
+    history:'इतिहास (History)',polity:'राजव्यवस्था (Polity)',
+    geography:'भूगोल (Geography)'
+  };
+  // Fetch 25 questions at a time to avoid timeout
+  var batchSize=25;
+  var totalNeeded=Math.min(mockOpts.qcount,100); // cap at 100 for speed
+  var allQs=[];
+  var fetchCount=Math.ceil(totalNeeded/batchSize);
+  var fetched=0;
+  function fetchBatch(batchIdx){
+    var batchSubjs=mockOpts.subjects.map(function(s){return subjNames[s]||s;});
+    var systemMsg='Tu SIRF Hindi mein MCQ generator hai. SIRF valid JSON array output kar. Koi markdown nahi. SABHI questions aur options HINDI (Devanagari) mein honge.';
+    var prompt=name+' exam ke liye '+batchSize+' MCQ banao.\n'
+      +'Subjects (equally distribute): '+batchSubjs.join(', ')+'.\n\n'
+      +'⚠️ SABHI questions aur options HINDI (Devanagari script) mein likhne hain.\n'
+      +'Sirf English Grammar subject ke options English mein ho sakte hain.\n\n'
+      +'RULES:\n'
+      +'- ans index 0/1/2/3 equally vary karo (0,1,2,3 roughly equal)\n'
+      +'- Realistic galat options jo confuse kare\n'
+      +'- Exam level: '+name+'\n\n'
+      +'FORMAT (SIRF JSON, kuch nahi):\n'
+      +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या","subj":"subject"}]';
+    fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:3500,temperature:0.6})
+    }).then(function(r){return r.json();}).then(function(data){
+      if(data.error) throw new Error(data.error.message);
+      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
+      var batch=JSON.parse(txt.substring(s,e));
+      // Shuffle options
+      batch=batch.map(function(q){
+        if(!q.opts||q.opts.length<4) return q;
+        var ct=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+        var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+        var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===ct;});
+        return Object.assign({},q,{opts:sh,ans:na===-1?q.ans:na});
+      });
+      allQs=allQs.concat(batch);
+      fetched++;
+      // Update loader
+      var pct=Math.round(fetched/fetchCount*100);
+      var ldr=document.getElementById('mock-loader-pct');
+      if(ldr) ldr.textContent=pct+'%';
+      if(fetched>=fetchCount){
+        mockState.qs=allQs.slice(0,totalNeeded);
+        renderMockQ();
+        startMockTimer();
+      } else {
+        fetchBatch(batchIdx+1);
+      }
+    }).catch(function(e){
+      document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))+'<br><button class="btn" onclick="sw(\'mock\')" >← Back</button> <button class="btn" onclick="launchMockWithConfig(mockState.name)">🔄 Retry</button></div>';
     });
-    mockState.qs=qs.slice(0,mockOpts.qcount);
-    renderMockQ();
-    startMockTimer();
-  }).catch(function(e){document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+e.message+'<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';});
+  }
+  // Add loader pct element
+  document.getElementById('mock-question').innerHTML+=
+    '<div id="mock-loader-pct" style="font-size:1rem;font-weight:900;color:var(--ac);margin-top:8px;text-align:center">0%</div>';
+  fetchBatch(0);
 }
+
 
 function renderMockQ(){
   var s=mockState;
