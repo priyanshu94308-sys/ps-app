@@ -3540,6 +3540,21 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     var aiQs=null;
     try{aiQs=JSON.parse(txt.substring(s,e));}catch(ex){return;}
     if(!aiQs||!aiQs.length) return;
+    // Filter duplicate options
+    aiQs=aiQs.filter(function(q){
+      if(!q.opts||q.opts.length<4) return false;
+      var clean=q.opts.map(function(o){return (o||'').replace(/^\([A-D]\)\s*/,'').trim().toLowerCase();});
+      var unique=clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+      return unique.length===4;
+    });
+    // Shuffle options so correct ans is not always A
+    aiQs=aiQs.map(function(q){
+      var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+      var shuffled=q.opts.slice().sort(function(){return Math.random()-.5;});
+      shuffled=shuffled.map(function(o,si){return '('+"ABCD"[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+      var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
+      return Object.assign({},q,{opts:shuffled,ans:newAns===-1?q.ans:newAns});
+    });
     // Cache AI questions
     var qbQs=getRWAQBQuestions(key,topic);
     var combined=qbQs.concat(aiQs);
@@ -4072,13 +4087,11 @@ function loadCAQuestions(id,name,more){
 
   var offset=cont.querySelectorAll('.qcard').length;
 
-  var prompt='Bihar Police/SSC GD/CGL exam expert. Topic: "'+name+'". Year: '+yr+'.'
-    +' Generate 15 UNIQUE MCQ in Hindi. STRICT RULES: (1) 4 options BILKUL ALAG honay chahiye. (2) Sirf EK sahi answer ho, baki 3 galat lekin plausible. (3) CRITICAL: "ans" index VARY karo - sirf 0 mat dena! 15 questions mein 0,1,2,3 roughly equal use karo. (4) Factual, exam-style Hindi.'
-    +avoid
-    +'
 
-Return ONLY valid JSON array (NO markdown, NO extra text):
-[{"q":"प्रश्न?","opts":["(A) विकल्प1","(B) विकल्प2","(C) विकल्प3","(D) विकल्प4"],"ans":0,"sol":"व्याख्या"}]';
+  var prompt='Bihar Police/SSC GD/CGL exam expert. Topic: "'+name+'". Year: '+yr+'.'
+    +' Generate 15 UNIQUE MCQ in Hindi. STRICT RULES: (1) 4 options BILKUL ALAG honay chahiye. (2) Sirf EK sahi answer ho, baki 3 galat lekin plausible. (3) CRITICAL: ans index VARY karo - sirf 0 mat dena, 0/1/2/3 sab use karo. (4) Factual, exam-style Hindi.'
+    +avoid
+    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"\u092a\u094d\u0930\u0936\u094d\u0928?","opts":["(A) \u0935\u093f\u0915\u0932\u094d\u092a1","(B) \u0935\u093f\u0915\u0932\u094d\u092a2","(C) \u0935\u093f\u0915\u0932\u094d\u092a3","(D) \u0935\u093f\u0915\u0932\u094d\u092a4"],"ans":2,"sol":"\u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e"}]';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -4179,7 +4192,7 @@ function loadDailyCA(force){
   document.getElementById('daily-ca-content').innerHTML='<div style="text-align:center;padding:12px;color:var(--t2);font-size:.75rem">🤖 Loading...</div>';
   var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var dateStr=d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
-  var prompt='Bihar Police/SSC/RRB exam expert. Generate today\'s current affairs for '+dateStr+'. Cover: appointments, awards, sports, science, economy, international. 8 items with 1 MCQ each. Hindi only. JSON: {"items":[{"cat":"विषय","headline":"तथ्य","mcq":{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"व्याख्या"}}]}';
+  var prompt='Bihar Police/SSC/RRB exam expert. '+dateStr+' ki current affairs generate karo.\n\nCover in order: niyukti/padonnati, puraskar/samman, khel, vigyan/taknik, arthvyavastha, antarrashtriya, rashtriya, koi bhi ek aur.\n\nSTRICT RULES:\n1. Har MCQ ke 4 options BILKUL ALAG aur realistic honay chahiye.\n2. CRITICAL: "ans" index VARY karo - sirf 0 mat dena, 0/1/2/3 sab use karo.\n3. Hindi only. Factual aur exam-style.\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य यहाँ","mcq":{"q":"प्रश्न?","opts":["(A) सही विकल्प","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":0,"sol":"व्याख्या"}}]}\n\nSIRF valid JSON, no markdown.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'JSON generator. Hindi only. No markdown.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.7})
@@ -4200,10 +4213,15 @@ function loadDailyCA(force){
         +'<div style="font-size:.75rem;font-weight:700;margin-bottom:7px">'+item.headline+'</div>';
       var q=item.mcq;
       if(q){
+        var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+        var shOpts=q.opts.slice().sort(function(){return Math.random()-.5;});
+        shOpts=shOpts.map(function(o,si){return '('+"ABCD"[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+        var shAns=shOpts.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
+        if(shAns===-1) shAns=q.ans;
         out+='<div class="qcard" style="margin:0;padding:8px;border-left:2px solid var(--in2)">'
           +'<div class="qtxt" style="font-size:.73rem">'+q.q+'</div>';
-        (q.opts||[]).forEach(function(o,j){
-          out+='<button class="opt" id="dca'+i+'_'+j+'" onclick="pickDCA('+i+','+j+','+q.ans+')">'+(o||'')+'</button>';
+        shOpts.forEach(function(o,j){
+          out+='<button class="opt" id="dca'+i+'_'+j+'" onclick="pickDCA('+i+','+j+','+shAns+')">'+( o||'')+'</button>';
         });
         out+='<div class="sol" id="dcasol'+i+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
         out+='</div>';
@@ -4231,6 +4249,7 @@ function pickDCA(i,oi,correct){
 
 // ── AI CHAT ──
 window._chatImg=null;
+window._chatHistory=[];
 
 function handleImgSelect(input){
   if(!input.files||!input.files[0]) return;
@@ -4289,26 +4308,32 @@ function showTyping(){
 
 function askQ(msg){
   addChatMsg(msg,'u');
+  window._chatHistory.push({role:'user',content:msg});
+  if(window._chatHistory.length>20) window._chatHistory=window._chatHistory.slice(-20);
   var typing=showTyping();
   var key=getGKey();
   if(!key){if(typing)typing.remove();addChatMsg('🔑 Settings mein Groq key daalo!','a');return;}
+  var sysPrompt='Tu PS Study App ka expert AI tutor hai. SSC CGL, SSC GD, Bihar Police, BSSC, RRB exams ke liye guide karta hai.'
+    +' Subjects: GK/GS, Maths, Reasoning, Hindi, Current Affairs.'
+    +' RULES: (1) Hamesha Hindi mein jawab de. (2) Short aur precise reh — ek concept ek baar explain kar.'
+    +' (3) Agar MCQ poochha ho to pehle answer bata, phir explanation. (4) Formulas/facts bullet points mein de.'
+    +' (5) Exam tips relevant ho to zaroor bata.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
       model:'llama-3.3-70b-versatile',
-      messages:[
-        {role:'system',content:'Tu PS Study App ka AI tutor hai. Sirf Hindi mein jawab de. SSC, Bihar Police, RRB exams ke liye helpful. Short aur clear answers.'},
-        {role:'user',content:msg}
-      ],
-      max_tokens:1000,temperature:0.5
+      messages:[{role:'system',content:sysPrompt}].concat(window._chatHistory),
+      max_tokens:1200,temperature:0.5
     })
   })
   .then(function(r){return r.json();})
   .then(function(data){
     if(typing) typing.remove();
     if(data.error) throw new Error(data.error.message);
-    addChatMsg(data.choices[0].message.content,'a');
+    var reply=data.choices[0].message.content;
+    window._chatHistory.push({role:'assistant',content:reply});
+    addChatMsg(reply,'a');
     clearImg();
   })
   .catch(function(e){if(typing)typing.remove();addChatMsg('❌ Error: '+e.message,'a');});
@@ -4328,7 +4353,7 @@ function askQWithImg(msg,imgDataUrl){
       model:'meta-llama/llama-4-scout-17b-16e-instruct',
       messages:[{role:'user',content:[
         {type:'image_url',image_url:{url:'data:'+mimeType+';base64,'+base64}},
-        {type:'text',text:msg||'Is image mein kya hai? Hindi mein samjhao.'}
+        {type:'text',text:msg||'Is image mein jo bhi question, text, ya problem hai use dhyan se dekho aur Hindi mein solve karo. Agar MCQ hai to sahi answer bata aur explain karo. Agar math/reasoning problem hai to step-by-step solve karo. Agar koi map/diagram/chart hai to explain karo. Exam point of view se jawab do.'}
       ]}],
       max_tokens:1000
     })
