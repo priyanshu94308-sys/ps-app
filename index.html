@@ -1057,6 +1057,10 @@ body::before{
         <button class="dbtn" onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}">🔄 Aaj Reset</button>
         <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
       </div>
+      <div class="scard">
+        <div class="sec">🔐 Account</div>
+        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
+      </div>
       <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v3.0 🚀 · 1,110+ Questions Built-in</div>
     </div>
   </div>
@@ -1064,6 +1068,7 @@ body::before{
     <button class="tb on" onclick="sw('home')" id="tb-home"><span>🏠</span>Home</button>
     <button class="tb" onclick="sw('practice')" id="tb-practice"><span>📚</span>Practice</button>
     <button class="tb" onclick="sw('yoga')" id="tb-yoga"><span>🧘</span>Yoga</button>
+    <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>Topic</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
     <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Report</button>
@@ -1114,7 +1119,7 @@ body::before{
 <div id="userPill" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99998;background:rgba(13,15,26,.97);padding:8px 14px;border-bottom:1px solid var(--br);align-items:center;gap:10px;">
   <img id="userAvatar" src="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--ac);object-fit:cover;" alt="">
   <div style="flex:1"><div style="font-size:.73rem;font-weight:800" id="userDisplayName">-</div><div style="font-size:.56rem;color:var(--gr)">✅ Cloud Synced</div></div>
-  <button onclick="signOutUser()" style="background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2);border-radius:7px;color:var(--a2);font-size:.62rem;font-weight:700;padding:4px 10px;cursor:pointer;">Logout</button>
+  
 </div>
 
 <div class="toast" id="toast"></div>
