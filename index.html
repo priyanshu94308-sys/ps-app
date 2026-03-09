@@ -145,6 +145,7 @@ body::before{
 .tab{display:none;padding:16px 15px 24px;animation:fadeUp .25s ease;}
 .tab.active{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
 
 /* ═══════════════════════════════
    BOTTOM NAV
@@ -3544,40 +3545,26 @@ function openRWASubject(key){
 function openRWATopic(key,idx){
   rwaCurrentSubject=key;
   rwaCurrentTopicIdx=idx;
+  rwaLoading=false;
   var topic=RWA_TOPICS[key].subtopics[idx];
   var cacheKey='rwa_'+key+'_'+idx;
   document.getElementById('rwa-topics-view').style.display='none';
   document.getElementById('rwa-quiz-view').style.display='block';
   document.getElementById('rwa-quiz-title').textContent=topic;
 
-  // Step 1: Show QB questions INSTANTLY (no loading delay)
-  var qbQs=getRWAQBQuestions(key,topic);
-  var initialQs=qbQs.length>0?qbQs:null;
+  // Always show loader first, then fetch all questions at once
+  document.getElementById('rwa-quiz-content').innerHTML=
+    '<div style="text-align:center;padding:40px 20px">'+
+    '<div style="font-size:2rem;margin-bottom:12px">🤖</div>'+
+    '<div style="font-size:.85rem;font-weight:700;color:var(--tx);margin-bottom:6px">AI questions bana raha hai...</div>'+
+    '<div style="font-size:.68rem;color:var(--t2);margin-bottom:20px">Topic: '+topic+'</div>'+
+    '<div style="display:flex;gap:6px;justify-content:center">'+
+    '<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'+
+    '<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'+
+    '<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'+
+    '</div></div>';
 
-  // Step 2: Try cache
-  try{
-    var cached=localStorage.getItem(cacheKey);
-    if(cached){
-      var cqs=JSON.parse(cached);
-      if(cqs&&cqs.length>0){
-        rwaQuizState={qs:cqs,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
-        renderRWAQuestion();
-        return; // Cached - instant, no AI needed now
-      }
-    }
-  }catch(e){}
-
-  // Step 3: Show QB questions immediately while AI loads in background
-  if(initialQs&&initialQs.length>0){
-    rwaQuizState={qs:initialQs,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
-    renderRWAQuestion();
-    // Background AI fetch
-    fetchRWAQuestionsBackground(key,idx,topic,cacheKey);
-  } else {
-    // No QB questions - show loader and fetch AI
-    document.getElementById('rwa-quiz-content').innerHTML='<div style="text-align:center;padding:30px;color:var(--t2);font-size:.8rem">🤖 AI questions bana raha hai...<br><span style="font-size:.65rem;opacity:.6">Pehli baar thoda time lagta hai</span></div>';
-    fetchRWAQuestionsBackground(key,idx,topic,cacheKey);
-  }
+  fetchRWAQuestionsBackground(key,idx,topic,cacheKey);
 }
 
 function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
@@ -3589,26 +3576,42 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   }
   if(rwaLoading) return;
   rwaLoading=true;
-  var prompt='SSC CGL/Bihar Police/SSC GD exam expert. Topic: "'+topic+'" par exactly 10 UNIQUE MCQ banao.'  
-    +'\n\nSTRICT RULES:\n'
-    +'1. Topic ke direct factual questions — general GK nahi.\n'
-    +'2. Har question ke 4 options BILKUL ALAG honay chahiye.\n'
-    +'3. CRITICAL: ans field mein 0/1/2/3 vary karo, sirf 0 mat dena.\n'
-    +'4. Hindi only, exam-style, realistic wrong options.\n'
-    +'5. SIRF valid JSON array, koi markdown nahi.\n\n'
-    +'Format: [{"q":"प्रश्न?","opts":["(A) ...","(B) ...","(C) ...","(D) ..."],"ans":2,"sol":"Hindi explanation"}]';
+  var systemMsg='Tu ek MCQ generator hai. OUTPUT SIRF valid JSON array hoga. Koi text, explanation, markdown allowed nahi. Har question SIRF given topic ke baare mein hoga.';
+  var prompt='TOPIC: "'+topic+'"\n\n'
+    +'Upar diye gaye TOPIC ke baare mein SIRF 10 MCQ questions banao.\n'
+    +'IMPORTANT: Har ek question "'+topic+'" topic ke baare mein HONA CHAHIYE.\n'
+    +'Koi bhi question is topic se bahar ka nahi hona chahiye.\n'
+    +'Agar topic hai "सिन्धु घाटी सभ्यता" toh SIRF Sindhu Ghati ke questions — Vedic kaal, Maurya, ya koi aur topic bilkul nahi.\n\n'
+    +'RULES:\n'
+    +'- 4 options: ek sahi, teen galat (realistic, confusing)\n'
+    +'- ans: correct option ka index (0/1/2/3) — 0,1,2,3 sab use karo equally\n'
+    +'- Hindi mein, SSC/Bihar Police exam style\n'
+    +'- sol: ek line mein Hindi explanation\n\n'
+    +'OUTPUT FORMAT (sirf yahi, kuch aur nahi):\n'
+    +'[\n'
+    +'{"q":"प्रश्न 1?","opts":["(A) option","(B) option","(C) option","(D) option"],"ans":1,"sol":"explanation"},\n'
+    +'{"q":"प्रश्न 2?","opts":["(A) option","(B) option","(C) option","(D) option"],"ans":3,"sol":"explanation"}\n'
+    +']';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. ONLY valid JSON array output kar. Hindi Devanagari. No markdown, no explanation.'},{role:'user',content:prompt}],max_tokens:3500,temperature:0.85})
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7})
   }).then(function(r){return r.json();}).then(function(data){
     rwaLoading=false;
     if(data.error){var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ '+data.error.message.substring(0,60)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';return;}
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
     var aiQs=null;
-    try{aiQs=JSON.parse(txt.substring(s,e));}catch(ex){return;}
-    if(!aiQs||!aiQs.length) return;
+    try{aiQs=JSON.parse(txt.substring(s,e));}catch(ex){
+      var qc2=document.getElementById('rwa-quiz-content');
+      if(qc2&&!qc2.querySelector('.qcard')) qc2.innerHTML='<div class="empty">❌ AI response parse nahi hua<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';
+      return;
+    }
+    if(!aiQs||!aiQs.length){
+      var qc2=document.getElementById('rwa-quiz-content');
+      if(qc2&&!qc2.querySelector('.qcard')) qc2.innerHTML='<div class="empty">❌ AI ne questions nahi diye<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';
+      return;
+    }
     // Filter duplicate options
     aiQs=aiQs.filter(function(q){
       if(!q.opts||q.opts.length<4) return false;
@@ -3624,22 +3627,11 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
       var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
       return Object.assign({},q,{opts:shuffled,ans:newAns===-1?q.ans:newAns});
     });
-    // Cache AI questions
-    var qbQs=getRWAQBQuestions(key,topic);
-    var combined=qbQs.concat(aiQs);
-    try{localStorage.setItem(cacheKey,JSON.stringify(combined));}catch(e){}
-    // If user still on same topic and hasn't started yet (cur==0, not answered)
-    // show a "naye questions ready" notification or just update if quiz not started
+    // Cache and show all questions at once
+    try{localStorage.setItem(cacheKey,JSON.stringify(aiQs));}catch(e){}
     if(rwaCurrentSubject===key && rwaCurrentTopicIdx===idx){
-      if(rwaQuizState.cur===0 && !rwaQuizState.answered){
-        // Replace with full set silently
-        rwaQuizState={qs:combined,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
-        renderRWAQuestion();
-      } else {
-        // Show badge that more questions are cached for next round
-        var badge=document.getElementById('rwa-ai-ready');
-        if(badge) badge.style.display='block';
-      }
+      rwaQuizState={qs:aiQs,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
+      renderRWAQuestion();
     }
   }).catch(function(e){rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
 }
@@ -3667,12 +3659,24 @@ function renderRWAQuestion(){
       +'<div style="font-size:.75rem;color:var(--t2);margin-bottom:16px">Score: '+pct+'%</div>'
       +'<div style="font-size:.72rem;color:var(--t2);margin-bottom:12px">🔄 Naye AI questions aa rahe hain...</div>'
       +'</div>';
-    // Delete cache so fresh questions generate
+    // Delete cache so fresh AI questions generate next time
     try{localStorage.removeItem(s.cacheKey);}catch(e){}
-    // Auto fetch new questions after 1.5s
+    rwaLoading=false;
+    // Auto fetch fresh set after short delay
     setTimeout(function(){
-      fetchRWAQuestions(rwaCurrentSubject,rwaCurrentTopicIdx,s.topic,s.cacheKey,true);
-    },1500);
+      if(rwaCurrentSubject&&rwaCurrentTopicIdx!==null){
+        document.getElementById('rwa-quiz-content').innerHTML=
+          '<div style="text-align:center;padding:40px 20px">'+
+          '<div style="font-size:2rem;margin-bottom:12px">🤖</div>'+
+          '<div style="font-size:.85rem;font-weight:700;color:var(--tx);margin-bottom:6px">Naye questions bana raha hai...</div>'+
+          '<div style="display:flex;gap:6px;justify-content:center;margin-top:12px">'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'+
+          '<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'+
+          '</div></div>';
+        fetchRWAQuestionsBackground(rwaCurrentSubject,rwaCurrentTopicIdx,s.topic,s.cacheKey);
+      }
+    },800);
     return;
   }
   var q=s.qs[s.cur];
