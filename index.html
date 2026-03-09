@@ -4073,9 +4073,12 @@ function loadCAQuestions(id,name,more){
   var offset=cont.querySelectorAll('.qcard').length;
 
   var prompt='Bihar Police/SSC GD/CGL exam expert. Topic: "'+name+'". Year: '+yr+'.'
-    +' Generate 15 UNIQUE MCQ. Rules: factual, direct, exam-style, Hindi only, realistic options.'
+    +' Generate 15 UNIQUE MCQ in Hindi. STRICT RULES: (1) 4 options BILKUL ALAG honay chahiye. (2) Sirf EK sahi answer ho, baki 3 galat lekin plausible. (3) CRITICAL: "ans" index VARY karo - sirf 0 mat dena! 15 questions mein 0,1,2,3 roughly equal use karo. (4) Factual, exam-style Hindi.'
     +avoid
-    +'\n\nReturn ONLY JSON array:\n[{"q":"प्रश्न?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"व्याख्या"}]';
+    +'
+
+Return ONLY valid JSON array (NO markdown, NO extra text):
+[{"q":"प्रश्न?","opts":["(A) विकल्प1","(B) विकल्प2","(C) विकल्प3","(D) विकल्प4"],"ans":0,"sol":"व्याख्या"}]';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -4098,6 +4101,13 @@ function loadCAQuestions(id,name,more){
     if(s===-1) throw new Error('JSON nahi mila');
     var arr=JSON.parse(txt.substring(s,e+1));
     if(!arr.length) throw new Error('Empty');
+    arr=arr.filter(function(q){
+      if(!q.opts||q.opts.length<4) return false;
+      var clean=q.opts.map(function(o){return (o||'').replace(/^([A-D])s*/,'').trim().toLowerCase();});
+      var unique=clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+      return unique.length===4;
+    });
+    if(!arr.length) throw new Error('Valid questions nahi mile, retry karo.');
 
     var ind=document.getElementById('ca_ind');
     if(ind) ind.remove();
@@ -4106,10 +4116,20 @@ function loadCAQuestions(id,name,more){
     var out='';
     arr.forEach(function(q,i){
       var idx=offset+i;
+      // Shuffle options so correct answer is not always A
+      var correctText=q.opts[q.ans];
+      var shuffled=q.opts.slice().sort(function(){return Math.random()-.5;});
+      // Fix option labels (A/B/C/D)
+      shuffled=shuffled.map(function(o,si){
+        var text=o.replace(/^\([A-D]\)\s*/,'');
+        return '('+'ABCD'[si]+') '+text;
+      });
+      var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText.replace(/^\([A-D]\)\s*/,'');});
+      if(newAns===-1) newAns=q.ans; // fallback
       out+='<div class="qcard" id="caq'+idx+'">'
         +'<div class="qtxt">Q'+(idx+1)+'. '+q.q+'</div>';
-      (q.opts||[]).forEach(function(o,j){
-        out+='<button class="opt" id="cao'+idx+'_'+j+'" onclick="pickCA('+idx+','+j+','+q.ans+')">'+(o||'')+'</button>';
+      shuffled.forEach(function(o,j){
+        out+='<button class="opt" id="cao'+idx+'_'+j+'" onclick="pickCA('+idx+','+j+','+newAns+')">'+(o||'')+'</button>';
       });
       if(q.sol) out+='<div class="sol" id="casol'+idx+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
       out+='</div>';
