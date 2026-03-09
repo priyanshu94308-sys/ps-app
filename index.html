@@ -937,25 +937,6 @@ body::before{
       <div class="sec">📋 Steps</div>
       <div id="yStepList"></div>
     </div>
-    <!-- RWA BOOK -->
-    <div class="tab" id="tab-rwa">
-      <div id="rwa-list">
-        <div style="background:linear-gradient(135deg,rgba(255,165,0,.15),rgba(255,107,138,.1));border:1px solid rgba(255,165,0,.3);border-radius:13px;padding:12px;margin-bottom:10px">
-          <div style="font-size:.95rem;font-weight:900">📖 RWA Yellow Book</div>
-          <div style="font-size:.65rem;color:var(--t2);margin-top:3px">Ankit Bhati Sir · AI-Generated Questions</div>
-        </div>
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:7px;color:var(--t2)">📚 Subject Choose Karo</div>
-        <div id="rwa-subjects"></div>
-      </div>
-      <div id="rwa-detail" style="display:none">
-        <button class="back" onclick="document.getElementById('rwa-list').style.display='block';document.getElementById('rwa-detail').style.display='none'">← Back</button>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:.88rem;font-weight:800" id="rwa-detail-title"></div>
-          <button onclick="loadRWAQuestions()" style="background:var(--ac);border:none;border-radius:6px;color:#fff;font-size:.6rem;font-weight:800;padding:4px 9px;cursor:pointer">🔄 नए</button>
-        </div>
-        <div id="rwa-detail-content"></div>
-      </div>
-    </div>
     <!-- CURRENT AFFAIRS -->
     <div class="tab" id="tab-ca">
       <!-- CA List View -->
@@ -1060,7 +1041,6 @@ body::before{
     <button class="tb" onclick="sw('yoga')" id="tb-yoga"><span>🧘</span>Yoga</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
-    <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>RWA</button>
     <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Report</button>
     <button class="tb" onclick="sw('settings')" id="tb-settings"><span>⚙️</span>Settings</button>
   </div>
@@ -1114,282 +1094,6 @@ body::before{
 
 <div class="toast" id="toast"></div>
 <script>
-
-// ══ RWA BOOK FACTS ══
-var RWA_FACTS = {
-history:`इतिहास के जनक हेरोडोटस हैं, इन्होंने हिस्टोरिका नामक पुस्तक लिखी।
-आग का आविष्कार पुरापाषाण काल में, पहिए का नवपाषाण काल में, कृषि का आविष्कार नवपाषाण काल में हुआ।
-मनुष्य ने सबसे पहले ताँबा धातु का प्रयोग किया। मनुष्य द्वारा बोई गई पहली फसल जौ (यव) थी।
-पुराणों की कुल संख्या 18 है। सबसे प्राचीन पुराण मत्स्य पुराण है।
-वेदों की कुल संख्या 4 है - ऋग्वेद, यजुर्वेद, सामवेद, अथर्ववेद।
-ऋग्वेद सबसे प्राचीन वेद है। ऋग्वेद में 10 मंडल, 1028 सूक्त तथा 10580 ऋचाएँ हैं।
-सामवेद को भारतीय संगीत का जनक कहते हैं। अथर्ववेद को ब्रह्मवेद भी कहते हैं।
-सिन्धु घाटी सभ्यता का काल 2500 ई.पू. से 1750 ई.पू.। हड़प्पा खोज 1921 ई. दयाराम साहनी ने।
-लोथल सिन्धु घाटी सभ्यता का प्रमुख बन्दरगाह था।
-सिन्धु सभ्यता के लोग मातृदेवी की पूजा करते थे। मोहनजोदड़ो को मृतकों का टीला कहते हैं।
-जैन धर्म के 24वें तीर्थंकर महावीर स्वामी थे। जन्म 540 ई.पू. कुंडग्राम (वैशाली)।
-बौद्ध धर्म के संस्थापक गौतम बुद्ध। जन्म 563 ई.पू. लुम्बिनी (कपिलवस्तु)।
-बुद्ध का पहला उपदेश सारनाथ में (धर्मचक्रप्रवर्तन)। मृत्यु 483 ई.पू. कुशीनगर।
-मौर्य वंश की स्थापना चन्द्रगुप्त मौर्य ने की। अशोक ने 261 ई.पू. कलिंग पर आक्रमण।
-गुप्त काल को भारतीय इतिहास का स्वर्ण युग कहते हैं।
-समुद्रगुप्त को भारत का नेपोलियन कहते हैं। चन्द्रगुप्त द्वितीय = विक्रमादित्य।
-हर्षवर्धन का शासनकाल 606-647 ई. ह्वेनसांग उनके दरबार में आया।
-महमूद गजनी ने भारत पर 17 बार आक्रमण किया। 1025-26 सोमनाथ मंदिर पर।
-गुलाम वंश 1206-1290: कुतुबुद्दीन ऐबक, इल्तुतमिश, रजिया सुल्तान, बलबन।
-रजिया सुल्तान पहली मुस्लिम महिला शासिका। मृत्यु 1240 ई.।
-अलाउद्दीन खिलजी ने मूल्य नियंत्रण प्रणाली और स्थायी सेना बनाई।
-मुहम्मद-बिन-तुगलक को पागल बादशाह कहते हैं।
-दिल्ली सल्तनत का अंतिम सुल्तान इब्राहिम लोदी था।
-पानीपत का प्रथम युद्ध 1526: बाबर vs इब्राहिम लोदी। बाबर जीता।
-बाबर ने तुजुक-ए-बाबरी (बाबरनामा) लिखी। खानवा युद्ध 1527 बाबर vs राणा सांगा।
-अकबर 1556-1605। हल्दीघाटी युद्ध 1576 अकबर vs महाराणा प्रताप।
-अकबर ने दीन-ए-इलाही धर्म चलाया। टोडरमल भूमि सुधारों का श्रेय।
-शाहजहाँ का काल वास्तुकला का स्वर्ण युग। ताजमहल यमुना किनारे आगरा में।
-औरंगजेब ने जिजया कर लागू किया। मृत्यु 1707 ई.।
-शिवाजी का जन्म 1627 शिवनेर किले में। 1674 में राज्याभिषेक।
-1857 ई. की क्रांति 10 मई मेरठ से शुरू। मंगल पांडे 34वीं रेजिमेंट।
-भारतीय राष्ट्रीय कांग्रेस स्थापना 1885 ए.ओ. ह्यूम ने।
-जलियाँवाला बाग हत्याकांड 13 अप्रैल 1919 अमृतसर।
-दांडी मार्च 12 मार्च 1930 महात्मा गाँधी ने।
-चौरी-चौरा कांड 4 फरवरी 1922। असहयोग आंदोलन 12 फरवरी 1922 को समाप्त।
-भारत छोड़ो आंदोलन अगस्त 1942। भारत 15 अगस्त 1947 को स्वतंत्र।
-महात्मा गाँधी जन्म 2 अक्तूबर 1869 पोरबंदर (गुजरात)।
-प्रथम विश्व युद्ध 28 जुलाई 1914 से 11 नवंबर 1918।
-द्वितीय विश्व युद्ध 1939-1945। हिरोशिमा 6 अगस्त, नागासाकी 9 अगस्त 1945 परमाणु बम।
-फ्रांस की क्रांति 1789 लुई 16वें के शासनकाल में। अमेरिका स्वतंत्रता 4 जुलाई 1776।`,
-
-geography:`भूगोल के जनक इरेटोस्थनीज। आधुनिक भूगोल के जनक अलेक्जेंडर वॉन हम्बोल्ट।
-ब्रह्मांड का व्यास 93 अरब प्रकाश-वर्ष। लगभग 100 अरब आकाशगंगाएँ हैं।
-पृथ्वी का सबसे निकटतम तारा सूर्य। सायरस सबसे चमकीला तारा।
-सूर्य के प्रकाश को पृथ्वी तक 8 मिनट 20 सेकंड लगते हैं।
-पृथ्वी के सबसे निकट ग्रह शुक्र। शुक्र सबसे चमकीला ग्रह।
-बृहस्पति सबसे बड़ा ग्रह। बुध सबसे छोटा और सबसे तेज।
-मंगल को लाल ग्रह कहते हैं। सौरमंडल की खोज कॉपरनिकस ने।
-ओजोन मंडल 15-35 किमी.। ओजोन को नष्ट करने वाली गैस CFC।
-आयनमंडल में रेडियो तरंगें परावर्तित होती हैं।
-पृथ्वी की आंतरिक संरचना: भूपर्पटी, मैंटल, केंद्रीय भाग।
-भारत का कुल क्षेत्रफल 32.8 लाख वर्ग किमी.।
-भारत के 7 स्थलीय पड़ोसी: पाकिस्तान, अफगानिस्तान, चीन, नेपाल, भूटान, म्यांमार, बांग्लादेश।
-गंगा नदी गंगोत्री ग्लेशियर से निकलती है।
-यमुना नदी यमुनोत्री से, प्रयागराज में गंगा से मिलती है।
-ब्रह्मपुत्र नदी पर विश्व का सबसे बड़ा नदी द्वीप माजुली (असम)।
-नर्मदा नदी अमरकंटक से निकलती है। डेल्टा नहीं बनाती।
-दामोदर नदी = बंगाल का शोक। कोसी नदी = बिहार का शोक।
-कावेरी नदी = दक्षिण भारत की गंगा।
-माउंट एवरेस्ट (8848 मी.) विश्व का सर्वोच्च शिखर, नेपाल में।
-भारत का सर्वोच्च शिखर K2 (8611 मी.)।
-भारत का सबसे बड़ा मरुस्थल थार। सबसे बड़ी झील वूलर (J&K)।
-चिल्का झील ओडिशा में, भारत की सबसे बड़ी खारे पानी की झील।
-गेहूँ और धान का सबसे बड़ा उत्पादक चीन। गन्ने का ब्राजील।
-जूट का सबसे बड़ा उत्पादक बांग्लादेश। रबर का थाईलैंड।
-विश्व का सबसे बड़ा देश रूस। सबसे छोटा वेटिकन सिटी।
-विश्व की सबसे लंबी नदी नील। सबसे बड़ा महासागर प्रशांत।`,
-
-polity:`संविधान 26 नवंबर 1949 को अंगीकृत, 26 जनवरी 1950 से लागू।
-डॉ. राजेंद्र प्रसाद संविधान सभा के अध्यक्ष।
-डॉ. बी.आर. अंबेडकर प्रारूप समिति के अध्यक्ष।
-भारत का संविधान विश्व का सबसे लंबा लिखित संविधान।
-मूल संविधान में 395 अनुच्छेद, 8 अनुसूचियाँ। वर्तमान 448 अनुच्छेद, 12 अनुसूचियाँ।
-समाजवादी और पंथनिरपेक्ष शब्द 42वें संशोधन (1976) से जोड़े गए।
-मौलिक अधिकार: 6 प्रकार। संवैधानिक उपचार का अधिकार = संविधान की आत्मा (अंबेडकर)।
-मौलिक कर्तव्य 42वें संशोधन (1976) से। मूल 10, अब 11।
-राष्ट्रपति देश का प्रथम नागरिक। कार्यकाल 5 वर्ष।
-उपराष्ट्रपति राज्यसभा का पदेन सभापति।
-लोकसभा में अधिकतम 552 सदस्य, वर्तमान 543 निर्वाचित।
-राज्यसभा अधिकतम 250 सदस्य। 12 राष्ट्रपति द्वारा मनोनीत।
-लोकसभा कार्यकाल 5 वर्ष। राज्यसभा स्थायी सदन।
-1773 रेग्यूलेटिंग एक्ट: वारेन हेस्टिंग्स पहला गवर्नर जनरल।
-1858 अधिनियम: शासन कंपनी से ब्रिटिश महारानी को।
-1919 माण्टेग्यू-चेम्सफोर्ड: प्रांतों में द्वैध शासन।
-1935 अधिनियम: 321 अनुच्छेद और 10 अनुसूचियाँ।
-राष्ट्रीय आपातकाल अनुच्छेद 352। राष्ट्रपति शासन अनुच्छेद 356।
-वित्त आयोग अनुच्छेद 280 के तहत हर 5 वर्ष में।
-73वें संशोधन से पंचायती राज को संवैधानिक दर्जा मिला।
-CAG नियुक्ति अनुच्छेद 148। UPSC अनुच्छेद 315।
-चुनाव आयोग अनुच्छेद 324 के तहत।`,
-
-economy:`अर्थशास्त्र के जनक एडम स्मिथ। 1776 में वेल्थ ऑफ नेशंस प्रकाशित।
-भारत की अर्थव्यवस्था मिश्रित अर्थव्यवस्था है।
-पहली पंचवर्षीय योजना 1951-56 कृषि आधारित। दूसरी भारी उद्योग (महालनोबिस मॉडल)।
-हरित क्रांति 1960 के दशक में। एम.एस. स्वामीनाथन = हरित क्रांति के जनक।
-श्वेत क्रांति (दूध) = वर्गीज कुरियन।
-GDP किसी देश की आर्थिक स्थिति मापने का प्रमुख तरीका।
-GST 1 जुलाई 2017 से लागू। एक अप्रत्यक्ष कर।
-RBI की स्थापना 1935। मुख्यालय मुंबई। बैंकों का बैंक।
-SEBI स्थापना 1988। NABARD स्थापना 1982।
-IMF स्थापना 1944। मुख्यालय वाशिंगटन DC।
-WTO स्थापना 1995।
-LPG नीति 1991: उदारीकरण, निजीकरण, वैश्वीकरण।
-रेपो रेट: RBI जिस दर पर बैंकों को ऋण देता है।
-रिवर्स रेपो रेट: RBI जिस दर पर बैंकों से ऋण लेता है।
-CRR: बैंकों को RBI के पास नकद जमा रखनी होती है।
-NITI Aayog स्थापना 1 जनवरी 2015। पहले योजना आयोग था।`,
-
-science:`SI पद्धति में 7 मूल मात्रक: मीटर, किलोग्राम, सेकंड, एम्पियर, केल्विन, मोल, कैंडेला।
-न्यूटन के तीन नियम: जड़त्व, F=ma, क्रिया-प्रतिक्रिया।
-प्रकाश की चाल 3×10⁸ मी./सेकंड।
-ध्वनि की चाल वायु में 332 मी./सेकंड (0°C पर)।
-इलेक्ट्रॉन की खोज जे.जे. थॉमसन। प्रोटॉन की रदरफोर्ड।
-न्यूट्रॉन की खोज जेम्स चैडविक ने 1932 में।
-DNA की खोज वॉटसन और क्रिक ने 1953 में।
-कोशिका की खोज रॉबर्ट हुक ने 1665 में। माइटोकॉन्ड्रिया = कोशिका का पावरहाउस।
-मानव शरीर में रक्त की मात्रा 5-6 लीटर। सामान्य रक्तचाप 120/80 mmHg।
-हृदय की सामान्य धड़कन 72 बार/मिनट। मानव शरीर में 206 हड्डियाँ।
-विटामिन A की कमी = रतौंधी। विटामिन C की कमी = स्कर्वी।
-विटामिन D की कमी = रिकेट्स।
-पानी का सूत्र H₂O। क्वथनांक 100°C। हिमांक 0°C।
-ऑक्सीजन की खोज प्रीस्टले ने 1774 में।
-हाइड्रोजन की खोज कैवेंडिश ने।
-सोने का प्रतीक Au। लोहे का Fe। चाँदी का Ag।
-पेनिसिलिन की खोज फ्लेमिंग ने 1928 में।
-इंसुलिन की खोज बेंटिंग और बेस्ट ने 1921 में।
-मलेरिया: प्लाज्मोडियम परजीवी, मादा एनोफिलीज मच्छर।
-X-किरण की खोज रॉन्टगन ने 1895 में।
-रेडियोधर्मिता की खोज हेनरी बेकरेल ने 1896 में।`,
-
-computer:`चार्ल्स बैबेज को कंप्यूटर का जन्मदाता कहते हैं।
-ENIAC प्रथम डिजिटल कंप्यूटर था।
-प्रथम पीढ़ी (1942-1955): निर्वात ट्यूब। UNIVAC I प्रथम व्यावसायिक कंप्यूटर।
-द्वितीय पीढ़ी (1956-1964): ट्रांजिस्टर।
-तृतीय पीढ़ी (1965-1975): IC (Integrated Circuit)।
-चतुर्थ पीढ़ी (1975-1990): VLSI, RAM।
-पंचम पीढ़ी (1990-अब): ULSI, AI, इंटरनेट।
-IPOS Cycle: Input → Process → Output → Storage।
-CPU कंप्यूटर का मस्तिष्क। RAM अस्थायी मेमोरी। ROM स्थायी।
-WWW का आविष्कार Tim Berners-Lee ने 1989 में।
-1 Byte = 8 Bits। 1 KB = 1024 Bytes। 1 MB = 1024 KB।
-Email का आविष्कार Ray Tomlinson ने 1971 में।
-Binary में केवल 0 और 1 का प्रयोग।
-ऑपरेटिंग सिस्टम: Windows, Linux, Mac OS, Android।
-HTML वेबपेज बनाने की भाषा।`,
-
-static_gk:`भारतीय शास्त्रीय नृत्यों की संख्या 8।
-भरतनाट्यम (तमिलनाडु), कथकली (केरल), कथक (UP), कुचिपुड़ी (आंध्र), मोहिनीअट्टम (केरल), मणिपुरी (मणिपुर), सत्रिया (असम), ओडिसी (ओडिशा)।
-भारत का राष्ट्रीय गीत वन्दे मातरम् (बंकिम चंद्र चटर्जी)।
-भारत का राष्ट्रगान जन-गण-मन (रवींद्रनाथ टैगोर)।
-राष्ट्रीय पशु बाघ। राष्ट्रीय पक्षी मोर। राष्ट्रीय फूल कमल।
-राष्ट्रीय फल आम। राष्ट्रीय वृक्ष बरगद। राष्ट्रीय खेल हॉकी।
-राष्ट्रीय जलीय जीव डॉल्फिन।
-राष्ट्रीय चिन्ह अशोक स्तंभ (सारनाथ)।
-राष्ट्रीय ध्वज तिरंगा: केसरिया, सफेद, हरा। अशोक चक्र नीला, 24 तीलियाँ।
-सर्वोच्च नागरिक सम्मान भारत रत्न।
-सर्वोच्च वीरता पुरस्कार परमवीर चक्र।
-ज्ञानपीठ पुरस्कार साहित्य का सर्वोच्च।
-अजंता की गुफाएं महाराष्ट्र में, बौद्ध धर्म से संबंधित।
-एलोरा की गुफाएं: हिंदू, बौद्ध, जैन तीनों।
-स्टैच्यू ऑफ यूनिटी (सरदार पटेल, गुजरात) 182 मीटर, विश्व की सबसे ऊँची मूर्ति।
-टिहरी बांध भारत का सबसे ऊँचा बांध। भाखड़ा नांगल सतलज नदी पर।
-हीराकुड बांध महानदी पर।
-काजीरंगा (असम) = एकसींगी गैंडा। गिर (गुजरात) = एशियाई सिंह।
-भारतीय सिनेमा के पितामह दादा साहेब फाल्के। पहली फिल्म राजा हरिश्चंद्र (1913)।
-नोबेल पुरस्कार पाने वाले पहले भारतीय: रवींद्रनाथ टैगोर (1913, साहित्य)।
-भारत के पहले प्रधानमंत्री जवाहरलाल नेहरू।
-भारत के पहले राष्ट्रपति डॉ. राजेंद्र प्रसाद।
-पहली महिला प्रधानमंत्री इंदिरा गाँधी। पहली महिला राष्ट्रपति प्रतिभा पाटिल (2007-2012)।`
-};
-
-var RWA_SUBJECTS = [
-  {id:'history',   label:'📜 इतिहास',          pages:'5-34',   color:'rgba(255,107,138,.15)'},
-  {id:'geography', label:'🌍 भूगोल',            pages:'35-73',  color:'rgba(107,155,255,.15)'},
-  {id:'polity',    label:'⚖️ राजव्यवस्था',      pages:'74-95',  color:'rgba(107,255,160,.15)'},
-  {id:'economy',   label:'💰 अर्थव्यवस्था',      pages:'96-126', color:'rgba(255,200,107,.15)'},
-  {id:'science',   label:'🔬 विज्ञान',          pages:'127-177',color:'rgba(200,107,255,.15)'},
-  {id:'computer',  label:'💻 कंप्यूटर',         pages:'178-195',color:'rgba(107,230,255,.15)'},
-  {id:'static_gk', label:'🏛️ Static GK',       pages:'196-245',color:'rgba(255,165,107,.15)'}
-];
-
-var rwaCurrentSubject = null;
-var rwaLoading = false;
-
-function initRWA(){
-  var grid = document.getElementById('rwa-subjects');
-  if(!grid) return;
-  var html = '';
-  RWA_SUBJECTS.forEach(function(s){
-    html += '<div onclick="openRWA(\''+s.id+'\')" style="background:'+s.color+';border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
-      + '<div><div style="font-size:.87rem;font-weight:800">'+s.label+'</div>'
-      + '<div style="font-size:.62rem;color:var(--t2)">Pages '+s.pages+' · AI Questions</div></div>'
-      + '<div style="font-size:1.2rem">→</div></div>';
-  });
-  grid.innerHTML = html;
-}
-
-function openRWA(subjectId){
-  rwaCurrentSubject = subjectId;
-  var s = RWA_SUBJECTS.find(function(x){return x.id===subjectId;});
-  document.getElementById('rwa-detail-title').textContent = s ? s.label : subjectId;
-  document.getElementById('rwa-list').style.display = 'none';
-  document.getElementById('rwa-detail').style.display = 'block';
-  document.getElementById('rwa-detail-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--t2);font-size:.8rem">⏳ AI questions generate kar raha hai...</div>';
-  loadRWAQuestions();
-}
-
-function loadRWAQuestions(){
-  if(rwaLoading) return;
-  var gkey = localStorage.getItem('ps_gkey');
-  if(!gkey){
-    document.getElementById('rwa-detail-content').innerHTML = '<div style="text-align:center;padding:20px;color:#ff6b8a;font-size:.8rem">⚠️ Settings mein Groq API key daalo pehle!</div>';
-    return;
-  }
-  if(!rwaCurrentSubject || !RWA_FACTS[rwaCurrentSubject]){
-    document.getElementById('rwa-detail-content').innerHTML = '<div style="color:#f66">Subject data nahi mila!</div>';
-    return;
-  }
-  rwaLoading = true;
-  var facts = RWA_FACTS[rwaCurrentSubject];
-  var prompt = 'Tum ek SSC/Bihar Police exam expert ho. Neeche diye gaye facts se exactly 10 MCQ questions banao.\n\nFACTS:\n' + facts + '\n\nRULES:\n- Har question in facts se hi ho\n- 4 options: (A) (B) (C) (D)\n- Ek sahi answer\n- Concise explanation\n- JSON format mein return karo:\n[\n  {"q":"question text","opts":["(A) ...","(B) ...","(C) ...","(D) ..."],"ans":0,"sol":"explanation"}\n]\nans mein 0-based index (0=A,1=B,2=C,3=D).\nSIRF JSON return karo, koi aur text nahi.';
-
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'user',content:prompt}],max_tokens:2000,temperature:0.7})
-  }).then(function(r){return r.json();}).then(function(data){
-    rwaLoading = false;
-    var text = (data.choices&&data.choices[0]&&data.choices[0].message&&data.choices[0].message.content)||'';
-    // Clean JSON
-    text = text.replace(/```json/g,'').replace(/```/g,'').trim();
-    var qs;
-    try{ qs = JSON.parse(text); } catch(e){
-      // Try to extract array
-      var m = text.match(/\[[\s\S]*\]/);
-      if(m){ try{ qs=JSON.parse(m[0]); }catch(e2){ qs=null; } }
-    }
-    if(!qs||!qs.length){
-      document.getElementById('rwa-detail-content').innerHTML = '<div style="color:#f66;padding:10px;font-size:.8rem">❌ Parse error. Dobara try karo.</div>';
-      return;
-    }
-    renderRWAQuestions(qs);
-  }).catch(function(err){
-    rwaLoading = false;
-    document.getElementById('rwa-detail-content').innerHTML = '<div style="color:#f66;padding:10px;font-size:.8rem">❌ API Error: '+err.message+'</div>';
-  });
-}
-
-function renderRWAQuestions(qs){
-  var out = '';
-  qs.forEach(function(q,i){
-    out += '<div class="qcard" id="rwa_q'+i+'">'
-      + '<div class="qn">Q'+(i+1)+'. '+q.q+'</div>';
-    (q.opts||[]).forEach(function(o,j){
-      out += '<button class="opt" id="rwa_opt'+i+'_'+j+'" onclick="pickRWA('+i+','+j+','+q.ans+')">'+o+'</button>';
-    });
-    if(q.sol) out += '<div class="sol" id="rwa_sol'+i+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
-    out += '</div>';
-  });
-  document.getElementById('rwa-detail-content').innerHTML = out;
-}
-
-function pickRWA(qi,sel,ans){
-  var opts = document.querySelectorAll('[id^="rwa_opt'+qi+'_"]');
-  opts.forEach(function(b,j){
-    b.disabled = true;
-    b.style.background = j===ans ? 'rgba(0,210,120,.25)' : (j===sel ? 'rgba(255,80,80,.2)' : '');
-    b.style.borderColor = j===ans ? 'var(--gr)' : (j===sel ? '#f55' : '');
-  });
-  var sol = document.getElementById('rwa_sol'+qi);
-  if(sol) sol.style.display = 'block';
-}
-
 var QB = {
 
 // ══════════════════════════════════════════════
@@ -2725,10 +2429,6 @@ function sw(tab){
   document.getElementById('tb-'+tab).classList.add('on');
   document.querySelector('.content').scrollTop=0;
   if(tab==='report') initReport();
-  if(tab==='rwa'){
-    document.getElementById('rwa-list').style.display='block';
-    document.getElementById('rwa-detail').style.display='none';
-  }
 }
 function showV(show,hide){
   document.getElementById(show).style.display='block';
@@ -2783,7 +2483,6 @@ function initApp(){
   renderSubjects();
   initYoga();
   initCA();
-  initRWA();
   var h=new Date().getHours();
   var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var d=new Date();
@@ -3220,24 +2919,7 @@ function loadCAQuestions(id,name,more){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']');
     if(s===-1) throw new Error('JSON nahi mila');
-    var raw=txt.substring(s,e+1);
-    // Clean common JSON issues from AI
-    raw=raw.replace(/,\s*}/g,'}').replace(/,\s*]/g,']');
-    raw=raw.replace(/[ -]/g,' ');
-    raw=raw.replace(/[\n\r]/g,' ');
-    var arr;
-    try{ arr=JSON.parse(raw); }
-    catch(je){
-      // Try extracting individual objects
-      var objs=[];
-      var depth=0,start=-1;
-      for(var ci=0;ci<raw.length;ci++){
-        if(raw[ci]==='{'){if(depth===0)start=ci;depth++;}
-        else if(raw[ci]==='}'){depth--;if(depth===0&&start>=0){try{objs.push(JSON.parse(raw.substring(start,ci+1)));}catch(x){}}}
-      }
-      if(!objs.length) throw new Error('JSON parse failed: '+je.message);
-      arr=objs;
-    }
+    var arr=JSON.parse(txt.substring(s,e+1));
     if(!arr.length) throw new Error('Empty');
 
     var ind=document.getElementById('ca_ind');
@@ -3521,7 +3203,6 @@ function initFirebase(){
     db=firebase.firestore();
     auth=firebase.auth();
     // onAuthStateChanged — single source of truth
-    auth.getRedirectResult().catch(function(e){console.log('redir:',e.message);});
     auth.onAuthStateChanged(function(user){
       if(user){
         currentUser=user;
@@ -3552,16 +3233,17 @@ function setLoginStatus(msg,type){
 function signInWithGoogle(){
   if(!auth){setLoginStatus('❌ Firebase load nahi hua','e');return;}
   var btn=document.getElementById('googleLoginBtn');
-  var svgHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google se Login Karo';
-  if(btn){btn.disabled=true;btn.style.opacity='.7';btn.textContent='⏳ Ja rahe hain...';}
+  if(btn){btn.disabled=true;btn.style.opacity='.7';btn.textContent='⏳ Google pe ja rahe hain...';}
   setLoginStatus('Ek second ruko...','i');
-  var provider=new firebase.auth.GoogleAuthProvider();
-  var isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-  function resetBtn(){if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML=svgHTML;}}
-  if(isMobile){
-    auth.signInWithRedirect(provider).catch(function(e){resetBtn();setLoginStatus('❌ '+e.message,'e');});
-  }else{
-    auth.signInWithPopup(provider).catch(function(e){resetBtn();setLoginStatus('❌ '+e.message,'e');});
+  try{
+    var provider=new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(function(e){
+      if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google se Login Karo';}
+      setLoginStatus('❌ '+e.message,'e');
+    });
+  }catch(e){
+    if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent='Google se Login Karo';}
+    setLoginStatus('❌ '+e.message,'e');
   }
 }
 
