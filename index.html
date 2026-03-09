@@ -1024,6 +1024,91 @@ body::before{
       </div>
     </div>
     <!-- REPORT -->
+    <div class="tab" id="tab-mock">
+      <div id="mock-home">
+        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">📝 MOCK TEST</div>
+        <div style="display:grid;gap:10px;">
+          <div onclick="startMock('ssc_gd')" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC GD / Bihar Police</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">80 Qs · 60 min · GK+Reasoning+Maths+Hindi</div>
+          </div>
+          <div onclick="startMock('ssc_cgl')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC CGL Tier-1</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 60 min · GK+Reasoning+Maths+English</div>
+          </div>
+          <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:var(--tx)">⚙️ Custom Mock</div>
+            <div style="font-size:.65rem;color:var(--t2);margin-top:4px">Khud set karo — subject, questions, time</div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <div style="font-size:.66rem;font-weight:800;color:var(--t2);margin-bottom:8px">📊 Recent Mocks</div>
+          <div id="mock-history-list"><div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div></div>
+        </div>
+      </div>
+      <div id="mock-setup" style="display:none">
+        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">⚙️ Custom Mock Setup</div>
+        <div class="cc" style="margin-bottom:10px">
+          <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Questions kitne?</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="mock-qcount-chips">
+            <button class="chip on" onclick="setMockOpt('qcount',25,this)">25</button>
+            <button class="chip" onclick="setMockOpt('qcount',50,this)">50</button>
+            <button class="chip" onclick="setMockOpt('qcount',80,this)">80</button>
+            <button class="chip" onclick="setMockOpt('qcount',100,this)">100</button>
+          </div>
+        </div>
+        <div class="cc" style="margin-bottom:10px">
+          <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Time limit?</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="chip on" onclick="setMockOpt('time',30,this)">30 min</button>
+            <button class="chip" onclick="setMockOpt('time',45,this)">45 min</button>
+            <button class="chip" onclick="setMockOpt('time',60,this)">60 min</button>
+          </div>
+        </div>
+        <div class="cc" style="margin-bottom:14px">
+          <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Subjects?</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="mock-subj-chips">
+            <button class="chip on" onclick="toggleMockSubj('gk',this)">GK</button>
+            <button class="chip on" onclick="toggleMockSubj('reasoning',this)">Reasoning</button>
+            <button class="chip on" onclick="toggleMockSubj('maths',this)">Maths</button>
+            <button class="chip on" onclick="toggleMockSubj('hindi',this)">Hindi</button>
+            <button class="chip" onclick="toggleMockSubj('english',this)">English</button>
+            <button class="chip" onclick="toggleMockSubj('science',this)">Science</button>
+          </div>
+        </div>
+        <button class="btn" onclick="launchCustomMock()" style="width:100%">🚀 Mock Shuru Karo</button>
+        <button onclick="showV('mock-home','mock-setup')" style="background:none;border:none;color:var(--t2);font-size:.7rem;padding:8px;cursor:pointer;display:block;margin:8px auto">← Wapas</button>
+      </div>
+      <div id="mock-test" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:.7rem;font-weight:800;color:var(--t2)" id="mock-qnum">Q 1/25</div>
+          <div style="font-size:.8rem;font-weight:900;color:var(--ac)" id="mock-timer">60:00</div>
+          <button onclick="submitMock()" style="background:var(--in);border:none;border-radius:8px;color:#fff;font-size:.62rem;font-weight:800;padding:5px 10px;cursor:pointer">Submit</button>
+        </div>
+        <div style="background:var(--br);height:3px;border-radius:2px;margin-bottom:14px"><div id="mock-progress" style="height:100%;background:var(--ac);border-radius:2px;transition:width .3s;width:0%"></div></div>
+        <div id="mock-question"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px">
+          <button onclick="mockNav(-1)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:8px 16px;font-size:.72rem;cursor:pointer">‹ Pehle</button>
+          <button onclick="mockNav(1)" style="background:var(--ac);border:none;border-radius:10px;color:#fff;padding:8px 16px;font-size:.72rem;font-weight:800;cursor:pointer">Agle ›</button>
+        </div>
+      </div>
+      <div id="mock-result" style="display:none">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:3rem" id="mock-res-emoji">🎯</div>
+          <div style="font-size:1.8rem;font-weight:900;margin:8px 0" id="mock-res-pct">0%</div>
+          <div style="font-size:.75rem;color:var(--t2)" id="mock-res-detail">0/0 sahi</div>
+          <div id="mock-res-grade" style="font-size:.8rem;font-weight:800;margin:8px 0;padding:6px 16px;border-radius:20px;display:inline-block"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+          <div class="cc" style="text-align:center"><div style="font-size:1.1rem;font-weight:900;color:var(--gr)" id="mock-res-correct">0</div><div style="font-size:.58rem;color:var(--t2)">Sahi</div></div>
+          <div class="cc" style="text-align:center"><div style="font-size:1.1rem;font-weight:900;color:var(--a2)" id="mock-res-wrong">0</div><div style="font-size:.58rem;color:var(--t2)">Galat</div></div>
+          <div class="cc" style="text-align:center"><div style="font-size:1.1rem;font-weight:900;color:var(--t2)" id="mock-res-skip">0</div><div style="font-size:.58rem;color:var(--t2)">Skip</div></div>
+        </div>
+        <div style="font-size:.66rem;font-weight:800;color:var(--t2);margin-bottom:8px">📋 Solutions</div>
+        <div id="mock-solutions"></div>
+        <button class="btn" onclick="showV('mock-home','mock-result');renderMockHistory()" style="width:100%;margin-top:12px">✅ Done</button>
+      </div>
+    </div>
     <div class="tab" id="tab-report">
       <div class="sgrid">
         <div class="sbox"><div class="snum" id="rStreak">0</div><div class="slbl">🔥 STREAK</div></div>
@@ -1077,6 +1162,7 @@ body::before{
     <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>Topic</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
+    <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
     <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Report</button>
     <button class="tb" onclick="sw('settings')" id="tb-settings"><span>⚙️</span>Settings</button>
   </div>
@@ -3460,6 +3546,14 @@ function sw(tab){
   document.querySelector('.content').scrollTop=0;
   if(tab==='report') initReport();
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
+  if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
+}
+function clearRWACache(){
+  try{
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf('rwa_')===0) localStorage.removeItem(k);
+    });
+  }catch(e){}
 }
 function showV(show,hide){
   document.getElementById(show).style.display='block';
@@ -3576,6 +3670,8 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   }
   if(rwaLoading) return;
   rwaLoading=true;
+  // Auto-reset after 30s to prevent permanent block
+  var _rwaTimeout=setTimeout(function(){rwaLoading=false;},30000);
   var systemMsg='Tu ek MCQ generator hai. OUTPUT SIRF valid JSON array hoga. Koi text, explanation, markdown allowed nahi. Har question SIRF given topic ke baare mein hoga.';
   var prompt='TOPIC: "'+topic+'"\n\n'
     +'Upar diye gaye TOPIC ke baare mein SIRF 10 MCQ questions banao.\n'
@@ -3597,8 +3693,17 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
     body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7})
   }).then(function(r){return r.json();}).then(function(data){
-    rwaLoading=false;
-    if(data.error){var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ '+data.error.message.substring(0,60)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';return;}
+    clearTimeout(_rwaTimeout);rwaLoading=false;
+    if(data.error){
+      var errMsg=data.error.message||'Unknown error';
+      var errCode=data.error.code||'';
+      var hint='';
+      if(errMsg.indexOf('auth')!==-1||errCode===401) hint=' (Key galat hai — Settings mein check karo)';
+      else if(errMsg.indexOf('rate')!==-1||errCode===429) hint=' (Rate limit — thoda ruko)';
+      var qc=document.getElementById('rwa-quiz-content');
+      if(qc)qc.innerHTML='<div class="empty">❌ '+errMsg.substring(0,80)+hint+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';
+      return;
+    }
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
     var aiQs=null;
@@ -3633,7 +3738,7 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
       rwaQuizState={qs:aiQs,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
       renderRWAQuestion();
     }
-  }).catch(function(e){rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
+  }).catch(function(e){clearTimeout(_rwaTimeout);rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
 }
 
 function getRWAQBQuestions(subjectKey,topic){
@@ -3738,6 +3843,24 @@ function rwaBreadcrumbBack(level){
 
 function initApp(){
   load();
+  // Apply saved dark/light mode
+  if(!S.dark){
+    var r=document.documentElement;
+    r.style.setProperty('--bg','#f5f5f0');
+    r.style.setProperty('--bg2','#ebebeb');
+    r.style.setProperty('--card','#ffffff');
+    r.style.setProperty('--cd2','#f0f0ea');
+    r.style.setProperty('--tx','#1a1a2e');
+    r.style.setProperty('--t2','#888899');
+    r.style.setProperty('--t3','#555566');
+    r.style.setProperty('--br','rgba(0,0,0,.08)');
+    r.style.setProperty('--br2','rgba(0,0,0,.13)');
+    r.style.setProperty('--glass','rgba(0,0,0,.03)');
+    document.body.style.background='#f5f5f0';
+    var tb=document.getElementById('themeBtn');if(tb)tb.textContent='🌙';
+  }
+  // Clear old topic cache so fresh AI questions always generate
+  clearRWACache();
   var ni=document.getElementById('nameInp');
   if(ni) ni.value=S.name;
   var gk=document.getElementById('geminiKey');
@@ -3953,17 +4076,68 @@ function renderChapters(){
   var qs=(QB[curSubj.id]||[]).filter(function(q){return curLvl==='all'||q.level===curLvl;});
   var chs={};
   qs.forEach(function(q){if(!chs[q.ch])chs[q.ch]=[];chs[q.ch].push(q);});
-  if(!Object.keys(chs).length){cl.innerHTML='<div class="empty">Koi question nahi</div>';return;}
-  cl.innerHTML=Object.keys(chs).map(function(ch){
-    var cqs=chs[ch];
-    var stats=S.sStats[curSubj.id]&&S.sStats[curSubj.id].chs&&S.sStats[curSubj.id].chs[ch]?S.sStats[curSubj.id].chs[ch]:{d:0,t:0};
-    var lvl=LVLARR[Math.floor(Math.random()*LVLARR.length)];
-    return '<div class="chi" onclick="openChapter(\''+esc(ch)+'\',\''+lvl+'\')">'
-      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+esc(ch)+'</div>'
-      +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">'+cqs.length+' Q · '+(stats.t?Math.round(stats.d/stats.t*100):0)+'% acc</div></div>'
-      +'<span class="lbg '+LVLCLS[lvl]+'">'+LVLLBL[lvl]+'</span><span style="font-size:.7rem;color:var(--t2)">▶</span>'
-      +'</div>';
-  }).join('');
+  var chKeys=Object.keys(chs);
+  var html='';
+  if(chKeys.length){
+    html=chKeys.map(function(ch){
+      var cqs=chs[ch];
+      var stats=S.sStats[curSubj.id]&&S.sStats[curSubj.id].chs&&S.sStats[curSubj.id].chs[ch]?S.sStats[curSubj.id].chs[ch]:{d:0,t:0};
+      var lvl=LVLARR[Math.floor(Math.random()*LVLARR.length)];
+      return '<div class="chi" onclick="openChapter(\''+esc(ch)+'\',\''+lvl+'\')">'+''
+        +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+esc(ch)+'</div>'
+        +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">'+cqs.length+' Q · '+(stats.t?Math.round(stats.d/stats.t*100):0)+'% acc</div></div>'
+        +'<span class="lbg '+LVLCLS[lvl]+'">'+LVLLBL[lvl]+'</span><span style="font-size:.7rem;color:var(--t2)">▶</span>'
+        +'</div>';
+    }).join('');
+  }
+  // Always show AI Practice button at bottom
+  html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--br)">'
+    +'<div style="font-size:.65rem;color:var(--t2);margin-bottom:8px;font-weight:700">🤖 AI Practice (Custom Questions)</div>'
+    +'<div onclick="openAIPractice()" style="background:linear-gradient(135deg,var(--ac),var(--pu));border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;">'
+    +'<div style="font-size:1.5rem">🤖</div>'
+    +'<div><div style="font-size:.8rem;font-weight:800;color:#fff">'+curSubj.name+' — AI Questions</div>'
+    +'<div style="font-size:.62rem;color:rgba(255,255,255,.75);margin-top:2px">AI se fresh 10 questions — koi bhi topic</div></div>'
+    +'</div></div>';
+  if(!chKeys.length) html='<div class="empty" style="margin-bottom:12px">QB questions nahi hain</div>'+html;
+  cl.innerHTML=html;
+}
+
+function openAIPractice(){
+  if(!curSubj) return;
+  var gkey=getGKey();
+  if(!gkey){toast('🔑 Settings mein Groq key daalo!');return;}
+  showV('pv3','pv2');
+  var pt=document.getElementById('pTitle');
+  if(pt) pt.textContent=curSubj.icon+' '+curSubj.name+' — AI Practice';
+  var ql=document.getElementById('qList');
+  if(ql) ql.innerHTML='<div style="text-align:center;padding:40px 20px"><div style="font-size:2rem;margin-bottom:12px">🤖</div><div style="font-size:.85rem;font-weight:700;color:var(--tx);margin-bottom:6px">AI questions bana raha hai...</div><div style="display:flex;gap:6px;justify-content:center;margin-top:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div><div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div><div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div></div></div>';
+  pracAns={};pracC=0;pracT=0;
+  var subjectNames={gk:'सामान्य ज्ञान',history:'भारतीय इतिहास',polity:'राजव्यवस्था',geography:'भूगोल',science:'विज्ञान',maths:'गणित',english:'English Grammar',reasoning:'Reasoning'};
+  var subName=subjectNames[curSubj.id]||curSubj.name;
+  var systemMsg='Tu MCQ generator hai. SIRF valid JSON array output kar. Koi bhi explanation ya markdown mat likho.';
+  var prompt='Subject: "'+subName+'" ke 10 SSC/Bihar Police exam style MCQ banao.\n\nRULES:\n- Varied topics cover karo is subject ke andar\n- 4 options: ek sahi, teen galat (realistic)\n- ans: 0/1/2/3 equally vary karo\n- Hindi mein (English grammar ke liye English)\n- sol: ek line explanation\n\nFORMAT:\n[{"q":"question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation","ch":"chapter name"}]';
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7})
+  }).then(function(r){return r.json();}).then(function(data){
+    if(data.error){if(ql)ql.innerHTML='<div class="empty">❌ '+data.error.message.substring(0,60)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
+    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
+    var aiQs;
+    try{aiQs=JSON.parse(txt.substring(s,e));}catch(ex){if(ql)ql.innerHTML='<div class="empty">❌ Parse error<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
+    if(!aiQs||!aiQs.length){if(ql)ql.innerHTML='<div class="empty">❌ Questions nahi aaye<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
+    // Shuffle options
+    aiQs=aiQs.map(function(q){
+      if(!q.opts||q.opts.length<4) return q;
+      var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+      var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+      var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
+      return Object.assign({},q,{_sopts:sh,_sans:na===-1?q.ans:na});
+    });
+    pracQs=aiQs;
+    renderPracQs();
+  }).catch(function(e){if(ql)ql.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';});
 }
 
 function openChapter(ch,lvl){
@@ -4183,6 +4357,9 @@ function loadCAQuestions(id,name,more){
   }
 
   var yr=new Date().getFullYear();
+  var mn3=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var now=new Date();
+  var currentDate=now.getDate()+' '+mn3[now.getMonth()]+' '+yr;
   var hist=_getCAHistory(id);
   var avoid='';
   if(hist.length>0){
@@ -4192,11 +4369,18 @@ function loadCAQuestions(id,name,more){
 
   var offset=cont.querySelectorAll('.qcard').length;
 
-
-  var prompt='Bihar Police/SSC GD/CGL exam expert. Topic: "'+name+'". Year: '+yr+'.'
-    +' Generate 15 UNIQUE MCQ in Hindi. STRICT RULES: (1) 4 options BILKUL ALAG honay chahiye. (2) Sirf EK sahi answer ho, baki 3 galat lekin plausible. (3) CRITICAL: ans index VARY karo - sirf 0 mat dena, 0/1/2/3 sab use karo. (4) Factual, exam-style Hindi.'
+  var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
+    +'\n\nTopic: "'+name+'" par 15 UNIQUE MCQ banao.'
+    +'\n\n⚠️ SABSE IMPORTANT: Sirf LATEST aur CURRENT data use karo ('+yr+' tak ka).'
+    +'\nJaise: CMs, Governors, appointments, awards — ABHI JO HAI wo likho, purana nahi.'
+    +'\nExample: MP CM = Mohan Yadav (NOT Shivraj), Bihar CM = Nitish Kumar, etc.'
+    +'\n\nSTRICT RULES:'
+    +'\n1. 4 options BILKUL ALAG — plausible wrong options'
+    +'\n2. ans index 0/1/2/3 equally vary karo — sirf 0 mat dena'
+    +'\n3. Factual, exam-style Hindi'
+    +'\n4. Sol mein latest fact explain karo'
     +avoid
-    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"\u092a\u094d\u0930\u0936\u094d\u0928?","opts":["(A) \u0935\u093f\u0915\u0932\u094d\u092a1","(B) \u0935\u093f\u0915\u0932\u094d\u092a2","(C) \u0935\u093f\u0915\u0932\u094d\u092a3","(D) \u0935\u093f\u0915\u0932\u094d\u092a4"],"ans":2,"sol":"\u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e"}]';
+    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या"}]';
 
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
@@ -4208,7 +4392,7 @@ function loadCAQuestions(id,name,more){
         {role:'user',content:prompt}
       ],
       max_tokens:4500,
-      temperature:0.9
+      temperature:0.3
     })
   })
   .then(function(r){return r.json();})
@@ -4323,15 +4507,56 @@ function loadDailyCA(force){
   if(!key){document.getElementById('daily-ca-content').innerHTML='<div class="empty">🔑 Groq key daalo!</div>';return;}
   var d=new Date();
   var cacheKey='dca_'+d.getFullYear()+'_'+d.getMonth()+'_'+d.getDate();
+  // Clear only old dates cache
   try{Object.keys(localStorage).forEach(function(k){if(k.startsWith('dca_')&&k!==cacheKey)localStorage.removeItem(k);});}catch(e){}
   var mn2=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var dateStr=d.getDate()+' '+mn2[d.getMonth()]+' '+d.getFullYear();
-  if(!force){try{var c=localStorage.getItem(cacheKey);if(c){var cp=JSON.parse(c);if(cp&&cp.items){renderDailyCAItems(cp.items,dateStr,cacheKey);return;}}}catch(e){}}
-  document.getElementById('daily-ca-content').innerHTML='<div style="text-align:center;padding:12px;color:var(--t2);font-size:.75rem">🤖 Loading...</div>';
-  var prompt='Bihar Police/SSC/RRB exam expert. '+dateStr+' ki current affairs generate karo.\n\nCover in order: niyukti/padonnati, puraskar/samman, khel, vigyan/taknik, arthvyavastha, antarrashtriya, rashtriya, koi bhi ek aur.\n\nSTRICT RULES:\n1. Har MCQ ke 4 options BILKUL ALAG aur realistic honay chahiye.\n2. CRITICAL: "ans" index VARY karo - sirf 0 mat dena, 0/1/2/3 sab use karo.\n3. Hindi only. Factual aur exam-style.\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य यहाँ","mcq":{"q":"प्रश्न?","opts":["(A) सही विकल्प","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":0,"sol":"व्याख्या"}}]}\n\nSIRF valid JSON, no markdown.';
+  // Cache hit — show instantly, no loading
+  if(!force){
+    try{
+      var c=localStorage.getItem(cacheKey);
+      if(c){
+        var cp=JSON.parse(c);
+        if(cp&&cp.items&&cp.items.length>0){
+          renderDailyCAItems(cp.items,dateStr,cacheKey);
+          return;
+        }
+        // Cache exists but empty means "no news today" — show blank
+        if(cp&&cp.noNews){
+          document.getElementById('daily-ca-content').innerHTML=
+            '<div style="text-align:center;padding:30px;color:var(--t2)">'
+            +'<div style="font-size:2rem">📭</div>'
+            +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi major current affairs nahi</div>'
+            +'<div style="font-size:.65rem">'+dateStr+'</div>'
+            +'<button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;padding:6px 14px;font-size:.65rem;cursor:pointer">🔄 Dobara Try Karo</button>'
+            +'</div>';
+          return;
+        }
+      }
+    }catch(e){}
+  }
+  // Show loader
+  document.getElementById('daily-ca-content').innerHTML=
+    '<div style="text-align:center;padding:30px">'
+    +'<div style="font-size:2rem">🤖</div>'
+    +'<div style="font-size:.8rem;font-weight:700;color:var(--ac);margin:8px 0">Aaj ki news dhundh raha hai...</div>'
+    +'<div style="font-size:.62rem;color:var(--t2)">'+dateStr+'</div>'
+    +'<div style="display:flex;gap:6px;justify-content:center;margin-top:12px">'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
+    +'</div></div>';
+  var prompt='Aaj ki date: '+dateStr+'.'
+    +'\n\nIndia ki aaj ki ('+dateStr+') REAL current affairs ke MCQ banao — Bihar Police/SSC/RRB exam style.'
+    +'\nCategories cover karo: niyukti, puraskar, khel, vigyan, arthvyavastha, antarrashtriya, rashtriya.'
+    +'\n\nAGAR AAJ KOI KHAAS KHABAR NAHI — toh {"noNews":true} return karo.'
+    +'\nWarna SIRF ASAL khabrein likho — kuch bhi mat banao.'
+    +'\n\nRULES:\n1. 4 options BILKUL ALAG, realistic\n2. ans index 0/1/2/3 vary karo\n3. Hindi only\n4. Headline mein poora fact likho'
+    +'\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य","mcq":{"q":"प्रश्न?","opts":["(A) सही","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":1,"sol":"व्याख्या"}}]}'
+    +'\n\nSIRF valid JSON. No markdown.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'JSON generator. Hindi only. No markdown.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.7})
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -4339,13 +4564,35 @@ function loadDailyCA(force){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     var parsed=JSON.parse(txt.substring(s,e));
-    renderDailyCAItems(parsed.items||[],dateStr,cacheKey);
-    toast('✅ CA ready!','i');
+    // AI said no news today
+    if(parsed.noNews){
+      try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
+      document.getElementById('daily-ca-content').innerHTML=
+        '<div style="text-align:center;padding:30px;color:var(--t2)">'
+        +'<div style="font-size:2rem">📭</div>'
+        +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi major current affairs nahi</div>'
+        +'<div style="font-size:.65rem">'+dateStr+' — Kal dobara check karo</div>'
+        +'</div>';
+      return;
+    }
+    if(!parsed.items||!parsed.items.length){
+      try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
+      document.getElementById('daily-ca-content').innerHTML=
+        '<div style="text-align:center;padding:30px;color:var(--t2)">'
+        +'<div style="font-size:2rem">📭</div>'
+        +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi news nahi mili</div>'
+        +'<button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;padding:6px 14px;font-size:.65rem;cursor:pointer">🔄 Retry</button>'
+        +'</div>';
+      return;
+    }
+    renderDailyCAItems(parsed.items,dateStr,cacheKey);
+    toast('✅ Aaj ki CA ready!','i');
   })
   .catch(function(e){
     document.getElementById('daily-ca-content').innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,60))+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="loadDailyCA(true)">🔄 Retry</button></div>';
   });
 }
+
 
 function pickDCA(i,oi,correct){
   var opts=document.querySelectorAll('[id^="dca'+i+'_"]');
@@ -4582,6 +4829,186 @@ function drawCharts(){
     if(charts.m) charts.m.destroy();
     mc.parentElement.innerHTML+='<div style="text-align:center;font-size:.65rem;color:var(--t2);padding:8px">Abhi koi mock data nahi</div>';
   }
+}
+
+
+// ══════════════════════════════════════
+// MOCK TEST
+// ══════════════════════════════════════
+var mockState={qs:[],cur:0,ans:{},timeLeft:0,timer:null,name:'',totalTime:0};
+var mockOpts={qcount:25,time:30,subjects:['gk','reasoning','maths','hindi']};
+
+function startMock(type){
+  if(type==='custom'){showV('mock-setup','mock-home');renderMockHistory();return;}
+  var configs={
+    ssc_gd:{name:'SSC GD / Bihar Police',qcount:80,time:60,subjects:['gk','reasoning','maths','hindi']},
+    ssc_cgl:{name:'SSC CGL Tier-1',qcount:100,time:60,subjects:['gk','reasoning','maths','english']}
+  };
+  var cfg=configs[type];
+  mockOpts={qcount:cfg.qcount,time:cfg.time,subjects:cfg.subjects};
+  launchMockWithConfig(cfg.name);
+}
+
+function setMockOpt(key,val,el){
+  mockOpts[key]=val;
+  if(el){
+    var parent=el.parentElement;
+    parent.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+    el.classList.add('on');
+  }
+}
+
+function toggleMockSubj(s,el){
+  var i=mockOpts.subjects.indexOf(s);
+  if(i===-1){mockOpts.subjects.push(s);el.classList.add('on');}
+  else{mockOpts.subjects.splice(i,1);el.classList.remove('on');}
+}
+
+function launchCustomMock(){
+  if(!mockOpts.subjects.length){toast('Kam se kam ek subject chunao!');return;}
+  launchMockWithConfig('Custom Mock');
+}
+
+function launchMockWithConfig(name){
+  var gkey=getGKey();
+  if(!gkey){toast('🔑 Settings mein Groq key daalo!');return;}
+  showV('mock-test','mock-home');
+  showV('mock-test','mock-setup');
+  mockState={qs:[],cur:0,ans:{},timeLeft:mockOpts.time*60,timer:null,name:name,totalTime:mockOpts.time*60};
+  document.getElementById('mock-question').innerHTML=
+    '<div style="text-align:center;padding:40px 20px"><div style="font-size:2rem">🤖</div><div style="font-size:.85rem;font-weight:700;margin-top:8px">AI mock paper bana raha hai...</div><div style="font-size:.65rem;color:var(--t2);margin-top:4px">'+name+' · '+mockOpts.qcount+' Qs · '+mockOpts.time+' min</div></div>';
+  document.getElementById('mock-timer').textContent=mockOpts.time+':00';
+  // Fetch questions per subject
+  var subjNames={gk:'General Knowledge',reasoning:'Reasoning',maths:'Mathematics',hindi:'Hindi Grammar & Literature',english:'English Grammar',science:'General Science',history:'History',polity:'Polity',geography:'Geography'};
+  var perSubj=Math.ceil(mockOpts.qcount/mockOpts.subjects.length);
+  var systemMsg='Tu MCQ generator hai. SIRF valid JSON array output kar. No markdown.';
+  var prompt='Generate '+perSubj+' MCQ for each of these subjects: '+mockOpts.subjects.map(function(s){return subjNames[s]||s;}).join(', ')+'.\n\nTotal: '+mockOpts.qcount+' questions.\nMix karo: easy 40%, medium 40%, hard 20%.\nSSC/Bihar Police exam level.\n\nFORMAT ONLY:\n[{"q":"question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation","subj":"subject"}]\n\nRULES:\n- ans index 0/1/2/3 equally vary karo\n- Hindi mein (English ke liye English)\n- Realistic wrong options';
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:6000,temperature:0.7})
+  }).then(function(r){return r.json();}).then(function(data){
+    if(data.error){document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+data.error.message.substring(0,80)+'<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';return;}
+    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
+    var qs;
+    try{qs=JSON.parse(txt.substring(s,e));}catch(ex){document.getElementById('mock-question').innerHTML='<div class="empty">❌ Parse error<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';return;}
+    if(!qs||!qs.length){document.getElementById('mock-question').innerHTML='<div class="empty">❌ Questions nahi aaye<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';return;}
+    // Shuffle options
+    qs=qs.map(function(q){
+      if(!q.opts||q.opts.length<4) return q;
+      var ct=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+      var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+      var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===ct;});
+      return Object.assign({},q,{opts:sh,ans:na===-1?q.ans:na});
+    });
+    mockState.qs=qs.slice(0,mockOpts.qcount);
+    renderMockQ();
+    startMockTimer();
+  }).catch(function(e){document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+e.message+'<br><button class="btn" onclick="sw(\'mock\')"  >Back</button></div>';});
+}
+
+function renderMockQ(){
+  var s=mockState;
+  var q=s.qs[s.cur];
+  if(!q) return;
+  var total=s.qs.length;
+  document.getElementById('mock-qnum').textContent='Q '+(s.cur+1)+'/'+total;
+  document.getElementById('mock-progress').style.width=((s.cur+1)/total*100)+'%';
+  var sel=s.ans[s.cur];
+  var html='<div style="font-size:.83rem;font-weight:700;line-height:1.5;margin-bottom:14px">'+esc(q.q)+'</div>';
+  html+='<div>';
+  (q.opts||[]).forEach(function(opt,i){
+    var picked=sel===i;
+    var bg=picked?'rgba(92,106,240,.2)':'var(--cd2)';
+    var border=picked?'var(--ac)':'var(--br2)';
+    html+='<div onclick="pickMockAns('+i+')" style="background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.78rem;transition:all .2s">'+esc(opt)+'</div>';
+  });
+  html+='</div>';
+  if(q.subj) html+='<div style="font-size:.58rem;color:var(--t2);margin-top:6px">Subject: '+esc(q.subj)+'</div>';
+  document.getElementById('mock-question').innerHTML=html;
+}
+
+function pickMockAns(i){
+  mockState.ans[mockState.cur]=i;
+  renderMockQ();
+}
+
+function mockNav(dir){
+  var newIdx=mockState.cur+dir;
+  if(newIdx<0||newIdx>=mockState.qs.length) return;
+  mockState.cur=newIdx;
+  renderMockQ();
+}
+
+function startMockTimer(){
+  if(mockState.timer) clearInterval(mockState.timer);
+  mockState.timer=setInterval(function(){
+    mockState.timeLeft--;
+    var m=Math.floor(mockState.timeLeft/60),s=mockState.timeLeft%60;
+    var el=document.getElementById('mock-timer');
+    if(el) el.textContent=m+':'+(s<10?'0':'')+s;
+    if(mockState.timeLeft<=300&&el) el.style.color='var(--a2)';
+    if(mockState.timeLeft<=0){clearInterval(mockState.timer);submitMock();}
+  },1000);
+}
+
+function submitMock(){
+  if(mockState.timer) clearInterval(mockState.timer);
+  var qs=mockState.qs,ans=mockState.ans;
+  var correct=0,wrong=0,skip=0;
+  qs.forEach(function(q,i){
+    if(ans[i]===undefined) skip++;
+    else if(ans[i]===q.ans) correct++;
+    else wrong++;
+  });
+  var total=qs.length;
+  var pct=Math.round(correct/total*100);
+  // Save to S.mocks
+  var mockRecord={name:mockState.name,date:new Date().toLocaleDateString('hi-IN'),pct:pct,correct:correct,wrong:wrong,skip:skip,total:total,time:Math.round((mockState.totalTime-mockState.timeLeft)/60)+' min'};
+  if(!S.mocks) S.mocks=[];
+  S.mocks.push(mockRecord);
+  save();
+  // Show result
+  showV('mock-result','mock-test');
+  document.getElementById('mock-res-pct').textContent=pct+'%';
+  document.getElementById('mock-res-detail').textContent=correct+'/'+total+' sahi';
+  document.getElementById('mock-res-correct').textContent=correct;
+  document.getElementById('mock-res-wrong').textContent=wrong;
+  document.getElementById('mock-res-skip').textContent=skip;
+  var emoji=pct>=80?'🏆':pct>=60?'🎯':pct>=40?'📚':'💪';
+  var grade=pct>=80?'Excellent!':pct>=60?'Good':pct>=40?'Average':'Keep Practicing';
+  var gradeColor=pct>=80?'var(--gr)':pct>=60?'var(--ac)':pct>=40?'var(--or)':'var(--a2)';
+  document.getElementById('mock-res-emoji').textContent=emoji;
+  var gradeEl=document.getElementById('mock-res-grade');
+  gradeEl.textContent=grade;gradeEl.style.background=gradeColor;gradeEl.style.color='#fff';
+  // Solutions
+  var solHtml=qs.map(function(q,i){
+    var ua=ans[i],ca=q.ans;
+    var status=ua===undefined?'⬜ Skip':ua===ca?'✅ Sahi':'❌ Galat';
+    var color=ua===undefined?'var(--t2)':ua===ca?'var(--gr)':'var(--a2)';
+    return '<div style="padding:10px;border-bottom:1px solid var(--br);font-size:.72rem">'
+      +'<div style="display:flex;justify-content:space-between"><span style="font-weight:700">Q'+(i+1)+'.</span><span style="color:'+color+';font-weight:800">'+status+'</span></div>'
+      +'<div style="margin:4px 0;line-height:1.4">'+esc(q.q)+'</div>'
+      +(ua!==undefined&&ua!==ca?'<div style="color:var(--a2)">Tumhara: '+esc((q.opts[ua]||''))+'</div>':'')
+      +'<div style="color:var(--gr)">Sahi: '+esc((q.opts[ca]||''))+'</div>'
+      +(q.sol?'<div style="color:var(--t2);margin-top:3px">💡 '+esc(q.sol)+'</div>':'')
+      +'</div>';
+  }).join('');
+  document.getElementById('mock-solutions').innerHTML=solHtml;
+}
+
+function renderMockHistory(){
+  var el=document.getElementById('mock-history-list');
+  if(!el) return;
+  if(!S.mocks||!S.mocks.length){el.innerHTML='<div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div>';return;}
+  el.innerHTML=S.mocks.slice().reverse().slice(0,5).map(function(m){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--cd2);border-radius:10px;margin-bottom:6px">'
+      +'<div><div style="font-size:.72rem;font-weight:700">'+esc(m.name||'Mock')+'</div>'
+      +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+' · '+esc(m.correct||0)+'/'+esc(m.total||0)+' · '+esc(m.time||'')+'</div></div>'
+      +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+m.pct+'%</div>'
+      +'</div>';
+  }).join('');
 }
 
 // ── FIREBASE ──
