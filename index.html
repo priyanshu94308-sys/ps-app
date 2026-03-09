@@ -51,6 +51,10 @@
   --pu:#b06af5;
   --or:#ff7043;
   --tl:#00c8c8;
+  --teal:#00c8c8;
+  --ye:#f5c518;
+  --ye:#f5c518;
+  --teal:#00c8c8;
 
   /* Shadows */
   --sh:0 8px 40px rgba(0,0,0,.6);
@@ -815,7 +819,7 @@ body::before{
     </div>
     <div style="display:flex;align-items:center;gap:6px">
       <div class="streak" id="streakPill">🔥 0 days</div>
-      <button class="ibtn" onclick="toggleTheme()" style="font-size:.8rem">☀️</button>
+      <button class="ibtn" id="themeBtn" onclick="toggleTheme()" style="font-size:.8rem">☀️</button>
     </div>
   </div>
   <div class="content">
@@ -994,7 +998,7 @@ body::before{
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
         <div style="width:35px;height:35px;background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.2rem">🤖</div>
         <div><div style="font-size:.86rem;font-weight:800">PS AI Tutor</div><div style="font-size:.62rem;color:var(--t2)" id="aiStatus">Settings mein Groq key daalo</div></div>
-        <button class="ibtn" style="margin-left:auto" onclick="document.getElementById('chatArea').innerHTML='';toast('Clear!')">🗑️</button>
+        <button class="ibtn" style="margin-left:auto" onclick="document.getElementById('chatArea').innerHTML='';window._chatHistory=[];toast('Clear!')">🗑️</button>
       </div>
       <div class="chips">
         <button class="chip" onclick="askQ('SSC CGL vacancy aur exam pattern batao')">SSC CGL</button>
@@ -1029,6 +1033,7 @@ body::before{
       <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📊 Daily Progress</div><div class="ch"><canvas id="weekChart"></canvas></div></div>
       <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📚 Subject Accuracy</div><div class="ch"><canvas id="subjChart"></canvas></div></div>
       <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📝 Mock Scores</div><div class="ch"><canvas id="mockChart"></canvas></div></div>
+      <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📅 Activity Heatmap (90 days)</div><div class="hm-w" id="hmWrap"><div class="hm" id="hmGrid"></div></div></div>
       <div class="card"><div class="sec">📜 Test History</div><div id="testHist"></div></div>
     </div>
     <!-- SETTINGS -->
@@ -3393,6 +3398,59 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function bold(s){var p=s.split('**'),o='';for(var i=0;i<p.length;i++)o+=i%2?'<strong>'+p[i]+'</strong>':p[i];return o;}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
+function toggleTheme(){
+  S.dark=!S.dark;
+  var r=document.documentElement;
+  if(S.dark){
+    r.style.setProperty('--bg','#0b0d14');r.style.setProperty('--bg2','#0f1119');
+    r.style.setProperty('--card','#13161f');r.style.setProperty('--cd2','#181c28');
+    r.style.setProperty('--tx','#f0f3ff');r.style.setProperty('--t2','#5c6580');
+    r.style.setProperty('--t3','#8892b0');r.style.setProperty('--br','rgba(255,255,255,.07)');
+    r.style.setProperty('--br2','rgba(255,255,255,.11)');r.style.setProperty('--glass','rgba(255,255,255,.04)');
+    document.querySelector('.ibtn[onclick*="toggleTheme"]').textContent='☀️';
+  } else {
+    r.style.setProperty('--bg','#f0f4ff');r.style.setProperty('--bg2','#e8edf8');
+    r.style.setProperty('--card','#ffffff');r.style.setProperty('--cd2','#eef1fb');
+    r.style.setProperty('--tx','#1a1d2e');r.style.setProperty('--t2','#7b85a8');
+    r.style.setProperty('--t3','#5c6580');r.style.setProperty('--br','rgba(0,0,0,.08)');
+    r.style.setProperty('--br2','rgba(0,0,0,.13)');r.style.setProperty('--glass','rgba(0,0,0,.03)');
+    document.querySelector('.ibtn[onclick*="toggleTheme"]').textContent='🌙';
+  }
+  save();
+}
+
+function toggleTheme(){
+  S.dark=!S.dark;
+  var r=document.documentElement;
+  if(S.dark){
+    r.style.setProperty('--bg','#0b0d14');
+    r.style.setProperty('--bg2','#0f1119');
+    r.style.setProperty('--card','#13161f');
+    r.style.setProperty('--cd2','#181c28');
+    r.style.setProperty('--tx','#f0f3ff');
+    r.style.setProperty('--t2','#5c6580');
+    r.style.setProperty('--t3','#8892b0');
+    r.style.setProperty('--br','rgba(255,255,255,.07)');
+    r.style.setProperty('--br2','rgba(255,255,255,.11)');
+    r.style.setProperty('--glass','rgba(255,255,255,.04)');
+    document.body.style.background='#0b0d14';
+    document.getElementById('themeBtn').textContent='☀️';
+  } else {
+    r.style.setProperty('--bg','#f5f5f0');
+    r.style.setProperty('--bg2','#ebebeb');
+    r.style.setProperty('--card','#ffffff');
+    r.style.setProperty('--cd2','#f0f0ea');
+    r.style.setProperty('--tx','#1a1a2e');
+    r.style.setProperty('--t2','#888899');
+    r.style.setProperty('--t3','#555566');
+    r.style.setProperty('--br','rgba(0,0,0,.08)');
+    r.style.setProperty('--br2','rgba(0,0,0,.13)');
+    r.style.setProperty('--glass','rgba(0,0,0,.03)');
+    document.body.style.background='#f5f5f0';
+    document.getElementById('themeBtn').textContent='🌙';
+  }
+  save();
+}
 function sw(tab){
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
@@ -3400,6 +3458,7 @@ function sw(tab){
   document.getElementById('tb-'+tab).classList.add('on');
   document.querySelector('.content').scrollTop=0;
   if(tab==='report') initReport();
+  if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
 }
 function showV(show,hide){
   document.getElementById(show).style.display='block';
@@ -3522,19 +3581,29 @@ function openRWATopic(key,idx){
 }
 
 function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
+  var gkey=getGKey();
+  if(!gkey){
+    var qc=document.getElementById('rwa-quiz-content');
+    if(qc&&!qc.querySelector('.qcard')) qc.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
+    return;
+  }
   if(rwaLoading) return;
-  var gkey='';
-  try{gkey=localStorage.getItem('ps_gkey')||'';}catch(e){}
-  if(!gkey) return; // No key, skip silently
   rwaLoading=true;
-  var prompt='Tum ek SSC CGL/Bihar Police/SSC GD exam expert ho. Topic: "'+topic+'" par exactly 10 MCQ questions banao.\n\nRULES:\n- SSC/competitive exam style, factual questions\n- 4 options: (A) (B) (C) (D)\n- Ek sahi answer\n- Short Hindi explanation\n- JSON array:\n[{"q":"question","opts":["(A) ...","(B) ...","(C) ...","(D) ..."],"ans":0,"sol":"explanation"}]\nans=0-based. SIRF JSON array, no markdown.';
+  var prompt='SSC CGL/Bihar Police/SSC GD exam expert. Topic: "'+topic+'" par exactly 10 UNIQUE MCQ banao.'  
+    +'\n\nSTRICT RULES:\n'
+    +'1. Topic ke direct factual questions — general GK nahi.\n'
+    +'2. Har question ke 4 options BILKUL ALAG honay chahiye.\n'
+    +'3. CRITICAL: ans field mein 0/1/2/3 vary karo, sirf 0 mat dena.\n'
+    +'4. Hindi only, exam-style, realistic wrong options.\n'
+    +'5. SIRF valid JSON array, koi markdown nahi.\n\n'
+    +'Format: [{"q":"प्रश्न?","opts":["(A) ...","(B) ...","(C) ...","(D) ..."],"ans":2,"sol":"Hindi explanation"}]';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'JSON only. Hindi.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.7})
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. ONLY valid JSON array output kar. Hindi Devanagari. No markdown, no explanation.'},{role:'user',content:prompt}],max_tokens:3500,temperature:0.85})
   }).then(function(r){return r.json();}).then(function(data){
     rwaLoading=false;
-    if(data.error) return;
+    if(data.error){var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ '+data.error.message.substring(0,60)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';return;}
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
     var aiQs=null;
@@ -3572,7 +3641,7 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
         if(badge) badge.style.display='block';
       }
     }
-  }).catch(function(){rwaLoading=false;});
+  }).catch(function(e){rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
 }
 
 function getRWAQBQuestions(subjectKey,topic){
@@ -3639,7 +3708,7 @@ function checkRWAAnswer(i){
   var sol=q.sol||q.solution||q.explanation||'';
   if(sol){
     document.getElementById('rwa-sol').style.display='block';
-    document.getElementById('rwa-sol').innerHTML='<div style="background:rgba(124,111,255,.1);border-left:3px solid var(--ac);border-radius:6px;padding:8px 10px;font-size:.72rem;line-height:1.6;margin-top:6px">💡 '+sol+'</div>';
+    document.getElementById('rwa-sol').innerHTML='<div style="background:rgba(124,111,255,.1);border-left:3px solid var(--ac);border-radius:6px;padding:8px 10px;font-size:.72rem;line-height:1.6;margin-top:6px">💡 '+esc(sol)+'</div>';
   }
   document.getElementById('rwa-next-btn').style.display='block';
 }
@@ -3695,7 +3764,7 @@ function updateHeader(){
   Object.values(S.log).forEach(function(l){if(l.tasks)total+=Object.values(l.tasks).filter(function(v){return v===true;}).length;});
   var m4t=document.getElementById('m4t');if(m4t)m4t.textContent=total;
   var log=getLog(today());
-  var m4w=document.getElementById('m4w');if(m4w)m4w.textContent=(log.water||0)+' L';
+  var m4w=document.getElementById('m4w');if(m4w)m4w.textContent=(log.water||0)+'🥛';
   updateGKStatus();
 }
 
@@ -3895,7 +3964,15 @@ function renderChapters(){
 
 function openChapter(ch,lvl){
   var allQs=(QB[curSubj.id]||[]).filter(function(q){return q.ch===ch&&(curLvl==='all'||q.level===curLvl);});
-  pracQs=shuffle(allQs).slice(0,20);
+  // Shuffle question order AND options within each question
+  pracQs=shuffle(allQs).slice(0,20).map(function(q){
+    var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+    var shOpts=shuffle(q.opts.slice()).map(function(o,si){
+      return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');
+    });
+    var shAns=shOpts.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
+    return Object.assign({},q,{_sopts:shOpts,_sans:shAns===-1?q.ans:shAns});
+  });
   pracAns={};pracC=0;pracT=0;
   var pt=document.getElementById('pTitle');
   if(pt) pt.textContent=curSubj.icon+' '+ch+' ('+pracQs.length+'Q)';
@@ -3912,10 +3989,13 @@ function renderPracQs(){
   if(ps) ps.textContent=pracC+'/'+pracT;
   ql.innerHTML=pracQs.map(function(q,i){
     var an=pracAns[i];
+    // Use pre-shuffled opts/ans if available, else use original
+    var opts=q._sopts||q.opts;
+    var correctIdx=q._sans!==undefined?q._sans:q.ans;
     return '<div class="qcard">'
       +'<div class="qtxt">Q'+(i+1)+'. '+esc(q.q)+'</div>'
-      +q.opts.map(function(o,j){
-        var cls='opt'+(an!==undefined?(j===q.ans?' c':j===an?' w':''):'');
+      +opts.map(function(o,j){
+        var cls='opt'+(an!==undefined?(j===correctIdx?' c':j===an?' w':''):'');
         return '<button class="'+cls+'" onclick="ansP('+i+','+j+')" '+(an!==undefined?'disabled':'')+'>'+esc(o)+'</button>';
       }).join('')
       +(an!==undefined?'<div class="sol"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+esc(q.sol||'')+'</div></div>':'')
@@ -3925,9 +4005,11 @@ function renderPracQs(){
 
 function ansP(qi,oi){
   if(pracAns[qi]!==undefined) return;
-  var ok=oi===pracQs[qi].ans;
+  var q=pracQs[qi];
+  var correctIdx=q._sans!==undefined?q._sans:q.ans;
+  var ok=oi===correctIdx;
   pracAns[qi]=oi;
-  if(ok) pracC++;pracT++;
+  if(ok){pracC++;}pracT++;
   if(!S.sStats[curSubj.id]) S.sStats[curSubj.id]={d:0,t:0,chs:{}};
   S.sStats[curSubj.id].t++;
   if(ok) S.sStats[curSubj.id].d++;
@@ -3945,11 +4027,30 @@ function yogaReset(){
 
 function initYoga(){yogaReset();}
 
+function drawYogaSVG(poseName){
+  var svg=document.getElementById('yogaSVG');
+  if(!svg) return;
+  // Simple stick figure poses
+  var poses={
+    default:'<circle cx="150" cy="25" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="39" x2="150" y2="85" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="120" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="180" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="85" x2="125" y2="115" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="85" x2="175" y2="115" stroke="var(--ac)" stroke-width="3"/>',
+    stretch:'<circle cx="150" cy="20" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="34" x2="150" y2="80" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="50" x2="105" y2="35" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="50" x2="195" y2="35" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="80" x2="125" y2="115" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="80" x2="175" y2="115" stroke="var(--ac)" stroke-width="3"/>',
+    sit:'<circle cx="150" cy="30" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="44" x2="150" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="120" y2="70" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="180" y2="70" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="75" x2="110" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="110" y1="90" x2="85" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="75" x2="190" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="190" y1="90" x2="215" y2="90" stroke="var(--ac)" stroke-width="3"/>',
+    lie:'<circle cx="60" cy="65" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="74" y1="65" x2="200" y2="65" stroke="var(--ac)" stroke-width="3"/><line x1="140" y1="65" x2="130" y2="45" stroke="var(--ac)" stroke-width="3"/><line x1="140" y1="65" x2="150" y2="45" stroke="var(--ac)" stroke-width="3"/><line x1="175" y1="65" x2="165" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="175" y1="65" x2="185" y2="90" stroke="var(--ac)" stroke-width="3"/>'
+  };
+  var n=(poseName||'').toLowerCase();
+  var key='default';
+  if(n.includes('बैठ')||n.includes('वज्र')||n.includes('पद्म')||n.includes('सुख')) key='sit';
+  else if(n.includes('लेट')||n.includes('शव')||n.includes('भुज')) key='lie';
+  else if(n.includes('ताड़')||n.includes('वृक्ष')||n.includes('त्रिकोण')) key='stretch';
+  svg.innerHTML=poses[key];
+}
+
 function renderYogaUI(){
   var step=YOGA_STEPS[Math.min(yIdx,YOGA_STEPS.length-1)];
   var m=Math.floor(yLeft/60),s=yLeft%60;
   var yn=document.getElementById('yogaNum');if(yn)yn.textContent=m+':'+(s<10?'0':'')+s;
   var ysn=document.getElementById('yStepName');if(ysn)ysn.textContent=step.name;
+  drawYogaSVG(step.name);
   var ysd=document.getElementById('yStepDesc');if(ysd)ysd.textContent=step.desc;
   var yb=document.getElementById('yBtn');if(yb)yb.textContent=yRun?'⏸ Pause':'▶ Start';
   var total=YOGA_STEPS[yIdx].dur;
@@ -4182,16 +4283,47 @@ function pickCA(qi,oi,correct){
 }
 
 // ── DAILY CA ──
+
+function renderDailyCAItems(items,dateStr,cacheKey){
+  var out='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<div style="font-size:.65rem;color:var(--ac);font-weight:800">📅 '+dateStr+'</div>'
+    +'<button onclick="loadDailyCA(true)" style="background:transparent;border:1px solid var(--br);border-radius:6px;color:var(--t2);font-size:.55rem;padding:2px 7px;cursor:pointer">🔄</button>'
+    +'</div>';
+  items.forEach(function(item,i){
+    out+='<div style="background:var(--cd2);border-radius:10px;padding:10px;margin-bottom:7px;border-left:3px solid var(--ac)">'
+      +'<div style="font-size:.55rem;font-weight:800;color:var(--ac);margin-bottom:2px">'+esc(item.cat||'')+'</div>'
+      +'<div style="font-size:.75rem;font-weight:700;margin-bottom:7px">'+esc(item.headline||'')+'</div>';
+    var q=item.mcq;
+    if(q){
+      var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+      var shOpts=q.opts.slice().sort(function(){return Math.random()-.5;});
+      shOpts=shOpts.map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+      var shAns=shOpts.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
+      if(shAns===-1) shAns=q.ans;
+      out+='<div class="qcard" style="margin:0;padding:8px;border-left:2px solid var(--in2)">'
+        +'<div class="qtxt" style="font-size:.73rem">'+esc(q.q||'')+'</div>';
+      shOpts.forEach(function(o,j){
+        out+='<button class="opt" id="dca'+i+'_'+j+'" onclick="pickDCA('+i+','+j+','+shAns+')">'+esc(o)+'</button>';
+      });
+      out+='<div class="sol" id="dcasol'+i+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+esc(q.sol||'')+'</div></div>';
+      out+='</div>';
+    }
+    out+='</div>';
+  });
+  document.getElementById('daily-ca-content').innerHTML=out;
+  try{localStorage.setItem(cacheKey,JSON.stringify({items:items}));}catch(e){}
+}
+
 function loadDailyCA(force){
   var key=getGKey();
   if(!key){document.getElementById('daily-ca-content').innerHTML='<div class="empty">🔑 Groq key daalo!</div>';return;}
   var d=new Date();
   var cacheKey='dca_'+d.getFullYear()+'_'+d.getMonth()+'_'+d.getDate();
   try{Object.keys(localStorage).forEach(function(k){if(k.startsWith('dca_')&&k!==cacheKey)localStorage.removeItem(k);});}catch(e){}
-  if(!force){try{var c=localStorage.getItem(cacheKey);if(c){document.getElementById('daily-ca-content').innerHTML=c;return;}}catch(e){}}
+  var mn2=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var dateStr=d.getDate()+' '+mn2[d.getMonth()]+' '+d.getFullYear();
+  if(!force){try{var c=localStorage.getItem(cacheKey);if(c){var cp=JSON.parse(c);if(cp&&cp.items){renderDailyCAItems(cp.items,dateStr,cacheKey);return;}}}catch(e){}}
   document.getElementById('daily-ca-content').innerHTML='<div style="text-align:center;padding:12px;color:var(--t2);font-size:.75rem">🤖 Loading...</div>';
-  var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var dateStr=d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
   var prompt='Bihar Police/SSC/RRB exam expert. '+dateStr+' ki current affairs generate karo.\n\nCover in order: niyukti/padonnati, puraskar/samman, khel, vigyan/taknik, arthvyavastha, antarrashtriya, rashtriya, koi bhi ek aur.\n\nSTRICT RULES:\n1. Har MCQ ke 4 options BILKUL ALAG aur realistic honay chahiye.\n2. CRITICAL: "ans" index VARY karo - sirf 0 mat dena, 0/1/2/3 sab use karo.\n3. Hindi only. Factual aur exam-style.\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य यहाँ","mcq":{"q":"प्रश्न?","opts":["(A) सही विकल्प","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":0,"sol":"व्याख्या"}}]}\n\nSIRF valid JSON, no markdown.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -4203,33 +4335,7 @@ function loadDailyCA(force){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     var parsed=JSON.parse(txt.substring(s,e));
-    var out='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-      +'<div style="font-size:.65rem;color:var(--ac);font-weight:800">📅 '+dateStr+'</div>'
-      +'<button onclick="loadDailyCA(true)" style="background:transparent;border:1px solid var(--br);border-radius:6px;color:var(--t2);font-size:.55rem;padding:2px 7px;cursor:pointer">🔄</button>'
-      +'</div>';
-    (parsed.items||[]).forEach(function(item,i){
-      out+='<div style="background:var(--cd2);border-radius:10px;padding:10px;margin-bottom:7px;border-left:3px solid var(--ac)">'
-        +'<div style="font-size:.55rem;font-weight:800;color:var(--ac);margin-bottom:2px">'+item.cat+'</div>'
-        +'<div style="font-size:.75rem;font-weight:700;margin-bottom:7px">'+item.headline+'</div>';
-      var q=item.mcq;
-      if(q){
-        var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
-        var shOpts=q.opts.slice().sort(function(){return Math.random()-.5;});
-        shOpts=shOpts.map(function(o,si){return '('+"ABCD"[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
-        var shAns=shOpts.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
-        if(shAns===-1) shAns=q.ans;
-        out+='<div class="qcard" style="margin:0;padding:8px;border-left:2px solid var(--in2)">'
-          +'<div class="qtxt" style="font-size:.73rem">'+q.q+'</div>';
-        shOpts.forEach(function(o,j){
-          out+='<button class="opt" id="dca'+i+'_'+j+'" onclick="pickDCA('+i+','+j+','+shAns+')">'+( o||'')+'</button>';
-        });
-        out+='<div class="sol" id="dcasol'+i+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
-        out+='</div>';
-      }
-      out+='</div>';
-    });
-    document.getElementById('daily-ca-content').innerHTML=out;
-    try{localStorage.setItem(cacheKey,out);}catch(e){}
+    renderDailyCAItems(parsed.items||[],dateStr,cacheKey);
     toast('✅ CA ready!','i');
   })
   .catch(function(e){
@@ -4369,6 +4475,29 @@ function askQWithImg(msg,imgDataUrl){
 }
 
 // ── REPORT ──
+
+function buildHeatmap(){
+  var grid=document.getElementById('hmGrid');
+  if(!grid) return;
+  var cells='';
+  for(var i=89;i>=0;i--){
+    var d=new Date();d.setDate(d.getDate()-i);
+    var k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    var log=S.log[k];
+    var lvl=0;
+    if(log&&log.tasks&&S.tasks.length){
+      var done=Object.values(log.tasks).filter(function(v){return v===true;}).length;
+      var pct=done/S.tasks.length;
+      if(pct>0) lvl=1;
+      if(pct>=0.33) lvl=2;
+      if(pct>=0.66) lvl=3;
+      if(pct>=1) lvl=4;
+    }
+    cells+='<div class="hmc'+(lvl?' l'+lvl:'')+'" title="'+k+'"></div>';
+  }
+  grid.innerHTML=cells;
+}
+
 function initReport(){
   var rs=document.getElementById('rStreak');if(rs)rs.textContent=calcStreak();
   var ra=document.getElementById('rAvg');if(ra)ra.textContent=calcMonthAvg()+'%';
@@ -4383,6 +4512,23 @@ function initReport(){
     var days=Object.keys(S.log).length;
     di.textContent='Total days: '+days+' · Tasks: '+S.tasks.length+' · Streak: '+calcStreak()+' days';
   }
+  // Test History
+  var th=document.getElementById('testHist');
+  if(th){
+    if(!S.mocks||!S.mocks.length){
+      th.innerHTML='<div class="empty" style="padding:16px">Abhi koi mock test nahi diya</div>';
+    } else {
+      th.innerHTML=S.mocks.slice().reverse().map(function(m){
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--br)">'
+          +'<div><div style="font-size:.78rem;font-weight:700">'+esc(m.name||'Mock Test')+'</div>'
+          +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+'</div></div>'
+          +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+(m.pct||0)+'%</div></div>';
+      }).join('');
+    }
+  }
+  // Heatmap
+  var hmw=document.getElementById('hmWrap');
+  if(hmw) buildHeatmap();
   // Charts
   try{drawCharts();}catch(e){}
 }
@@ -4405,6 +4551,32 @@ function drawCharts(){
   if(wc){
     if(charts.w) charts.w.destroy();
     charts.w=new Chart(wc,{type:'bar',data:{labels:days,datasets:[{data:vals,backgroundColor:'rgba(245,166,35,.7)',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{max:100,ticks:{color:'#5c6580',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#5c6580',font:{size:10}},grid:{display:false}}}}});
+  }
+  // Subject accuracy chart
+  var sc=document.getElementById('subjChart');
+  if(sc&&S.sStats&&Object.keys(S.sStats).length){
+    var sLabels=[],sVals=[],sColors=[];
+    var cmap={gk:'rgba(92,106,240,.7)',math:'rgba(245,166,35,.7)',reasoning:'rgba(0,214,143,.7)',hindi:'rgba(176,106,245,.7)',science:'rgba(255,112,67,.7)',english:'rgba(0,200,200,.7)'};
+    Object.keys(S.sStats).forEach(function(k){
+      var st=S.sStats[k];
+      if(st.t){sLabels.push(k.toUpperCase());sVals.push(Math.round(st.d/st.t*100));sColors.push(cmap[k]||'rgba(255,255,255,.4)');}
+    });
+    if(charts.s) charts.s.destroy();
+    charts.s=new Chart(sc,{type:'bar',data:{labels:sLabels,datasets:[{data:sVals,backgroundColor:sColors,borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{max:100,ticks:{color:'#5c6580',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#5c6580',font:{size:10}},grid:{display:false}}}}});
+  } else if(sc){
+    if(charts.s) charts.s.destroy();
+    sc.parentElement.innerHTML+='<div style="text-align:center;font-size:.65rem;color:var(--t2);padding:8px">Practice karo — accuracy chart yahan dikhega</div>';
+  }
+  // Mock scores chart
+  var mc=document.getElementById('mockChart');
+  if(mc&&S.mocks&&S.mocks.length){
+    var mLabels=S.mocks.map(function(m,i){return 'M'+(i+1);});
+    var mVals=S.mocks.map(function(m){return m.pct||0;});
+    if(charts.m) charts.m.destroy();
+    charts.m=new Chart(mc,{type:'line',data:{labels:mLabels,datasets:[{data:mVals,borderColor:'#7b87ff',backgroundColor:'rgba(123,135,255,.15)',borderWidth:2,pointBackgroundColor:'#7b87ff',fill:true,tension:.3}]},options:{plugins:{legend:{display:false}},scales:{y:{max:100,min:0,ticks:{color:'#5c6580',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#5c6580',font:{size:10}},grid:{display:false}}}}});
+  } else if(mc){
+    if(charts.m) charts.m.destroy();
+    mc.parentElement.innerHTML+='<div style="text-align:center;font-size:.65rem;color:var(--t2);padding:8px">Abhi koi mock data nahi</div>';
   }
 }
 
