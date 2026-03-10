@@ -902,6 +902,16 @@ body::before{
           <div style="font-size:.68rem;font-weight:800;color:var(--ac);min-width:36px;text-align:right" id="challengeCount">0/30</div>
         </div>
       </div>
+      <!-- SR DUE CARD -->
+      <div id="srHomeCard" style="display:none;background:linear-gradient(135deg,rgba(0,200,100,.1),rgba(0,150,200,.1));border:1px solid rgba(0,200,100,.3);border-radius:14px;padding:12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:.75rem;font-weight:800">📅 Revision Due</div>
+            <div style="font-size:.65rem;color:var(--t2)" id="srDueCount">0 questions</div>
+          </div>
+          <button onclick="openSRSession()" style="background:var(--gr);border:none;border-radius:10px;color:#fff;font-size:.72rem;font-weight:800;padding:8px 14px;cursor:pointer">Start ▶</button>
+        </div>
+      </div>
       <!-- EXAM COUNTDOWN -->
       <div id="examCountdownCard" style="display:none;margin-bottom:12px">
         <div style="font-size:.6rem;font-weight:800;color:var(--t2);letter-spacing:1px;margin-bottom:6px">📅 EXAM COUNTDOWN</div>
@@ -952,6 +962,13 @@ body::before{
             <div style="font-size:.58rem;color:rgba(255,255,255,.75)" id="bmCountLbl">0 saved</div>
           </div>
         </div>
+        <div onclick="openSRSession()" style="background:linear-gradient(135deg,#059669,#0891b2);border-radius:14px;padding:14px;cursor:pointer;margin-top:8px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:1.5rem">📅</div>
+          <div>
+            <div style="font-size:.75rem;font-weight:800;color:#fff">Spaced Repetition</div>
+            <div style="font-size:.6rem;color:rgba(255,255,255,.75)" id="srDueLbl2">0 questions due aaj</div>
+          </div>
+        </div>
       </div>
       <div id="pv2" style="display:none">
         <button class="back" onclick="showV('pv1','pv2')">← Back</button>
@@ -998,6 +1015,18 @@ body::before{
           </div>
         </div>
       </div>
+      <!-- SPACED REPETITION SESSION -->
+      <div id="pv-sr" style="display:none">
+        <button class="back" onclick="showV('pv1','pv-sr')">← Back</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="font-size:1.5rem">📅</div>
+          <div>
+            <div style="font-size:.85rem;font-weight:800">Spaced Repetition</div>
+            <div style="font-size:.62rem;color:var(--t2)">Aaj ke due questions revise karo</div>
+          </div>
+        </div>
+        <div id="sr-content"></div>
+      </div>
       <!-- BOOKMARKS -->
       <div id="pv-bookmarks" style="display:none">
         <button class="back" onclick="showV('pv1','pv-bookmarks')">← Back</button>
@@ -1010,25 +1039,7 @@ body::before{
     </div>
     <!-- MOCK -->
         <!-- YOGA -->
-    <div class="tab" id="tab-yoga">
-      <div class="yscene">
-        <div style="width:100%;height:130px;position:relative;margin-bottom:8px">
-          <svg id="yogaSVG" viewBox="0 0 300 130" style="width:100%;height:100%"></svg>
-        </div>
-        <div class="yring">
-          <svg width="74" height="74"><circle class="yrb" cx="37" cy="37" r="31"/><circle class="yrf" id="yogaRing" cx="37" cy="37" r="31" stroke-dasharray="194.8" stroke-dashoffset="0"/></svg>
-          <div class="ynum" id="yogaNum">1:00</div>
-        </div>
-        <div style="font-size:.86rem;font-weight:800;margin-bottom:2px" id="yStepName">🙏 Taiyar Ho!</div>
-        <div style="font-size:.68rem;color:var(--t2);line-height:1.5;margin-bottom:9px" id="yStepDesc">Start dabao — yoga session shuru hoga!</div>
-        <div style="display:flex;gap:7px;justify-content:center">
-          <button class="ybtn go" id="yBtn" onclick="yogaToggle()">▶ Start</button>
-          <button class="ybtn" onclick="yogaReset()">↺ Reset</button>
-        </div>
-      </div>
-      <div class="sec">📋 Steps</div>
-      <div id="yStepList"></div>
-    </div>
+    <!-- Yoga moved to Settings -->
     <!-- RWA BOOK -->
     <div class="tab" id="tab-rwa">
       <!-- Level 1: Subjects -->
@@ -1056,9 +1067,16 @@ body::before{
     </div>
 <!-- CURRENT AFFAIRS -->
     <div class="tab" id="tab-ca">
-      <!-- CA List View -->
-      <div id="ca-list">
-        <!-- Daily CA Card -->
+      <!-- CA Sub-nav -->
+      <div class="chips" style="margin-bottom:10px">
+        <button class="chip on" id="ca-tab-daily" onclick="caSubTab('daily',this)">📅 Daily CA</button>
+        <button class="chip" id="ca-tab-topics" onclick="caSubTab('topics',this)">📚 Topics</button>
+        <button class="chip" id="ca-tab-digest" onclick="caSubTab('digest',this)">📆 Monthly</button>
+        <button class="chip" id="ca-tab-news" onclick="caSubTab('news',this)">📰 Summarizer</button>
+      </div>
+
+      <!-- Daily CA -->
+      <div id="ca-view-daily">
         <div style="background:linear-gradient(135deg,rgba(124,111,255,.15),rgba(255,107,138,.1));border:1px solid rgba(124,111,255,.3);border-radius:13px;padding:12px;margin-bottom:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
             <div>
@@ -1070,15 +1088,39 @@ body::before{
           <div style="font-size:.65rem;color:var(--t2);margin-bottom:8px">Bihar Police • SSC • RRB • BSSC ke liye filtered</div>
           <div id="daily-ca-content"><div style="font-size:.7rem;color:var(--t2);text-align:center;padding:10px">⬆️ Load button dabao</div></div>
         </div>
-        <!-- 38 Topics -->
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:7px;color:var(--t2)">📚 Topic-wise Practice</div>
-        <div id="ca-sections"></div>
       </div>
-      <!-- CA Topic Detail View -->
-      <div id="ca-detail" style="display:none">
-        <button class="back" onclick="document.getElementById('ca-list').style.display='block';document.getElementById('ca-detail').style.display='none'">← Back</button>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:.88rem;font-weight:800" id="ca-detail-title"></div><button id="ca-refresh-btn" style="background:var(--ac);border:none;border-radius:6px;color:#fff;font-size:.6rem;font-weight:800;padding:4px 9px;cursor:pointer">🔄 नए</button></div>
-        <div id="ca-detail-content"></div>
+
+      <!-- Topics View -->
+      <div id="ca-view-topics" style="display:none">
+        <div id="ca-list-inner">
+          <div style="font-size:.78rem;font-weight:800;margin-bottom:7px;color:var(--t2)">📚 Topic-wise Practice</div>
+          <div id="ca-sections"></div>
+        </div>
+        <div id="ca-detail" style="display:none">
+          <button class="back" onclick="document.getElementById('ca-list-inner').style.display='block';document.getElementById('ca-detail').style.display='none'">← Back</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:.88rem;font-weight:800" id="ca-detail-title"></div>
+            <button id="ca-refresh-btn" style="background:var(--ac);border:none;border-radius:6px;color:#fff;font-size:.6rem;font-weight:800;padding:4px 9px;cursor:pointer">🔄 नए</button>
+          </div>
+          <div id="ca-detail-content"></div>
+        </div>
+      </div>
+
+      <!-- Monthly CA Digest -->
+      <div id="ca-view-digest" style="display:none">
+        <div style="font-size:.85rem;font-weight:800;margin-bottom:4px">📆 Monthly CA Digest</div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:12px">Poore mahine ki important current affairs ek jagah</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="digestMonthChips"></div>
+        <div id="digestContent"><div class="empty">Mahina choose karo</div></div>
+      </div>
+
+      <!-- Newspaper Summarizer -->
+      <div id="ca-view-news" style="display:none">
+        <div style="font-size:.85rem;font-weight:800;margin-bottom:4px">📰 News Summarizer</div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:10px">Koi bhi news article paste karo — AI key facts + MCQ banayega</div>
+        <textarea id="newsInput" style="width:100%;min-height:130px;background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:10px;font-family:inherit;font-size:.75rem;color:var(--tx);resize:vertical;box-sizing:border-box" placeholder="Yahan news article paste karo...&#10;&#10;Example: 'India ne aaj X missile test ki. Ye missile 500km door tak maar sakti hai...'"></textarea>
+        <button onclick="summarizeNews()" class="btn" style="width:100%;margin-top:8px">🤖 Summary + MCQ Banao</button>
+        <div id="newsSummaryOut" style="margin-top:10px"></div>
       </div>
     </div>
     <!-- ASK AI -->
@@ -1276,6 +1318,27 @@ body::before{
         <div class="sec">🔐 Account</div>
         <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
       </div>
+      <!-- YOGA -->
+      <div class="scard">
+        <div class="sec">🧘 Yoga / Meditation</div>
+        <div class="yscene" style="background:transparent;padding:0;border-radius:0;border:none">
+          <div style="width:100%;height:120px;position:relative;margin-bottom:8px">
+            <svg id="yogaSVG" viewBox="0 0 300 130" style="width:100%;height:100%"></svg>
+          </div>
+          <div class="yring">
+            <svg width="74" height="74"><circle class="yrb" cx="37" cy="37" r="31"/><circle class="yrf" id="yogaRing" cx="37" cy="37" r="31" stroke-dasharray="194.8" stroke-dashoffset="0"/></svg>
+            <div class="ynum" id="yogaNum">1:00</div>
+          </div>
+          <div style="font-size:.86rem;font-weight:800;margin-bottom:2px" id="yStepName">🙏 Taiyar Ho!</div>
+          <div style="font-size:.68rem;color:var(--t2);line-height:1.5;margin-bottom:9px" id="yStepDesc">Start dabao — yoga session shuru hoga!</div>
+          <div style="display:flex;gap:7px;justify-content:center">
+            <button class="ybtn go" id="yBtn" onclick="yogaToggle()">▶ Start</button>
+            <button class="ybtn" onclick="yogaReset()">↺ Reset</button>
+          </div>
+        </div>
+        <div class="sec" style="margin-top:10px">📋 Steps</div>
+        <div id="yStepList"></div>
+      </div>
       <!-- EXAM DATES -->
       <div class="scard">
         <div class="sec">📅 Exam Countdown Set Karo</div>
@@ -1326,7 +1389,6 @@ body::before{
   <div class="tabbar">
     <button class="tb on" onclick="sw('home')" id="tb-home"><span>🏠</span>Home</button>
     <button class="tb" onclick="sw('practice')" id="tb-practice"><span>📚</span>Practice</button>
-    <button class="tb" onclick="sw('yoga')" id="tb-yoga"><span>🧘</span>Yoga</button>
     <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>Topic</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
@@ -3616,7 +3678,7 @@ var LVLCLS={easy:'le',moderate:'lm',hard:'lh'};
 var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:[],xp:0,dailyChallenge:{date:'',count:0,target:30,subj:'gk'}};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:[],xp:0,dailyChallenge:{date:'',count:0,target:30,subj:'gk'},srDue:[],srDone:{}};
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
 var pracQs=[],pracAns={},pracC=0,pracT=0;
 var charts={w:null,s:null,m:null};
@@ -3710,12 +3772,16 @@ function toggleTheme(){
 function sw(tab){
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('tb-'+tab).classList.add('on');
+  var tabEl=document.getElementById('tab-'+tab);
+  var tbEl=document.getElementById('tb-'+tab);
+  if(!tabEl||!tbEl) return;
+  tabEl.classList.add('active');
+  tbEl.classList.add('on');
   document.querySelector('.content').scrollTop=0;
-  if(tab==='report') initReport();
+  if(tab==='report'){initReport();renderWeakTopics();}
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
+  if(tab==='settings'){renderExamDatesList();initCommunityChat();initYoga();}
 }
 function clearRWACache(){
   try{
@@ -4131,7 +4197,16 @@ function saveGKey(){
 }
 
 // ── HOME ──
-function renderHome(){renderTasks();updateProgress();renderMood();renderWater();updateHeader();}
+function renderHome(){
+  renderTasks();updateProgress();renderMood();renderWater();updateHeader();
+  initDailyChallenge();
+  renderExamCountdown();
+  renderSRHomeCard();
+  var lbl=document.getElementById('bmCountLbl');
+  if(lbl) lbl.textContent=(S.bookmarks||[]).length+' saved';
+  var lbl2=document.getElementById('srDueLbl2');
+  if(lbl2){var due=getDueSRQuestions();lbl2.textContent=due.length+' questions due aaj';}
+}
 
 function updateProgress(){
   var log=getLog(today());
@@ -4391,6 +4466,7 @@ function ansP(qi,oi){
   save();
   toast(ok?'✅ Sahi!':'❌ Galat!',ok?'':'e');
   renderPracQs();
+  updateDailyChallenge();
 }
 
 // ── YOGA ──
@@ -4518,7 +4594,7 @@ function initCA(){
 }
 
 function openCATopic(id,name){
-  document.getElementById('ca-list').style.display='none';
+  document.getElementById('ca-list-inner').style.display='none';
   document.getElementById('ca-detail').style.display='block';
   document.getElementById('ca-detail-title').textContent=name;
   var rb=document.getElementById('ca-refresh-btn');
@@ -5214,6 +5290,10 @@ function submitMock(){
   });
   var total=qs.length;
   var pct=Math.round(correct/total*100);
+  // Negative marking net score
+  if(mockOpts.negMarking){
+    mockState._negScore=Math.max(0,correct-(wrong*0.25));
+  }
   // Save to S.mocks
   var mockRecord={name:mockState.name,date:new Date().toLocaleDateString('hi-IN'),pct:pct,correct:correct,wrong:wrong,skip:skip,total:total,time:Math.round((mockState.totalTime-mockState.timeLeft)/60)+' min'};
   if(!S.mocks) S.mocks=[];
@@ -5222,7 +5302,9 @@ function submitMock(){
   // Show result
   showV('mock-result','mock-test');
   document.getElementById('mock-res-pct').textContent=pct+'%';
-  document.getElementById('mock-res-detail').textContent=correct+'/'+total+' sahi';
+  var detailTxt=correct+'/'+total+' sahi';
+  if(mockOpts.negMarking&&mockState._negScore!==undefined) detailTxt+=' · Net: '+mockState._negScore.toFixed(2);
+  document.getElementById('mock-res-detail').textContent=detailTxt;
   document.getElementById('mock-res-correct').textContent=correct;
   document.getElementById('mock-res-wrong').textContent=wrong;
   document.getElementById('mock-res-skip').textContent=skip;
@@ -5922,73 +6004,400 @@ function sendCommunityMsg(){
   }).catch(function(e){toast('Send failed: '+e.message.substring(0,40),'e');});
 }
 
+// [patches consolidated below]
+
+
 // ═══════════════════════════════════════════════════════════════
-// PATCH: renderHome — add challenge + countdown
+// 📰 CA SUB-TAB NAVIGATION
 // ═══════════════════════════════════════════════════════════════
-var _origRenderHome=renderHome;
-function renderHome(){
-  _origRenderHome();
-  initDailyChallenge();
-  renderExamCountdown();
+function caSubTab(tab, el){
+  ['daily','topics','digest','news'].forEach(function(t){
+    var v=document.getElementById('ca-view-'+t);
+    var b=document.getElementById('ca-tab-'+t);
+    if(v) v.style.display=(t===tab?'block':'none');
+    if(b) b.classList.toggle('on',t===tab);
+  });
+  if(tab==='digest') initDigestMonths();
+  if(tab==='daily'){var k=getGKey();if(k) loadDailyCA(false);}
 }
 
-// PATCH: initReport — add weak topic finder
-var _origInitReport=initReport;
-function initReport(){
-  _origInitReport();
-  renderWeakTopics();
+// ═══════════════════════════════════════════════════════════════
+// 📰 NEWSPAPER SUMMARIZER
+// ═══════════════════════════════════════════════════════════════
+function summarizeNews(){
+  var inp=document.getElementById('newsInput');
+  var out=document.getElementById('newsSummaryOut');
+  if(!inp||!out) return;
+  var text=inp.value.trim();
+  if(!text||text.length<50){toast('Thoda lamba article paste karo!','e');return;}
+  if(text.length>8000) text=text.substring(0,8000);
+  var key=getGKey();
+  if(!key){toast('Groq key daalo Settings mein!','e');return;}
+  out.innerHTML='<div style="text-align:center;padding:20px">'
+    +'<div style="font-size:2rem">🤖</div>'
+    +'<div style="font-size:.8rem;font-weight:700;color:var(--ac);margin:8px 0">Article analyze ho raha hai...</div>'
+    +'<div style="display:flex;gap:6px;justify-content:center">'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
+    +'</div></div>';
+  var prompt='Ye news article padhke Bihar Police/SSC/RRB exam ke liye key facts nikalo.\n\n'
+    +'ARTICLE:\n'+text+'\n\n'
+    +'OUTPUT FORMAT (SIRF JSON, kuch nahi):\n'
+    +'{\n'
+    +'"headline": "ek line mein main baat",\n'
+    +'"keyFacts": ["fact 1","fact 2","fact 3","fact 4","fact 5"],\n'
+    +'"whyImportant": "exam ke liye kyun important hai (1-2 lines)",\n'
+    +'"mcqs": [{"q":"\u092a\u094d\u0930\u0936\u094d\u0928?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":1,"sol":"\u0935\u094d\u092f\u093e\u0916\u094d\u092f\u093e"}]\n'
+    +'}\n\n'
+    +'RULES: Hindi mein, 3-5 MCQ, ans 0/1/2/3 vary karo, SIRF valid JSON.';
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      messages:[
+        {role:'system',content:'JSON generator. Hindi. No markdown. Sirf valid JSON.'},
+        {role:'user',content:prompt}
+      ],
+      max_tokens:2000,temperature:0.3
+    })
+  }).then(function(r){return r.json();})
+  .then(function(data){
+    if(data.error) throw new Error(data.error.message);
+    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
+    var parsed=JSON.parse(txt.substring(s,e));
+    renderNewsSummary(parsed);
+  })
+  .catch(function(e){
+    out.innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))+'<br><button class="btn" style="margin-top:8px" onclick="summarizeNews()">🔄 Retry</button></div>';
+  });
 }
 
-// PATCH: sw — init community chat when settings opened
-var _origSw=sw;
-function sw(tab){
-  _origSw(tab);
-  if(tab==='settings'){
-    renderExamDatesList();
-    initCommunityChat();
-  }
-}
-
-// PATCH: ansP — update daily challenge counter
-var _origAnsP=ansP;
-function ansP(qi,oi){
-  _origAnsP(qi,oi);
-  updateDailyChallenge();
-}
-
-// PATCH: submitMock — apply negative marking
-var _origSubmitMock=submitMock;
-function submitMock(){
-  if(mockOpts.negMarking){
-    // Recalculate with negative marking
-    var qs=mockState.qs,ans=mockState.ans;
-    var correct=0,wrong=0,skip=0,rawScore=0;
-    qs.forEach(function(q,i){
-      if(ans[i]===undefined) skip++;
-      else if(ans[i]===q.ans){correct++;rawScore+=1;}
-      else{wrong++;rawScore-=0.25;}
+function renderNewsSummary(d){
+  var out=document.getElementById('newsSummaryOut');
+  if(!out||!d) return;
+  var html='<div class="cc" style="margin-bottom:0">';
+  // Headline
+  html+='<div style="font-size:.88rem;font-weight:800;margin-bottom:10px;color:var(--ac)">📰 '+esc(d.headline||'')+'</div>';
+  // Key Facts
+  if(d.keyFacts&&d.keyFacts.length){
+    html+='<div style="font-size:.68rem;font-weight:800;color:var(--t2);margin-bottom:6px">🔑 KEY FACTS</div>';
+    html+='<div style="margin-bottom:12px">';
+    d.keyFacts.forEach(function(f,i){
+      html+='<div style="display:flex;gap:8px;margin-bottom:6px;font-size:.75rem;line-height:1.4">'
+        +'<span style="color:var(--ac);font-weight:800;flex-shrink:0">'+(i+1)+'.</span>'
+        +'<span>'+esc(f)+'</span></div>';
     });
-    mockState._negScore=Math.max(0,rawScore);
+    html+='</div>';
   }
-  _origSubmitMock();
-  // Show neg score if applicable
-  if(mockOpts.negMarking&&mockState._negScore!==undefined){
-    var detail=document.getElementById('mock-res-detail');
-    if(detail) detail.textContent+=' · Net Score: '+mockState._negScore.toFixed(2);
+  // Why Important
+  if(d.whyImportant){
+    html+='<div style="background:rgba(92,106,240,.1);border:1px solid rgba(92,106,240,.2);border-radius:10px;padding:9px;margin-bottom:12px;font-size:.72rem;color:var(--t2)">'
+      +'<span style="font-weight:800;color:var(--ac)">⭐ Exam ke liye:</span> '+esc(d.whyImportant)+'</div>';
   }
+  // MCQs
+  if(d.mcqs&&d.mcqs.length){
+    html+='<div style="font-size:.68rem;font-weight:800;color:var(--t2);margin-bottom:8px">📝 PRACTICE MCQ</div>';
+    d.mcqs.forEach(function(q,qi){
+      // Shuffle options
+      if(q.opts&&q.opts.length>=4){
+        var ct=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+        var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+        var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===ct;});
+        if(na!==-1){q.opts=sh;q.ans=na;}
+      }
+      html+='<div class="qcard" id="nsq'+qi+'">'
+        +'<div class="qtxt">Q'+(qi+1)+'. '+esc(q.q)+'</div>'
+        +q.opts.map(function(o,i){
+          return '<button class="opt" onclick="pickNSQ('+qi+','+i+','+q.ans+')">'+esc(o)+'</button>';
+        }).join('')
+        +'<div id="nssol'+qi+'" style="display:none" class="sol"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+esc(q.sol||'')+'</div></div>'
+        +'</div>';
+    });
+  }
+  html+='<button onclick="saveNewsToSR('+JSON.stringify(JSON.stringify(d.mcqs||[]))+'.replace?JSON.parse('+JSON.stringify(JSON.stringify(d.mcqs||[]))+'):[])" style="width:100%;margin-top:8px;background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:9px;font-size:.7rem;cursor:pointer">📌 MCQs ko Revision mein Save Karo</button>';
+  html+='</div>';
+  out.innerHTML=html;
 }
 
-// INIT new features on app load
-(function(){
-  var _origInitApp=initApp;
-  window.initApp=function(){
-    _origInitApp();
-    updatePomoDisplay();
-    // Refresh bookmark count label
-    var lbl=document.getElementById('bmCountLbl');
-    if(lbl) lbl.textContent=(S.bookmarks||[]).length+' saved';
-  };
-})();
+function pickNSQ(qi,oi,correct){
+  var card=document.getElementById('nsq'+qi);
+  if(!card) return;
+  var opts=card.querySelectorAll('.opt');
+  opts.forEach(function(o){o.disabled=true;});
+  if(opts[oi]) opts[oi].className='opt '+(oi===correct?'c':'w');
+  if(oi!==correct&&opts[correct]) opts[correct].className='opt c';
+  var sol=document.getElementById('nssol'+qi);
+  if(sol) sol.style.display='block';
+}
+
+function saveNewsToSR(qs){
+  if(!qs||!qs.length){toast('Koi MCQ nahi!','e');return;}
+  if(!S.srDue) S.srDue=[];
+  var today=new Date();
+  qs.forEach(function(q){
+    if(!q.q) return;
+    S.srDue.push({
+      q:q.q,opts:q.opts,ans:q.ans,sol:q.sol||'',
+      dueDate:today.toISOString().split('T')[0],
+      interval:1,ease:2.5,reps:0
+    });
+  });
+  save();
+  toast('✅ '+qs.length+' questions revision mein save!','i');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📆 MONTHLY CA DIGEST
+// ═══════════════════════════════════════════════════════════════
+var digestCache={};
+
+function initDigestMonths(){
+  var chips=document.getElementById('digestMonthChips');
+  if(!chips) return;
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var now=new Date();
+  var html='';
+  // Last 4 months
+  for(var i=3;i>=0;i--){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var mIdx=d.getMonth();
+    var yr=d.getFullYear();
+    var key=yr+'_'+mIdx;
+    var lbl=months[mIdx]+' '+yr;
+    html+='<button class="chip" onclick="loadMonthlyDigest('+mIdx+','+yr+',this)" data-key="'+key+'">'+lbl+'</button>';
+  }
+  chips.innerHTML=html;
+}
+
+function loadMonthlyDigest(month,year,el){
+  // Highlight selected
+  document.querySelectorAll('#digestMonthChips .chip').forEach(function(c){c.classList.remove('on');});
+  if(el) el.classList.add('on');
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var key='digest_'+year+'_'+month;
+  var out=document.getElementById('digestContent');
+  // Check cache
+  var cached=digestCache[key];
+  if(!cached){try{var c=localStorage.getItem(key);if(c) cached=JSON.parse(c);}catch(e){}}
+  if(cached){renderDigest(cached,months[month]+' '+year);return;}
+  var gkey=getGKey();
+  if(!gkey){out.innerHTML='<div class="empty">🔑 Groq key daalo Settings mein!</div>';return;}
+  out.innerHTML='<div style="text-align:center;padding:30px">'
+    +'<div style="font-size:2rem">🤖</div>'
+    +'<div style="font-size:.8rem;font-weight:700;color:var(--ac);margin:8px 0">'+months[month]+' '+year+' ki CA compile ho rahi hai...</div>'
+    +'<div style="display:flex;gap:6px;justify-content:center">'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
+    +'</div></div>';
+  var prompt=months[month]+' '+year+' month ki India ki top 15-20 REAL current affairs banao.\n'
+    +'Bihar Police/SSC/RRB/BSSC exam ke liye relevant.\n'
+    +'Categories: Niyukti, Awards, Sports, Science/Tech, Economy, International, National, Bihar.\n\n'
+    +'FORMAT (SIRF JSON):\n'
+    +'{"month":"'+months[month]+' '+year+'","items":['
+    +'{"cat":"Category","headline":"Poora fact yahan","detail":"1-2 line context"}'
+    +']}\n\nRULES: Hindi mein, factual, important facts jo exam mein aate hain. SIRF valid JSON.';
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      messages:[
+        {role:'system',content:'JSON generator. Hindi. No markdown.'},
+        {role:'user',content:prompt}
+      ],
+      max_tokens:3000,temperature:0.3
+    })
+  }).then(function(r){return r.json();})
+  .then(function(data){
+    if(data.error) throw new Error(data.error.message);
+    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
+    var parsed=JSON.parse(txt.substring(s,e));
+    digestCache[key]=parsed;
+    try{localStorage.setItem(key,JSON.stringify(parsed));}catch(ex){}
+    renderDigest(parsed,months[month]+' '+year);
+    toast('✅ Digest ready!','i');
+  })
+  .catch(function(e){
+    out.innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))+'<br><button class="btn" style="margin-top:8px" onclick="loadMonthlyDigest('+month+','+year+',null)">🔄 Retry</button></div>';
+  });
+}
+
+function renderDigest(data,label){
+  var out=document.getElementById('digestContent');
+  if(!out||!data||!data.items) return;
+  var cats={};
+  data.items.forEach(function(item){
+    var c=item.cat||'Other';
+    if(!cats[c]) cats[c]=[];
+    cats[c].push(item);
+  });
+  var catIcons={Niyukti:'👤',Awards:'🏆',Sports:'🏅',Science:'🔬','Science/Tech':'🔬',Economy:'💰',International:'🌍',National:'🇮🇳',Bihar:'📍',Other:'📌'};
+  var html='<div style="font-size:.75rem;font-weight:800;color:var(--ac);margin-bottom:12px">📆 '+esc(label)+' — '+data.items.length+' facts</div>';
+  Object.keys(cats).forEach(function(cat){
+    var icon=catIcons[cat]||'📌';
+    html+='<div style="margin-bottom:14px">'
+      +'<div style="font-size:.65rem;font-weight:800;color:var(--t2);letter-spacing:1px;margin-bottom:6px">'+icon+' '+cat.toUpperCase()+'</div>';
+    cats[cat].forEach(function(item,i){
+      html+='<div style="background:var(--cd2);border:1px solid var(--br);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
+        +'<div style="font-size:.78rem;font-weight:700;line-height:1.4;margin-bottom:4px">'+esc(item.headline||'')+'</div>'
+        +(item.detail?'<div style="font-size:.65rem;color:var(--t2)">'+esc(item.detail)+'</div>':'')
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  // Refresh button
+  html+='<button onclick="refreshDigest()" style="width:100%;background:transparent;border:1px solid var(--br2);border-radius:10px;padding:8px;font-size:.65rem;cursor:pointer;color:var(--t2)">🔄 Refresh</button>';
+  out.innerHTML=html;
+}
+
+function refreshDigest(){
+  // Clear cache for current selected month
+  var sel=document.querySelector('#digestMonthChips .chip.on');
+  if(!sel) return;
+  var key='digest_'+sel.dataset.key;
+  delete digestCache[key];
+  try{localStorage.removeItem(key);}catch(e){}
+  sel.click();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📅 SPACED REPETITION
+// ═══════════════════════════════════════════════════════════════
+// SM-2 Algorithm simplified
+// Each question has: dueDate, interval (days), ease (2.5), reps
+
+function getTodayStr(){
+  return new Date().toISOString().split('T')[0];
+}
+
+function getDueSRQuestions(){
+  if(!S.srDue||!S.srDue.length) return [];
+  var today=getTodayStr();
+  return S.srDue.filter(function(q){return q.dueDate<=today;});
+}
+
+function updateSRQuestion(idx,quality){
+  // quality: 0=wrong, 1=hard, 2=easy (simplified)
+  var q=S.srDue[idx];
+  if(!q) return;
+  if(quality===0){
+    q.reps=0;q.interval=1;
+  } else if(quality===1){
+    q.reps=(q.reps||0)+1;
+    q.interval=q.interval||1;
+    q.ease=Math.max(1.3,(q.ease||2.5)-0.15);
+  } else {
+    q.reps=(q.reps||0)+1;
+    if(q.reps===1) q.interval=1;
+    else if(q.reps===2) q.interval=6;
+    else q.interval=Math.round((q.interval||1)*(q.ease||2.5));
+    q.ease=Math.min(3.5,(q.ease||2.5)+0.1);
+  }
+  var due=new Date();
+  due.setDate(due.getDate()+q.interval);
+  q.dueDate=due.toISOString().split('T')[0];
+  save();
+}
+
+function addToSR(q){
+  if(!S.srDue) S.srDue=[];
+  // Don't add duplicates
+  if(S.srDue.some(function(b){return b.q===q.q;})) return false;
+  S.srDue.push({
+    q:q.q,opts:q.opts||[],ans:q.ans,sol:q.sol||'',
+    dueDate:getTodayStr(),interval:1,ease:2.5,reps:0
+  });
+  save();
+  return true;
+}
+
+// SR card on Home — show how many due today
+function renderSRHomeCard(){
+  var due=getDueSRQuestions();
+  var card=document.getElementById('srHomeCard');
+  if(!card) return;
+  if(!due.length){card.style.display='none';return;}
+  card.style.display='block';
+  card.querySelector('#srDueCount').textContent=due.length+' questions due aaj!';
+}
+
+// Render SR practice (mini quiz for due questions)
+var srSession={qs:[],cur:0,ans:null};
+function openSRSession(){
+  var due=getDueSRQuestions();
+  if(!due.length){toast('Aaj koi revision due nahi! 🎉','i');return;}
+  srSession={qs:due,cur:0,ans:null};
+  // Find indices in S.srDue
+  srSession.qs=srSession.qs.map(function(q){
+    var idx=S.srDue.indexOf(q);
+    return Object.assign({},q,{_srIdx:idx});
+  });
+  sw('practice');
+  setTimeout(function(){
+    showV('pv-sr','pv1');
+    renderSRQ();
+  },100);
+}
+
+function renderSRQ(){
+  var el=document.getElementById('sr-content');
+  if(!el) return;
+  var s=srSession;
+  if(s.cur>=s.qs.length){
+    el.innerHTML='<div style="text-align:center;padding:24px">'
+      +'<div style="font-size:3rem">🎉</div>'
+      +'<div style="font-size:1.1rem;font-weight:900;margin:8px 0">Revision Done!</div>'
+      +'<div style="font-size:.72rem;color:var(--t2);margin-bottom:16px">'+s.qs.length+' questions revise kiye</div>'
+      +'<button class="btn" onclick="showV(\'pv1\',\'pv-sr\')">← Back</button></div>';
+    return;
+  }
+  var q=s.qs[s.cur];
+  var opts=q.opts||[];
+  var html='<div style="font-size:.62rem;color:var(--t2);margin-bottom:8px">Revision '+(s.cur+1)+'/'+s.qs.length
+    +' · <span style="color:var(--ac)">'+q.interval+'d interval</span></div>'
+    +'<div style="font-size:.85rem;font-weight:700;line-height:1.5;margin-bottom:14px">'+esc(q.q)+'</div>';
+  opts.forEach(function(o,i){
+    var bg='var(--cd2)';var border='var(--br2)';
+    if(s.ans!==null){
+      if(i===q.ans){bg='rgba(0,200,100,.2)';border='var(--gr)';}
+      else if(i===s.ans&&i!==q.ans){bg='rgba(255,80,80,.2)';border='var(--a2)';}
+    }
+    html+='<div onclick="srPick('+i+')" style="background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.78rem">'+esc(o)+'</div>';
+  });
+  if(s.ans!==null){
+    var correct=(s.ans===q.ans);
+    html+='<div style="background:rgba(0,0,0,.1);border-radius:10px;padding:9px 12px;font-size:.72rem;color:var(--t2);margin:8px 0">💡 '+esc(q.sol||'')+'</div>';
+    html+='<div style="font-size:.65rem;font-weight:800;margin-bottom:6px;color:var(--t2)">Kitna mushkil laga?</div>';
+    html+='<div style="display:flex;gap:6px">'
+      +'<button onclick="srRate(0)" style="flex:1;background:rgba(255,80,80,.15);border:1px solid var(--a2);border-radius:10px;padding:8px;font-size:.68rem;font-weight:700;cursor:pointer;color:var(--a2)">😖 Nahi aaya</button>'
+      +'<button onclick="srRate(1)" style="flex:1;background:rgba(255,160,0,.15);border:1px solid var(--or);border-radius:10px;padding:8px;font-size:.68rem;font-weight:700;cursor:pointer;color:var(--or)">😐 Thoda mushkil</button>'
+      +'<button onclick="srRate(2)" style="flex:1;background:rgba(0,200,100,.15);border:1px solid var(--gr);border-radius:10px;padding:8px;font-size:.68rem;font-weight:700;cursor:pointer;color:var(--gr)">😊 Aasan tha</button>'
+      +'</div>';
+  }
+  el.innerHTML=html;
+}
+
+function srPick(i){
+  if(srSession.ans!==null) return;
+  srSession.ans=i;
+  renderSRQ();
+}
+
+function srRate(quality){
+  var q=srSession.qs[srSession.cur];
+  if(q._srIdx!==undefined) updateSRQuestion(q._srIdx,quality);
+  srSession.cur++;
+  srSession.ans=null;
+  renderSRQ();
+}
+
+// PATCH renderHome for SR card
+// [SR home consolidated]
 
 </script>
 </body>
