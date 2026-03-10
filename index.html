@@ -1037,6 +1037,7 @@ body::before{
       </div>
       <!-- RWA view -->
       <div id="study-view-rwa">
+      <div id="rwa-subjects-view">
         <div style="background:linear-gradient(135deg,rgba(255,165,0,.15),rgba(255,107,138,.1));border:1px solid rgba(255,165,0,.3);border-radius:13px;padding:12px;margin-bottom:12px">
           <div style="font-size:.95rem;font-weight:900">📖 RWA Yellow Book</div>
           <div style="font-size:.63rem;color:var(--t2);margin-top:3px">Ankit Bhati Sir · AI + QB Questions</div>
@@ -1044,6 +1045,7 @@ body::before{
         <div style="font-size:.75rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📚 Subject Choose Karo</div>
         <div id="rwa-subjects"></div>
       </div>
+            </div>
       <div id="rwa-topics-view" style="display:none">
         <button onclick="rwaBreadcrumbBack(0)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Subjects</button>
         <div style="font-size:.88rem;font-weight:900;margin-bottom:10px" id="rwa-topic-title"></div>
@@ -1149,6 +1151,18 @@ body::before{
           <div onclick="startMock('bssc')" style="background:linear-gradient(135deg,#dc2626,#f97316);border-radius:14px;padding:16px;cursor:pointer">
             <div style="font-size:.9rem;font-weight:900;color:#fff">BSSC</div>
             <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">150 Qs · 135 min</div>
+          </div>
+          <div onclick="startMock('ssc_chsl')" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC CHSL Tier-1</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 60 min</div>
+          </div>
+          <div onclick="startMock('rrb_group_d')" style="background:linear-gradient(135deg,#be185d,#ec4899);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">RRB Group D</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 90 min</div>
+          </div>
+          <div onclick="startMock('bpsc')" style="background:linear-gradient(135deg,#065f46,#059669);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">BPSC Prelims</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">150 Qs · 120 min</div>
           </div>
           <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:14px;padding:16px;cursor:pointer">
             <div style="font-size:.9rem;font-weight:900;color:var(--tx)">⚙️ Custom Mock</div>
@@ -4858,7 +4872,7 @@ function handleImgSelect(input){
     var prev=document.getElementById('imgPreview');
     if(prev) prev.src=e.target.result;
     if(wrap) wrap.style.display='block';
-    var ci=document.getElementById('chatInp');
+    var ci=document.getElementById('askInput');
     if(ci){ci.placeholder='Photo ke baare mein poochho...';ci.focus();}
   };
   reader.readAsDataURL(file);
@@ -4869,11 +4883,11 @@ function clearImg(){
   window._chatImg=null;
   var wrap=document.getElementById('imgPreviewWrap');if(wrap)wrap.style.display='none';
   var prev=document.getElementById('imgPreview');if(prev)prev.src='';
-  var ci=document.getElementById('chatInp');if(ci)ci.placeholder='Photo ya text se poochho...';
+  var ci=document.getElementById('askInput');if(ci)ci.placeholder='Photo ya text se poochho...';
 }
 
 function sendChat(){
-  var inp=document.getElementById('chatInp');
+  var inp=document.getElementById('askInput');
   var msg=inp.value.trim();
   var img=window._chatImg||null;
   if(!msg&&!img){toast('Kuch likho ya photo lo!','e');return;}
