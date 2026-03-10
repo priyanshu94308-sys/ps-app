@@ -677,6 +677,29 @@ body::before{
    SETTINGS
 ═══════════════════════════════ */
 .scard{background:var(--card);border-radius:20px;padding:15px;margin-bottom:12px;border:1px solid var(--br);}
+/* ── RAPID FIRE ── */
+.rf-timer{font-size:2.5rem;font-weight:900;text-align:center;color:var(--ac);line-height:1;}
+.rf-bar{height:6px;border-radius:3px;background:var(--br);margin:8px 0 14px;}
+.rf-fill{height:100%;border-radius:3px;background:var(--ac);transition:width 1s linear;}
+/* ── BOOKMARKS ── */
+.bk-btn{background:none;border:none;font-size:1rem;cursor:pointer;padding:4px 6px;border-radius:6px;transition:transform .2s;}
+.bk-btn:active{transform:scale(1.3);}
+/* ── POMODORO ── */
+.pomo-fab{position:fixed;bottom:80px;right:16px;width:48px;height:48px;border-radius:50%;background:var(--ac);border:none;color:#fff;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);z-index:99;display:flex;align-items:center;justify-content:center;}
+.pomo-modal{position:fixed;bottom:140px;right:16px;background:var(--card);border:1px solid var(--br2);border-radius:20px;padding:18px;width:220px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:100;display:none;}
+.pomo-time{font-size:2.4rem;font-weight:900;text-align:center;letter-spacing:2px;color:var(--ac);}
+/* ── COMMUNITY ── */
+.chat-msg{display:flex;gap:8px;margin-bottom:12px;align-items:flex-start;}
+.chat-avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;}
+.chat-bubble{background:var(--cd2);border-radius:12px 12px 12px 4px;padding:8px 11px;flex:1;font-size:.75rem;line-height:1.5;border:1px solid var(--br);}
+.chat-bubble.mine{background:rgba(92,106,240,.18);border-radius:12px 12px 4px 12px;border-color:var(--ac);}
+.chat-name{font-size:.58rem;font-weight:800;color:var(--ac);margin-bottom:2px;}
+.chat-time{font-size:.52rem;color:var(--t3);margin-top:2px;}
+/* ── CHALLENGE ── */
+.challenge-card{background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(123,79,232,.15));border:1px solid rgba(92,106,240,.3);border-radius:16px;padding:14px;margin-bottom:12px;}
+/* ── WEAK TOPIC ── */
+.wt-bar{height:8px;border-radius:4px;background:var(--br);margin:3px 0;}
+.wt-fill{height:100%;border-radius:4px;transition:width .8s ease;}
 .srow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
 .srow:not(:last-child){border-bottom:1px solid var(--br);}
 .tog{width:46px;height:26px;background:rgba(255,255,255,.08);border-radius:99px;position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background .3s;}
@@ -867,6 +890,23 @@ body::before{
           </div>
         </div>
       </div>
+      <!-- DAILY CHALLENGE -->
+      <div class="challenge-card" id="challengeCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:.72rem;font-weight:800">🏆 Aaj Ka Challenge</div>
+          <div style="font-size:.6rem;color:var(--t2)" id="challengeSubjLbl">GK</div>
+        </div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:6px" id="challengeDesc">30 questions solve karo aaj</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:8px;background:rgba(0,0,0,.2);border-radius:4px"><div id="challengeBar" style="height:100%;border-radius:4px;background:var(--ac);width:0%;transition:width .5s"></div></div>
+          <div style="font-size:.68rem;font-weight:800;color:var(--ac);min-width:36px;text-align:right" id="challengeCount">0/30</div>
+        </div>
+      </div>
+      <!-- EXAM COUNTDOWN -->
+      <div id="examCountdownCard" style="display:none;margin-bottom:12px">
+        <div style="font-size:.6rem;font-weight:800;color:var(--t2);letter-spacing:1px;margin-bottom:6px">📅 EXAM COUNTDOWN</div>
+        <div id="examCountdownList" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px"></div>
+      </div>
       <button class="tog-btn" onclick="var f=document.getElementById('addForm');f.style.display=f.style.display==='block'?'none':'block'">＋  Nayi Task Add Karo</button>
       <div class="add-form" id="addForm" style="display:none">
         <div style="font-size:.59rem;color:var(--t2);font-weight:800;margin-bottom:6px">📝 NAYI TASK</div>
@@ -900,6 +940,18 @@ body::before{
           <button class="chip" onclick="setExam('upsc',this)">UPSC</button>
         </div>
         <div class="sg" id="subjGrid"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+          <div onclick="showV('pv-rapidfire','pv1')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:14px;padding:14px;cursor:pointer;text-align:center">
+            <div style="font-size:1.4rem">⚡</div>
+            <div style="font-size:.72rem;font-weight:800;color:#fff;margin-top:4px">Rapid Fire</div>
+            <div style="font-size:.58rem;color:rgba(255,255,255,.75)">30 sec per Q</div>
+          </div>
+          <div onclick="openBookmarks()" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:14px;padding:14px;cursor:pointer;text-align:center">
+            <div style="font-size:1.4rem">📌</div>
+            <div style="font-size:.72rem;font-weight:800;color:#fff;margin-top:4px">Bookmarks</div>
+            <div style="font-size:.58rem;color:rgba(255,255,255,.75)" id="bmCountLbl">0 saved</div>
+          </div>
+        </div>
       </div>
       <div id="pv2" style="display:none">
         <button class="back" onclick="showV('pv1','pv2')">← Back</button>
@@ -919,6 +971,41 @@ body::before{
           <span style="font-size:.7rem;color:var(--t2)">Score</span><span style="font-size:1rem;font-weight:800;color:var(--gr)" id="pScoreN">0/0</span>
         </div>
         <div id="qList"></div>
+      </div>
+      <!-- RAPID FIRE -->
+      <div id="pv-rapidfire" style="display:none">
+        <button class="back" onclick="showV('pv1','pv-rapidfire');rfStop()">← Back</button>
+        <div style="text-align:center;margin-bottom:12px">
+          <div style="font-size:.7rem;font-weight:800;color:var(--ac);letter-spacing:1px">⚡ RAPID FIRE</div>
+          <div style="font-size:.6rem;color:var(--t2)">30 seconds per question!</div>
+        </div>
+        <div id="rf-content">
+          <div style="text-align:center;padding:20px">
+            <div style="font-size:3rem;margin-bottom:8px">⚡</div>
+            <div style="font-size:.85rem;font-weight:800;margin-bottom:4px">Rapid Fire Quiz</div>
+            <div style="font-size:.68rem;color:var(--t2);margin-bottom:16px">10 random questions • 30 sec each • Speed test!</div>
+            <div style="margin-bottom:12px">
+              <div style="font-size:.65rem;font-weight:700;margin-bottom:6px;color:var(--t2)">Subject:</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+                <button class="chip on" onclick="setRFSubj('all',this)">🎲 Random</button>
+                <button class="chip" onclick="setRFSubj('gk',this)">GK</button>
+                <button class="chip" onclick="setRFSubj('history',this)">History</button>
+                <button class="chip" onclick="setRFSubj('maths',this)">Maths</button>
+                <button class="chip" onclick="setRFSubj('science',this)">Science</button>
+              </div>
+            </div>
+            <button class="btn" onclick="startRF()" style="width:80%;font-size:.85rem;padding:12px">🚀 Start!</button>
+          </div>
+        </div>
+      </div>
+      <!-- BOOKMARKS -->
+      <div id="pv-bookmarks" style="display:none">
+        <button class="back" onclick="showV('pv1','pv-bookmarks')">← Back</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:.85rem;font-weight:800">📌 Saved Questions</div>
+          <button onclick="clearBookmarks()" style="background:none;border:none;font-size:.6rem;color:var(--a2);cursor:pointer">🗑️ Clear</button>
+        </div>
+        <div id="bookmark-list"></div>
       </div>
     </div>
     <!-- MOCK -->
@@ -1100,6 +1187,15 @@ body::before{
             <button class="chip" onclick="toggleMockSubj('science',this)">Science</button>
           </div>
         </div>
+        <div class="cc" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:.68rem;font-weight:700">Negative Marking?</div>
+              <div style="font-size:.6rem;color:var(--t2)">Galat answer pe -0.25 katega</div>
+            </div>
+            <button class="tog" id="negMarkTog" onclick="toggleNegMark(this)"></button>
+          </div>
+        </div>
         <button class="btn" onclick="launchCustomMock()" style="width:100%">🚀 Mock Shuru Karo</button>
         <button onclick="showV('mock-home','mock-setup')" style="background:none;border:none;color:var(--t2);font-size:.7rem;padding:8px;cursor:pointer;display:block;margin:8px auto">← Wapas</button>
       </div>
@@ -1144,6 +1240,10 @@ body::before{
       <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📚 Subject Accuracy</div><div class="ch"><canvas id="subjChart"></canvas></div></div>
       <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📝 Mock Scores</div><div class="ch"><canvas id="mockChart"></canvas></div></div>
       <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📅 Activity Heatmap (90 days)</div><div class="hm-w" id="hmWrap"><div class="hm" id="hmGrid"></div></div></div>
+      <div class="cc">
+        <div style="font-size:.66rem;font-weight:800;margin-bottom:10px;color:var(--t2)">📊 Weak Topic Finder</div>
+        <div id="weakTopicList"><div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div></div>
+      </div>
       <div class="card"><div class="sec">📜 Test History</div><div id="testHist"></div></div>
     </div>
     <!-- SETTINGS -->
@@ -1176,8 +1276,52 @@ body::before{
         <div class="sec">🔐 Account</div>
         <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
       </div>
-      <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v3.0 🚀 · 1,110+ Questions Built-in</div>
+      <!-- EXAM DATES -->
+      <div class="scard">
+        <div class="sec">📅 Exam Countdown Set Karo</div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:10px">Apne upcoming exams ki date daalo — home pe countdown dikhega</div>
+        <div id="examDatesList" style="margin-bottom:10px"></div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <select class="fi" id="examNameSel" style="flex:1;font-size:.68rem">
+            <option value="SSC GD">🪖 SSC GD</option>
+            <option value="Bihar Police">👮 Bihar Police</option>
+            <option value="SSC CGL">📊 SSC CGL</option>
+            <option value="RRB NTPC">🚂 RRB NTPC</option>
+            <option value="BSSC">📋 BSSC</option>
+            <option value="BPSC">🎖️ BPSC</option>
+          </select>
+          <input type="date" class="fi" id="examDateInp" style="flex:1;font-size:.68rem">
+        </div>
+        <button class="add-btn2" onclick="addExamDate()" style="width:100%;padding:9px">+ Exam Add Karo</button>
+      </div>
+      <!-- COMMUNITY CHAT -->
+      <div class="scard">
+        <div class="sec">💬 Community Chat</div>
+        <div style="font-size:.63rem;color:var(--t2);margin-bottom:10px">Sab students ek saath — doubt poochho, discuss karo!</div>
+        <div id="communityMsgs" style="height:300px;overflow-y:auto;margin-bottom:10px;padding:4px"></div>
+        <div style="display:flex;gap:6px">
+          <input type="text" class="fi" id="communityInp" placeholder="Message likho..." maxlength="200" style="flex:1;font-size:.75rem" onkeydown="if(event.key==='Enter')sendCommunityMsg()">
+          <button onclick="sendCommunityMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.8rem;font-weight:800;padding:8px 14px;cursor:pointer">Send</button>
+        </div>
+      </div>
+      <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v4.0 🚀 · 1,110+ Questions Built-in</div>
     </div>
+  </div>
+  <!-- POMODORO FAB -->
+  <button class="pomo-fab" id="pomoFab" onclick="togglePomo()" title="Pomodoro Timer">⏱️</button>
+  <div class="pomo-modal" id="pomoModal">
+    <div style="font-size:.65rem;font-weight:800;color:var(--t2);margin-bottom:8px;text-align:center" id="pomoLabel">🍅 FOCUS TIME</div>
+    <div class="pomo-time" id="pomoDisplay">25:00</div>
+    <div style="height:4px;background:var(--br);border-radius:2px;margin:10px 0"><div id="pomoBar" style="height:100%;border-radius:2px;background:var(--ac);width:100%;transition:width 1s linear"></div></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+      <button onclick="startPomo()" id="pomoStartBtn" style="flex:1;background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.72rem;font-weight:800;padding:8px;cursor:pointer">▶ Start</button>
+      <button onclick="resetPomo()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:10px;font-size:.72rem;padding:8px 12px;cursor:pointer">↺</button>
+    </div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:8px">
+      <button onclick="setPomoMode('work')" id="pm-work" style="font-size:.58rem;padding:3px 10px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;cursor:pointer">25m Work</button>
+      <button onclick="setPomoMode('break')" id="pm-break" style="font-size:.58rem;padding:3px 10px;border-radius:20px;border:1px solid var(--br2);background:transparent;color:var(--t2);cursor:pointer">5m Break</button>
+    </div>
+    <div style="font-size:.58rem;color:var(--t2);text-align:center;margin-top:8px" id="pomoCycles">Cycles: 0</div>
   </div>
   <div class="tabbar">
     <button class="tb on" onclick="sw('home')" id="tb-home"><span>🏠</span>Home</button>
@@ -3472,7 +3616,7 @@ var LVLCLS={easy:'le',moderate:'lm',hard:'lh'};
 var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[]};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:[],xp:0,dailyChallenge:{date:'',count:0,target:30,subj:'gk'}};
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
 var pracQs=[],pracAns={},pracC=0,pracT=0;
 var charts={w:null,s:null,m:null};
@@ -4889,7 +5033,7 @@ function drawCharts(){
 // MOCK TEST
 // ══════════════════════════════════════
 var mockState={qs:[],cur:0,ans:{},timeLeft:0,timer:null,name:'',totalTime:0};
-var mockOpts={qcount:25,time:30,subjects:['gk','reasoning','maths','hindi']};
+var mockOpts={qcount:25,time:30,subjects:['gk','reasoning','maths','hindi'],negMarking:false};
 
 function startMock(type){
   if(type==='custom'){showV('mock-setup','mock-home');renderMockHistory();return;}
@@ -5236,6 +5380,615 @@ save=function(){_localSave();saveToFirestore();};
 
 // ── START ──
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
+
+
+// ═══════════════════════════════════════════════════════════════
+// 📌 BOOKMARKS
+// ═══════════════════════════════════════════════════════════════
+function toggleBookmark(q,btnEl){
+  if(!S.bookmarks) S.bookmarks=[];
+  var idx=S.bookmarks.findIndex(function(b){return b.q===q.q;});
+  if(idx===-1){
+    S.bookmarks.push({q:q.q,opts:q.opts,ans:q.ans,sol:q.sol||'',savedAt:Date.now()});
+    if(btnEl){btnEl.textContent='🔖';btnEl.title='Bookmark hatao';}
+    toast('📌 Saved!','i');
+  } else {
+    S.bookmarks.splice(idx,1);
+    if(btnEl){btnEl.textContent='🏷️';btnEl.title='Bookmark karo';}
+    toast('Bookmark hataya','i');
+  }
+  save();
+  // update count label
+  var lbl=document.getElementById('bmCountLbl');
+  if(lbl) lbl.textContent=(S.bookmarks.length)+' saved';
+}
+
+function openBookmarks(){
+  showV('pv-bookmarks','pv1');
+  renderBookmarks();
+}
+
+function renderBookmarks(){
+  var list=document.getElementById('bookmark-list');
+  if(!list) return;
+  var bms=S.bookmarks||[];
+  var lbl=document.getElementById('bmCountLbl');
+  if(lbl) lbl.textContent=bms.length+' saved';
+  if(!bms.length){list.innerHTML='<div class="empty">📌 Abhi koi saved question nahi<br><span style="font-size:.65rem">Practice mein 🏷️ button dabao</span></div>';return;}
+  list.innerHTML=bms.map(function(q,i){
+    var opts=q.opts||[];
+    return '<div class="qcard">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+      +'<div class="qtxt" style="flex:1">Q'+(i+1)+'. '+esc(q.q)+'</div>'
+      +'<button class="bk-btn" onclick="removeBookmark('+i+')" title="Hatao">🗑️</button>'
+      +'</div>'
+      +opts.map(function(o,j){
+        return '<button class="opt'+(j===q.ans?' c':'')+'" disabled>'+esc(o)+'</button>';
+      }).join('')
+      +(q.sol?'<div class="sol"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+esc(q.sol)+'</div></div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function removeBookmark(i){
+  if(!S.bookmarks) return;
+  S.bookmarks.splice(i,1);
+  save();
+  renderBookmarks();
+  toast('Hataya!','i');
+}
+
+function clearBookmarks(){
+  if(!confirm('Saare bookmarks delete karein?')) return;
+  S.bookmarks=[];
+  save();
+  renderBookmarks();
+  toast('Cleared!');
+}
+
+// Helper to add bookmark button to qcard
+function bmBtn(q){
+  var saved=(S.bookmarks||[]).some(function(b){return b.q===q.q;});
+  var icon=saved?'🔖':'🏷️';
+  var title=saved?'Bookmark hatao':'Bookmark karo';
+  return '<button class="bk-btn" title="'+title+'" onclick="toggleBookmark('+JSON.stringify(JSON.stringify(q))+'.replace ? JSON.parse('+JSON.stringify(JSON.stringify(q))+') : {},this)" style="float:right;margin-top:-2px">'+icon+'</button>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ⚡ RAPID FIRE QUIZ
+// ═══════════════════════════════════════════════════════════════
+var rfState={qs:[],cur:0,ans:null,score:0,timer:null,timeLeft:30,subj:'all',running:false};
+
+function setRFSubj(subj,el){
+  rfState.subj=subj;
+  document.querySelectorAll('#pv-rapidfire .chip').forEach(function(c){c.classList.remove('on');});
+  if(el) el.classList.add('on');
+}
+
+function startRF(){
+  // Pick 10 random questions from QB
+  var pool=[];
+  var subj=rfState.subj;
+  if(subj==='all'){
+    Object.keys(QB).forEach(function(k){pool=pool.concat(QB[k]);});
+  } else if(QB[subj]) {
+    pool=QB[subj].slice();
+  } else {
+    Object.keys(QB).forEach(function(k){pool=pool.concat(QB[k]);});
+  }
+  // Shuffle and take 10
+  pool=shuffle(pool.slice()).slice(0,10);
+  // Shuffle options for each
+  pool=pool.map(function(q){
+    var ct=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
+    var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
+    var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===ct;});
+    return Object.assign({},q,{opts:sh,ans:na===-1?q.ans:na});
+  });
+  rfState={qs:pool,cur:0,ans:null,score:0,timer:null,timeLeft:30,subj:rfState.subj,running:true};
+  renderRFQ();
+}
+
+function renderRFQ(){
+  var s=rfState;
+  if(s.cur>=s.qs.length){
+    rfStop();
+    var pct=Math.round(s.score/s.qs.length*100);
+    var emoji=pct>=80?'🏆':pct>=60?'⚡':'💪';
+    document.getElementById('rf-content').innerHTML=
+      '<div style="text-align:center;padding:24px">'
+      +'<div style="font-size:3rem">'+emoji+'</div>'
+      +'<div style="font-size:1.6rem;font-weight:900;margin:8px 0">'+s.score+'/'+s.qs.length+'</div>'
+      +'<div style="font-size:.8rem;color:var(--t2);margin-bottom:4px">Score: '+pct+'%</div>'
+      +'<div style="font-size:.72rem;color:var(--ac);font-weight:700;margin-bottom:20px">'+(pct>=80?'Zabardast! 🔥':pct>=60?'Acha kiya!':'Aur practice karo!')+'</div>'
+      +'<button class="btn" onclick="startRF()" style="width:80%">🔄 Dobara Khelo</button>'
+      +'</div>';
+    return;
+  }
+  var q=s.qs[s.cur];
+  var html='<div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+    +'<div style="font-size:.65rem;color:var(--t2);font-weight:700">Q '+(s.cur+1)+'/'+s.qs.length+'  •  Score: '+s.score+'</div>'
+    +'<div style="font-size:.85rem;font-weight:900;color:'+(s.timeLeft<=10?'var(--a2)':'var(--ac)')+'">'+s.timeLeft+'s</div>'
+    +'</div>'
+    +'<div class="rf-bar"><div class="rf-fill" id="rf-timebar" style="width:'+(s.timeLeft/30*100)+'%"></div></div>'
+    +'<div style="font-size:.85rem;font-weight:700;line-height:1.5;margin-bottom:14px">'+esc(q.q)+'</div>';
+  q.opts.forEach(function(o,i){
+    var bg='var(--cd2)';var border='var(--br2)';var clr='var(--tx)';
+    if(s.ans!==null){
+      if(i===q.ans){bg='rgba(0,200,100,.2)';border='var(--gr)';}
+      else if(i===s.ans&&i!==q.ans){bg='rgba(255,80,80,.2)';border='var(--a2)';}
+    }
+    html+='<div onclick="rfPick('+i+')" style="background:'+bg+';border:1px solid '+border+';color:'+clr+';border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.78rem;transition:all .2s">'
+      +esc(o)+'</div>';
+  });
+  if(s.ans!==null){
+    html+='<div style="background:rgba(0,0,0,.15);border-radius:10px;padding:9px 12px;font-size:.72rem;color:var(--t2);margin-top:4px">💡 '+esc(q.sol||'')+'</div>';
+    html+='<div style="text-align:right;margin-top:10px"><button onclick="rfNext()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.75rem;font-weight:800;padding:9px 20px;cursor:pointer">Next ›</button></div>';
+  }
+  html+='</div>';
+  document.getElementById('rf-content').innerHTML=html;
+  // Start timer
+  if(rfState.timer) clearInterval(rfState.timer);
+  if(s.ans===null){
+    rfState.timer=setInterval(function(){
+      rfState.timeLeft--;
+      var tb=document.getElementById('rf-timebar');
+      if(tb) tb.style.width=(rfState.timeLeft/30*100)+'%';
+      var tdisp=document.querySelector('#rf-content [style*="font-weight:900"]');
+      if(tdisp) tdisp.textContent=rfState.timeLeft+'s';
+      if(tdisp) tdisp.style.color=rfState.timeLeft<=10?'var(--a2)':'var(--ac)';
+      if(rfState.timeLeft<=0){
+        clearInterval(rfState.timer);
+        rfState.ans=-1; // time up = wrong
+        renderRFQ();
+      }
+    },1000);
+  }
+}
+
+function rfPick(i){
+  if(rfState.ans!==null) return;
+  if(rfState.timer) clearInterval(rfState.timer);
+  rfState.ans=i;
+  var q=rfState.qs[rfState.cur];
+  if(i===q.ans){
+    rfState.score++;
+    // Update daily challenge
+    updateDailyChallenge();
+  }
+  renderRFQ();
+}
+
+function rfNext(){
+  rfState.cur++;
+  rfState.ans=null;
+  rfState.timeLeft=30;
+  renderRFQ();
+}
+
+function rfStop(){
+  if(rfState.timer) clearInterval(rfState.timer);
+  rfState.running=false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ➖ NEGATIVE MARKING
+// ═══════════════════════════════════════════════════════════════
+function toggleNegMark(el){
+  mockOpts.negMarking=!mockOpts.negMarking;
+  el.classList.toggle('on',mockOpts.negMarking);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📊 WEAK TOPIC FINDER
+// ═══════════════════════════════════════════════════════════════
+var subjFullNames={
+  gk:'सामान्य ज्ञान',history:'इतिहास',polity:'राजव्यवस्था',
+  geography:'भूगोल',science:'विज्ञान',maths:'गणित',
+  reasoning:'रीजनिंग',hindi:'हिंदी',english:'English'
+};
+
+function renderWeakTopics(){
+  var el=document.getElementById('weakTopicList');
+  if(!el) return;
+  var stats=S.sStats||{};
+  var keys=Object.keys(stats).filter(function(k){return stats[k].t>0;});
+  if(!keys.length){el.innerHTML='<div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div>';return;}
+  // Sort by accuracy ascending
+  keys.sort(function(a,b){
+    var pa=stats[a].d/stats[a].t;
+    var pb=stats[b].d/stats[b].t;
+    return pa-pb;
+  });
+  var html='';
+  keys.forEach(function(k){
+    var st=stats[k];
+    var pct=Math.round(st.d/st.t*100);
+    var color=pct>=70?'var(--gr)':pct>=50?'var(--or)':'var(--a2)';
+    var label=pct>=70?'💪 Strong':pct>=50?'📚 OK':'⚠️ Weak';
+    var name=subjFullNames[k]||k;
+    html+='<div style="margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">'
+      +'<div style="font-size:.72rem;font-weight:700">'+name+'</div>'
+      +'<div style="display:flex;gap:6px;align-items:center">'
+      +'<span style="font-size:.58rem;color:'+color+'">'+label+'</span>'
+      +'<span style="font-size:.72rem;font-weight:800;color:'+color+'">'+pct+'%</span>'
+      +'</div></div>'
+      +'<div class="wt-bar"><div class="wt-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'
+      +'<div style="font-size:.58rem;color:var(--t2)">'+st.d+'/'+st.t+' sahi · '+st.t+' total</div>'
+      +'</div>';
+  });
+  // Weakest topic practice button
+  var weakest=keys[0];
+  if(weakest){
+    var wPct=Math.round(stats[weakest].d/stats[weakest].t*100);
+    if(wPct<70){
+      html+='<div style="margin-top:8px;padding:10px;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);border-radius:12px;text-align:center">'
+        +'<div style="font-size:.65rem;color:var(--a2);font-weight:800;margin-bottom:6px">⚠️ Sabse Kamzor: '+(subjFullNames[weakest]||weakest)+' ('+wPct+'%)</div>'
+        +'<button class="btn" onclick="practiceWeakTopic(\'' +weakest+ '\')" style="font-size:.68rem;padding:7px 16px">📚 Abhi Practice Karo</button>'
+        +'</div>';
+    }
+  }
+  el.innerHTML=html;
+}
+
+function practiceWeakTopic(subjId){
+  sw('practice');
+  // Find the subject in SUBJECTS list
+  setTimeout(function(){
+    var subjBtns=document.querySelectorAll('#subjGrid .sg-item');
+    for(var i=0;i<subjBtns.length;i++){
+      if(subjBtns[i].dataset&&subjBtns[i].dataset.id===subjId){
+        subjBtns[i].click();
+        break;
+      }
+    }
+  },300);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📅 EXAM COUNTDOWN
+// ═══════════════════════════════════════════════════════════════
+function addExamDate(){
+  var name=document.getElementById('examNameSel').value;
+  var dateVal=document.getElementById('examDateInp').value;
+  if(!dateVal){toast('Date daalo!','e');return;}
+  var d=new Date(dateVal);
+  if(d<new Date()){toast('Future ki date daalo!','e');return;}
+  if(!S.examDates) S.examDates=[];
+  // Remove if already exists
+  S.examDates=S.examDates.filter(function(e){return e.name!==name;});
+  S.examDates.push({name:name,date:dateVal});
+  save();
+  renderExamDatesList();
+  renderExamCountdown();
+  document.getElementById('examDateInp').value='';
+  toast('✅ '+name+' added!','i');
+}
+
+function renderExamDatesList(){
+  var el=document.getElementById('examDatesList');
+  if(!el) return;
+  var dates=S.examDates||[];
+  if(!dates.length){el.innerHTML='<div style="font-size:.65rem;color:var(--t2)">Koi exam nahi add kiya</div>';return;}
+  el.innerHTML=dates.map(function(e,i){
+    var d=new Date(e.date);
+    var today=new Date();today.setHours(0,0,0,0);
+    var diff=Math.ceil((d-today)/(1000*60*60*24));
+    var dStr=diff>0?diff+' din bache':'Exam ho gaya!';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--br)">'
+      +'<div><div style="font-size:.72rem;font-weight:700">'+esc(e.name)+'</div>'
+      +'<div style="font-size:.58rem;color:var(--t2)">'+e.date+' · <span style="color:var(--ac);font-weight:700">'+dStr+'</span></div>'
+      +'</div>'
+      +'<button onclick="removeExamDate('+i+')" style="background:none;border:none;color:var(--a2);cursor:pointer;font-size:.8rem">×</button>'
+      +'</div>';
+  }).join('');
+}
+
+function removeExamDate(i){
+  S.examDates.splice(i,1);
+  save();
+  renderExamDatesList();
+  renderExamCountdown();
+}
+
+function renderExamCountdown(){
+  var card=document.getElementById('examCountdownCard');
+  var list=document.getElementById('examCountdownList');
+  if(!card||!list) return;
+  var dates=(S.examDates||[]).filter(function(e){
+    return new Date(e.date)>=new Date();
+  });
+  if(!dates.length){card.style.display='none';return;}
+  card.style.display='block';
+  var today=new Date();today.setHours(0,0,0,0);
+  list.innerHTML=dates.map(function(e){
+    var d=new Date(e.date);
+    var diff=Math.ceil((d-today)/(1000*60*60*24));
+    var color=diff<=30?'var(--a2)':diff<=60?'var(--or)':'var(--gr)';
+    return '<div style="background:var(--card);border:1px solid var(--br2);border-radius:12px;padding:10px 14px;flex-shrink:0;text-align:center;min-width:100px">'
+      +'<div style="font-size:1.5rem;font-weight:900;color:'+color+'">'+diff+'</div>'
+      +'<div style="font-size:.55rem;font-weight:700;color:var(--t2)">din bacha</div>'
+      +'<div style="font-size:.62rem;font-weight:800;margin-top:2px">'+esc(e.name)+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🏆 DAILY CHALLENGE
+// ═══════════════════════════════════════════════════════════════
+var CHALLENGE_SUBJECTS=['gk','history','maths','science','reasoning','hindi'];
+var CHALLENGE_NAMES={gk:'GK',history:'History',maths:'Maths',science:'Science',reasoning:'Reasoning',hindi:'Hindi'};
+
+function initDailyChallenge(){
+  var t=today();
+  if(!S.dailyChallenge) S.dailyChallenge={date:'',count:0,target:30,subj:'gk'};
+  if(S.dailyChallenge.date!==t){
+    // New day — pick random subject, reset
+    var idx=Math.floor(Math.random()*CHALLENGE_SUBJECTS.length);
+    S.dailyChallenge={date:t,count:0,target:30,subj:CHALLENGE_SUBJECTS[idx]};
+    save();
+  }
+  renderDailyChallenge();
+}
+
+function renderDailyChallenge(){
+  var dc=S.dailyChallenge||{count:0,target:30,subj:'gk'};
+  var lbl=document.getElementById('challengeSubjLbl');
+  var desc=document.getElementById('challengeDesc');
+  var bar=document.getElementById('challengeBar');
+  var cnt=document.getElementById('challengeCount');
+  var card=document.getElementById('challengeCard');
+  if(!card) return;
+  var subjName=CHALLENGE_NAMES[dc.subj]||'GK';
+  if(lbl) lbl.textContent=subjName;
+  if(desc) desc.textContent=dc.count>=dc.target?'🎉 Challenge complete! '+dc.count+'/'+dc.target:dc.target+' questions solve karo aaj ('+subjName+')';
+  var pct=Math.min(100,Math.round(dc.count/dc.target*100));
+  if(bar) bar.style.width=pct+'%';
+  if(bar) bar.style.background=pct>=100?'var(--gr)':'var(--ac)';
+  if(cnt) cnt.textContent=dc.count+'/'+dc.target;
+  if(card&&pct>=100) card.style.borderColor='rgba(0,200,100,.5)';
+}
+
+function updateDailyChallenge(){
+  if(!S.dailyChallenge) return;
+  S.dailyChallenge.count=(S.dailyChallenge.count||0)+1;
+  save();
+  renderDailyChallenge();
+  if(S.dailyChallenge.count===S.dailyChallenge.target){
+    toast('🏆 Daily Challenge Complete!','i');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ⏱️ POMODORO TIMER
+// ═══════════════════════════════════════════════════════════════
+var pomoState={running:false,timer:null,timeLeft:25*60,totalTime:25*60,mode:'work',cycles:0};
+var pomoOpen=false;
+
+function togglePomo(){
+  pomoOpen=!pomoOpen;
+  var modal=document.getElementById('pomoModal');
+  if(modal) modal.style.display=pomoOpen?'block':'none';
+}
+
+function setPomoMode(mode){
+  if(pomoState.running){stopPomo();}
+  pomoState.mode=mode;
+  var mins=mode==='work'?25:5;
+  pomoState.timeLeft=mins*60;
+  pomoState.totalTime=mins*60;
+  document.getElementById('pm-work').style.background=mode==='work'?'var(--ac)':'transparent';
+  document.getElementById('pm-work').style.color=mode==='work'?'#fff':'var(--t2)';
+  document.getElementById('pm-work').style.border=mode==='work'?'1px solid var(--ac)':'1px solid var(--br2)';
+  document.getElementById('pm-break').style.background=mode==='break'?'var(--gr)':'transparent';
+  document.getElementById('pm-break').style.color=mode==='break'?'#fff':'var(--t2)';
+  document.getElementById('pm-break').style.border=mode==='break'?'1px solid var(--gr)':'1px solid var(--br2)';
+  updatePomoDisplay();
+}
+
+function startPomo(){
+  if(pomoState.running){stopPomo();return;}
+  pomoState.running=true;
+  var btn=document.getElementById('pomoStartBtn');
+  if(btn) btn.textContent='⏸ Pause';
+  pomoState.timer=setInterval(function(){
+    pomoState.timeLeft--;
+    updatePomoDisplay();
+    if(pomoState.timeLeft<=0){
+      clearInterval(pomoState.timer);
+      pomoState.running=false;
+      if(pomoState.mode==='work'){
+        pomoState.cycles++;
+        toast('🍅 Focus session done! Break lo!','i');
+        setPomoMode('break');
+      } else {
+        toast('⚡ Break khatam! Focus karo!','i');
+        setPomoMode('work');
+      }
+      var btn2=document.getElementById('pomoStartBtn');
+      if(btn2) btn2.textContent='▶ Start';
+      try{if(navigator.vibrate) navigator.vibrate([300,100,300]);}catch(e){}
+    }
+  },1000);
+}
+
+function stopPomo(){
+  clearInterval(pomoState.timer);
+  pomoState.running=false;
+  var btn=document.getElementById('pomoStartBtn');
+  if(btn) btn.textContent='▶ Start';
+}
+
+function resetPomo(){
+  stopPomo();
+  var mins=pomoState.mode==='work'?25:5;
+  pomoState.timeLeft=mins*60;
+  pomoState.totalTime=mins*60;
+  updatePomoDisplay();
+}
+
+function updatePomoDisplay(){
+  var m=Math.floor(pomoState.timeLeft/60);
+  var s=pomoState.timeLeft%60;
+  var disp=m+':'+(s<10?'0':'')+s;
+  var el=document.getElementById('pomoDisplay');
+  if(el) el.textContent=disp;
+  var bar=document.getElementById('pomoBar');
+  if(bar) bar.style.width=(pomoState.timeLeft/pomoState.totalTime*100)+'%';
+  var lbl=document.getElementById('pomoLabel');
+  if(lbl) lbl.textContent=pomoState.mode==='work'?'🍅 FOCUS TIME':'☕ BREAK TIME';
+  var cycles=document.getElementById('pomoCycles');
+  if(cycles) cycles.textContent='Cycles: '+pomoState.cycles;
+  // Update fab emoji
+  var fab=document.getElementById('pomoFab');
+  if(fab) fab.textContent=pomoState.running?'⏸':'⏱️';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 💬 COMMUNITY CHAT (Firebase Firestore Real-time)
+// ═══════════════════════════════════════════════════════════════
+var _commUnsubscribe=null;
+
+function initCommunityChat(){
+  if(!window.db||!window.auth||!auth.currentUser) return;
+  var chatEl=document.getElementById('communityMsgs');
+  if(!chatEl) return;
+  chatEl.innerHTML='<div style="text-align:center;padding:10px;font-size:.65rem;color:var(--t2)">Loading...</div>';
+  // Unsubscribe previous listener
+  if(_commUnsubscribe){try{_commUnsubscribe();}catch(e){}}
+  try {
+    _commUnsubscribe=db.collection('community')
+      .orderBy('ts','asc')
+      .limitToLast(60)
+      .onSnapshot(function(snap){
+        var msgs=[];
+        snap.forEach(function(doc){msgs.push(Object.assign({id:doc.id},doc.data()));});
+        renderCommunityMsgs(msgs);
+      }, function(err){
+        var chatEl2=document.getElementById('communityMsgs');
+        if(chatEl2) chatEl2.innerHTML='<div class="empty" style="font-size:.65rem">❌ Chat load nahi hua: '+esc(err.message.substring(0,50))+'</div>';
+      });
+  } catch(e){
+    chatEl.innerHTML='<div class="empty" style="font-size:.65rem">❌ '+esc(e.message.substring(0,60))+'</div>';
+  }
+}
+
+function renderCommunityMsgs(msgs){
+  var chatEl=document.getElementById('communityMsgs');
+  if(!chatEl) return;
+  var me=auth&&auth.currentUser?auth.currentUser.uid:'';
+  if(!msgs.length){
+    chatEl.innerHTML='<div style="text-align:center;padding:20px;font-size:.68rem;color:var(--t2)">💬 Abhi koi message nahi<br>Pehla message bhejo!</div>';
+    return;
+  }
+  chatEl.innerHTML=msgs.map(function(m){
+    var isMine=m.uid===me;
+    var ts='';
+    if(m.ts&&m.ts.toDate){var d=m.ts.toDate();ts=d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();}
+    var initials=(m.name||'?').charAt(0).toUpperCase();
+    var avatarHtml=m.photo
+      ?'<img class="chat-avatar" src="'+esc(m.photo)+'" onerror="this.style.display=\'none\'" alt="">'
+      :'<div class="chat-avatar">'+initials+'</div>';
+    return '<div class="chat-msg" style="flex-direction:'+(isMine?'row-reverse':'row')+'">'
+      +avatarHtml
+      +'<div class="chat-bubble'+(isMine?' mine':'')+'">'
+      +(isMine?'':'<div class="chat-name">'+esc(m.name||'Student')+'</div>')
+      +'<div>'+esc(m.text||'')+'</div>'
+      +(ts?'<div class="chat-time">'+ts+'</div>':'')
+      +'</div></div>';
+  }).join('');
+  // Auto-scroll to bottom
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+
+function sendCommunityMsg(){
+  var inp=document.getElementById('communityInp');
+  if(!inp) return;
+  var txt=inp.value.trim();
+  if(!txt){return;}
+  if(txt.length>200){toast('200 characters se zyada nahi!','e');return;}
+  if(!auth||!auth.currentUser){toast('Login karo pehle!','e');return;}
+  if(!window.db){toast('DB not ready','e');return;}
+  var user=auth.currentUser;
+  inp.value='';
+  db.collection('community').add({
+    uid:user.uid,
+    name:S.name||user.displayName||'Student',
+    photo:user.photoURL||'',
+    text:txt,
+    ts:firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(e){toast('Send failed: '+e.message.substring(0,40),'e');});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PATCH: renderHome — add challenge + countdown
+// ═══════════════════════════════════════════════════════════════
+var _origRenderHome=renderHome;
+function renderHome(){
+  _origRenderHome();
+  initDailyChallenge();
+  renderExamCountdown();
+}
+
+// PATCH: initReport — add weak topic finder
+var _origInitReport=initReport;
+function initReport(){
+  _origInitReport();
+  renderWeakTopics();
+}
+
+// PATCH: sw — init community chat when settings opened
+var _origSw=sw;
+function sw(tab){
+  _origSw(tab);
+  if(tab==='settings'){
+    renderExamDatesList();
+    initCommunityChat();
+  }
+}
+
+// PATCH: ansP — update daily challenge counter
+var _origAnsP=ansP;
+function ansP(qi,oi){
+  _origAnsP(qi,oi);
+  updateDailyChallenge();
+}
+
+// PATCH: submitMock — apply negative marking
+var _origSubmitMock=submitMock;
+function submitMock(){
+  if(mockOpts.negMarking){
+    // Recalculate with negative marking
+    var qs=mockState.qs,ans=mockState.ans;
+    var correct=0,wrong=0,skip=0,rawScore=0;
+    qs.forEach(function(q,i){
+      if(ans[i]===undefined) skip++;
+      else if(ans[i]===q.ans){correct++;rawScore+=1;}
+      else{wrong++;rawScore-=0.25;}
+    });
+    mockState._negScore=Math.max(0,rawScore);
+  }
+  _origSubmitMock();
+  // Show neg score if applicable
+  if(mockOpts.negMarking&&mockState._negScore!==undefined){
+    var detail=document.getElementById('mock-res-detail');
+    if(detail) detail.textContent+=' · Net Score: '+mockState._negScore.toFixed(2);
+  }
+}
+
+// INIT new features on app load
+(function(){
+  var _origInitApp=initApp;
+  window.initApp=function(){
+    _origInitApp();
+    updatePomoDisplay();
+    // Refresh bookmark count label
+    var lbl=document.getElementById('bmCountLbl');
+    if(lbl) lbl.textContent=(S.bookmarks||[]).length+' saved';
+  };
+})();
 
 </script>
 </body>
