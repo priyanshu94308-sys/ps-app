@@ -144,6 +144,7 @@ body::before{
 .content::-webkit-scrollbar{display:none;}
 .tab{display:none;padding:16px 15px 24px;animation:fadeUp .25s ease;}
 .tab.active{display:block;}
+.tab#tab-community.active{display:flex;flex-direction:column;min-height:calc(100vh - 130px);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
 
@@ -1389,7 +1390,7 @@ body::before{
     </div>
 
     <!-- COMMUNITY TAB -->
-    <div class="tab" id="tab-community" style="display:flex;flex-direction:column;height:100%;min-height:calc(100vh - 130px)">
+    <div class="tab" id="tab-community">
       <div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(255,107,138,.1));border:1px solid rgba(92,106,240,.2);border-radius:13px;padding:10px 12px;margin-bottom:10px">
         <div style="display:flex;align-items:center;gap:8px">
           <div style="font-size:1.4rem">💬</div>
@@ -1409,7 +1410,7 @@ body::before{
         <button class="chip" onclick="communityQuick('Maths shortcut batao!')">Maths Tips</button>
         <button class="chip" onclick="communityQuick('GK trick share karo!')">GK Tricks</button>
       </div>
-      <div id="communityMsgs" style="flex:1;overflow-y:auto;padding:4px;margin-bottom:8px;min-height:280px"></div>
+      <div id="communityMsgs" style="height:calc(100vh - 310px);min-height:250px;overflow-y:auto;padding:4px;margin-bottom:8px"></div>
       <div style="display:flex;gap:6px;padding-bottom:4px">
         <input type="text" class="fi" id="communityInp" placeholder="Message likho... (Enter = Send)" maxlength="200" style="flex:1;font-size:.75rem" onkeydown="if(event.key==='Enter')sendCommunityMsg()">
         <button onclick="sendCommunityMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.85rem;font-weight:800;padding:8px 14px;cursor:pointer">➤</button>
@@ -4879,6 +4880,51 @@ function handleImgSelect(input){
   input.value='';
 }
 
+function handleImgUpload(input){
+  if(!input.files||!input.files[0]) return;
+  var file=input.files[0];
+  var reader=new FileReader();
+  reader.onload=function(e){
+    window._chatImg=e.target.result;
+    var wrap=document.getElementById('imgPreviewWrap');if(wrap)wrap.style.display='block';
+    var prev=document.getElementById('imgPreview');if(prev)prev.src=e.target.result;
+    var ci=document.getElementById('askInput');if(ci)ci.placeholder='Photo ke baare mein poochho...';
+    toast('Image ready! Kuch poochho 📷','i');
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+
+function askQWithImage(msg){
+  addChatMsg(msg,'u');
+  var typing=showTyping();
+  var key=getGKey();
+  if(!key){if(typing)typing.remove();addChatMsg('🔑 Settings mein Groq key daalo!','a');return;}
+  var imgData=window._chatImg;
+  clearImg();
+  // Use llama vision model
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({
+      model:'meta-llama/llama-4-scout-17b-16e-instruct',
+      messages:[{role:'user',content:[
+        {type:'image_url',image_url:{url:imgData}},
+        {type:'text',text:msg||'Is image ko explain karo aur exam ke liye relevant facts batao. Hindi mein jawab do.'}
+      ]}],
+      max_tokens:1000
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(typing)typing.remove();
+    if(data.error)throw new Error(data.error.message);
+    var reply=data.choices[0].message.content;
+    addChatMsg(reply,'a');
+  })
+  .catch(function(e){if(typing)typing.remove();addChatMsg('❌ Image error: '+e.message,'a');});
+}
+
 function clearImg(){
   window._chatImg=null;
   var wrap=document.getElementById('imgPreviewWrap');if(wrap)wrap.style.display='none';
@@ -4918,6 +4964,19 @@ function showTyping(){
 }
 
 function askQ(msg){
+  var inp=document.getElementById('askInput');
+  if(!msg){
+    if(!inp||!inp.value.trim()){return;}
+    msg=inp.value.trim();
+    inp.value='';
+    // auto-resize
+    inp.style.height='auto';
+  }
+  // image support
+  if(window._chatImg){
+    askQWithImage(msg);
+    return;
+  }
   addChatMsg(msg,'u');
   window._chatHistory.push({role:'user',content:msg});
   if(window._chatHistory.length>20) window._chatHistory=window._chatHistory.slice(-20);
@@ -5947,7 +6006,7 @@ function updatePomoDisplay(){
 var _commUnsubscribe=null;
 
 function initCommunityChat(){
-  if(!window.db||!window.auth||!auth.currentUser) return;
+  if(!db||!auth||!currentUser) return;
   var chatEl=document.getElementById('communityMsgs');
   if(!chatEl) return;
   chatEl.innerHTML='<div style="text-align:center;padding:10px;font-size:.65rem;color:var(--t2)">Loading...</div>';
@@ -6005,7 +6064,7 @@ function sendCommunityMsg(){
   if(!txt){return;}
   if(txt.length>200){toast('200 characters se zyada nahi!','e');return;}
   if(!auth||!auth.currentUser){toast('Login karo pehle!','e');return;}
-  if(!window.db){toast('DB not ready','e');return;}
+  if(!db){toast('DB not ready','e');return;}
   var user=auth.currentUser;
   inp.value='';
   db.collection('community').add({
@@ -6719,16 +6778,25 @@ function studySubTab(tab, el){
   });
   var view=document.getElementById('study-view-'+tab);
   if(view) view.style.display='block';
-  if(el) el.classList.add('on');
-  else {var b2=document.getElementById('study-tab-'+tab); if(b2) b2.classList.add('on');}
-  if(tab==='ca'){ loadDailyCA(); loadCASections(); }
+  // activate button
+  if(el){ el.classList.add('on'); }
+  else { var b2=document.getElementById('study-tab-'+tab); if(b2) b2.classList.add('on'); }
+  // init content
+  if(tab==='rwa'){ loadRWASubjects(); }
+  if(tab==='ca'){ initCA(); if(getGKey()) loadDailyCA(false); }
   if(tab==='digest'){ initDigestMonths(); }
 }
 
 function initStudyTab(){
-  // Show RWA by default
+  // Reset all rwa sub-views
+  var sv=document.getElementById('rwa-subjects-view');
+  var tv=document.getElementById('rwa-topics-view');
+  var qv=document.getElementById('rwa-quiz-view');
+  if(sv) sv.style.display='block';
+  if(tv) tv.style.display='none';
+  if(qv) qv.style.display='none';
+  // Show RWA sub-tab by default
   studySubTab('rwa', document.getElementById('study-tab-rwa'));
-  loadRWASubjects();
 }
 
 function initReport(){
@@ -6748,6 +6816,9 @@ function communityQuick(msg){
   if(inp){inp.value=msg;sendCommunityMsg();}
 }
 
+
+function loadRWASubjects(){ initRWA(); }
+function loadCASections(){ initCA(); }
 </script>
 </body>
 </html>
