@@ -1246,30 +1246,6 @@ body::before{
         <div style="margin-bottom:4px"><div style="font-size:.66rem;font-weight:800;margin-bottom:6px;color:var(--t2)">📊 Weak Topic Finder</div><div id="weakTopicList"><div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div></div></div>
         <div><div style="font-size:.66rem;font-weight:800;margin-bottom:6px;color:var(--t2)">📜 Test History</div><div id="testHist"></div></div>
       </div>
-      <!-- 💬 COMMUNITY CHAT -->
-      <div class="scard">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <div>
-            <div class="sec" style="margin:0">💬 Community Chat</div>
-            <div style="font-size:.6rem;color:var(--t2)">Sab students ek saath — doubt poochho, tips share karo!</div>
-          </div>
-          <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
-            <div style="width:7px;height:7px;border-radius:50%;background:var(--gr)" id="chatOnline"></div>
-            <span style="font-size:.58rem;color:var(--t2)" id="chatOnlineLbl">Live</span>
-          </div>
-        </div>
-        <div class="chips" style="margin-bottom:8px">
-          <button class="chip" onclick="communityQuick('SSC GD kab aayega?')">SSC GD?</button>
-          <button class="chip" onclick="communityQuick('Bihar Police date?')">BP Date?</button>
-          <button class="chip" onclick="communityQuick('Maths shortcut!')">Maths</button>
-          <button class="chip" onclick="communityQuick('GK trick share karo!')">GK Tips</button>
-        </div>
-        <div id="communityMsgs" style="height:260px;overflow-y:auto;padding:4px;margin-bottom:8px"></div>
-        <div style="display:flex;gap:6px">
-          <input type="text" class="fi" id="communityInp" placeholder="Message likho... (Enter = Send)" maxlength="200" style="flex:1;font-size:.75rem" onkeydown="if(event.key==='Enter')sendCommunityMsg()">
-          <button onclick="sendCommunityMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.85rem;font-weight:800;padding:8px 14px;cursor:pointer">➤</button>
-        </div>
-      </div>
       <!-- 👤 PROFILE -->
       <div class="scard">
         <div class="sec">👤 Profile</div>
@@ -1398,6 +1374,34 @@ body::before{
       <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v5.0 🚀 · 1,110+ Questions</div>
     </div>
 
+    <!-- COMMUNITY TAB -->
+    <div class="tab" id="tab-community" style="display:flex;flex-direction:column;height:100%;min-height:calc(100vh - 130px)">
+      <div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(255,107,138,.1));border:1px solid rgba(92,106,240,.2);border-radius:13px;padding:10px 12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:1.4rem">💬</div>
+          <div>
+            <div style="font-size:.85rem;font-weight:800">Community Chat</div>
+            <div style="font-size:.6rem;color:var(--t2)">Sab students ek saath — doubt poochho, tips share karo!</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--gr)" id="chatOnline"></div>
+            <span style="font-size:.58rem;color:var(--t2)" id="chatOnlineLbl">Live</span>
+          </div>
+        </div>
+      </div>
+      <div class="chips" style="margin-bottom:8px">
+        <button class="chip" onclick="communityQuick('SSC GD kab aayega?')">SSC GD?</button>
+        <button class="chip" onclick="communityQuick('Bihar Police date?')">BP Date?</button>
+        <button class="chip" onclick="communityQuick('Maths shortcut batao!')">Maths Tips</button>
+        <button class="chip" onclick="communityQuick('GK trick share karo!')">GK Tricks</button>
+      </div>
+      <div id="communityMsgs" style="flex:1;overflow-y:auto;padding:4px;margin-bottom:8px;min-height:280px"></div>
+      <div style="display:flex;gap:6px;padding-bottom:4px">
+        <input type="text" class="fi" id="communityInp" placeholder="Message likho... (Enter = Send)" maxlength="200" style="flex:1;font-size:.75rem" onkeydown="if(event.key==='Enter')sendCommunityMsg()">
+        <button onclick="sendCommunityMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.85rem;font-weight:800;padding:8px 14px;cursor:pointer">➤</button>
+      </div>
+    </div>
+
   <!-- POMODORO FAB -->
   <button class="pomo-fab" id="pomoFab" onclick="togglePomo()" title="Pomodoro Timer">⏱️</button>
   <div class="pomo-modal" id="pomoModal">
@@ -1420,6 +1424,7 @@ body::before{
     <button class="tb" onclick="sw('study')" id="tb-study"><span>📖</span>Study</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
     <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
+    <button class="tb" onclick="sw('community')" id="tb-community"><span>💬</span>Chat</button>
     <button class="tb" onclick="sw('settings')" id="tb-settings"><span>⚙️</span>Settings</button>
   </div>
 
@@ -3800,7 +3805,12 @@ function sw(tab){
   // report now in settings
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
-  if(tab==='settings'){renderExamDatesList();initDailyChallenge();initReport();initCommunityChat();}
+  if(tab==='settings'){
+    renderExamDatesList();initDailyChallenge();initReport();
+    renderXPBar();renderReadiness();renderStudyLog();renderErrorNotebook();
+    showFormulas(_curFormulaSubj||'maths',null);filterFormulas();
+  }
+  if(tab==='community'){initCommunityChat();}
   if(tab==='study'){initStudyTab();}
 }
 function clearRWACache(){
@@ -6684,23 +6694,7 @@ function ansP(qi,oi){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PATCH: sw settings — init all new panels
-// ═══════════════════════════════════════════════════════════════
-var _origSwSett=sw;
-function sw(tab){
-  _origSwSett(tab);
-  if(tab==='settings'){
-    renderXPBar();
-    renderReadiness();
-    renderStudyLog();
-    renderErrorNotebook();
-    showFormulas(_curFormulaSubj||'maths',null);
-    filterFormulas();
-    // report stats
-    var rs=document.getElementById('rStreak');
-    if(rs){ initReport(); }
-  }
-}
+// Settings init merged into main sw()
 
 function studySubTab(tab, el){
   ['rwa','ca','digest','news'].forEach(function(t){
