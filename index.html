@@ -546,36 +546,36 @@ body::before{
 .rnum{font-size:1.1rem;font-weight:800;}
 
 /* ═══════════════════════════════
-   YOGA
+
 ═══════════════════════════════ */
-.yscene{
-  background:linear-gradient(135deg,rgba(0,214,143,.08),rgba(0,200,200,.05));
-  border-radius:22px;border:1px solid rgba(0,214,143,.18);
-  padding:20px;margin-bottom:13px;text-align:center;
-}
-.yring{position:relative;width:86px;height:86px;margin:0 auto 10px;}
-.yring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
-.yrb{stroke:rgba(255,255,255,.07);stroke-width:5;fill:none;}
-.yrf{stroke:var(--gr);stroke-width:5;fill:none;stroke-linecap:round;transition:stroke-dashoffset .8s linear;}
-.ynum{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.15rem;font-weight:900;color:var(--gr);}
-.ybtn{
-  flex:1;max-width:115px;background:var(--cd2);
-  border:1.5px solid var(--br2);border-radius:13px;
-  color:var(--tx);font-family:inherit;font-size:.79rem;
-  font-weight:700;padding:11px;cursor:pointer;transition:all .18s;
-}
-.ybtn.go{
-  background:linear-gradient(135deg,var(--gr),var(--tl));
-  border-color:transparent;color:#000;
-  box-shadow:0 6px 20px rgba(0,214,143,.3);font-weight:800;
-}
-.ysc{
-  background:var(--card);border-radius:13px;
-  padding:11px 15px;border:1px solid var(--br);
-  display:flex;align-items:center;gap:10px;margin-bottom:7px;
-}
-.ysc.cur{border-color:rgba(0,214,143,.35);background:rgba(0,214,143,.06);}
-.ysc.done{opacity:.35;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ═══════════════════════════════
    NOTES
@@ -890,18 +890,7 @@ body::before{
           </div>
         </div>
       </div>
-      <!-- DAILY CHALLENGE -->
-      <div class="challenge-card" id="challengeCard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:.72rem;font-weight:800">🏆 Aaj Ka Challenge</div>
-          <div style="font-size:.6rem;color:var(--t2)" id="challengeSubjLbl">GK</div>
-        </div>
-        <div style="font-size:.65rem;color:var(--t2);margin-bottom:6px" id="challengeDesc">30 questions solve karo aaj</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="flex:1;height:8px;background:rgba(0,0,0,.2);border-radius:4px"><div id="challengeBar" style="height:100%;border-radius:4px;background:var(--ac);width:0%;transition:width .5s"></div></div>
-          <div style="font-size:.68rem;font-weight:800;color:var(--ac);min-width:36px;text-align:right" id="challengeCount">0/30</div>
-        </div>
-      </div>
+      <!-- Challenge moved to Settings -->
       <!-- SR DUE CARD -->
       <div id="srHomeCard" style="display:none;background:linear-gradient(135deg,rgba(0,200,100,.1),rgba(0,150,200,.1));border:1px solid rgba(0,200,100,.3);border-radius:14px;padding:12px;margin-bottom:10px">
         <div style="display:flex;align-items:center;justify-content:space-between">
@@ -1037,12 +1026,8 @@ body::before{
         <div id="bookmark-list"></div>
       </div>
     </div>
-    <!-- MOCK -->
-        <!-- YOGA -->
-    <!-- Yoga moved to Settings -->
     <!-- RWA BOOK -->
     <div class="tab" id="tab-rwa">
-      <!-- Level 1: Subjects -->
       <div id="rwa-subjects-view">
         <div style="background:linear-gradient(135deg,rgba(255,165,0,.15),rgba(255,107,138,.1));border:1px solid rgba(255,165,0,.3);border-radius:13px;padding:12px;margin-bottom:12px">
           <div style="font-size:.95rem;font-weight:900">📖 RWA Yellow Book</div>
@@ -1051,31 +1036,26 @@ body::before{
         <div style="font-size:.75rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📚 Subject Choose Karo</div>
         <div id="rwa-subjects"></div>
       </div>
-      <!-- Level 2: Topics list -->
       <div id="rwa-topics-view" style="display:none">
         <button onclick="rwaBreadcrumbBack(0)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Subjects</button>
         <div style="font-size:.88rem;font-weight:900;margin-bottom:10px" id="rwa-topic-title"></div>
         <div id="rwa-topics-list"></div>
       </div>
-      <!-- Level 3: Quiz -->
       <div id="rwa-quiz-view" style="display:none">
         <button onclick="rwaBreadcrumbBack(1)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Topics</button>
         <div style="font-size:.82rem;font-weight:900;margin-bottom:10px" id="rwa-quiz-title"></div>
-        <div id="rwa-ai-ready" style="display:none;font-size:.6rem;color:#0c6;margin-bottom:8px;background:rgba(0,200,100,.1);border-radius:6px;padding:4px 8px">✅ AI questions ready — quiz khatam hone ke baad milenge!</div>
+        <div id="rwa-ai-ready" style="display:none;font-size:.6rem;color:#0c6;margin-bottom:8px;background:rgba(0,200,100,.1);border-radius:6px;padding:4px 8px">✅ AI questions ready!</div>
         <div id="rwa-quiz-content"></div>
       </div>
     </div>
-<!-- CURRENT AFFAIRS -->
+    <!-- CA TAB -->
     <div class="tab" id="tab-ca">
-      <!-- CA Sub-nav -->
       <div class="chips" style="margin-bottom:10px">
         <button class="chip on" id="ca-tab-daily" onclick="caSubTab('daily',this)">📅 Daily CA</button>
         <button class="chip" id="ca-tab-topics" onclick="caSubTab('topics',this)">📚 Topics</button>
         <button class="chip" id="ca-tab-digest" onclick="caSubTab('digest',this)">📆 Monthly</button>
         <button class="chip" id="ca-tab-news" onclick="caSubTab('news',this)">📰 Summarizer</button>
       </div>
-
-      <!-- Daily CA -->
       <div id="ca-view-daily">
         <div style="background:linear-gradient(135deg,rgba(124,111,255,.15),rgba(255,107,138,.1));border:1px solid rgba(124,111,255,.3);border-radius:13px;padding:12px;margin-bottom:10px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -1089,8 +1069,6 @@ body::before{
           <div id="daily-ca-content"><div style="font-size:.7rem;color:var(--t2);text-align:center;padding:10px">⬆️ Load button dabao</div></div>
         </div>
       </div>
-
-      <!-- Topics View -->
       <div id="ca-view-topics" style="display:none">
         <div id="ca-list-inner">
           <div style="font-size:.78rem;font-weight:800;margin-bottom:7px;color:var(--t2)">📚 Topic-wise Practice</div>
@@ -1105,20 +1083,16 @@ body::before{
           <div id="ca-detail-content"></div>
         </div>
       </div>
-
-      <!-- Monthly CA Digest -->
       <div id="ca-view-digest" style="display:none">
         <div style="font-size:.85rem;font-weight:800;margin-bottom:4px">📆 Monthly CA Digest</div>
         <div style="font-size:.65rem;color:var(--t2);margin-bottom:12px">Poore mahine ki important current affairs ek jagah</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="digestMonthChips"></div>
         <div id="digestContent"><div class="empty">Mahina choose karo</div></div>
       </div>
-
-      <!-- Newspaper Summarizer -->
       <div id="ca-view-news" style="display:none">
         <div style="font-size:.85rem;font-weight:800;margin-bottom:4px">📰 News Summarizer</div>
         <div style="font-size:.65rem;color:var(--t2);margin-bottom:10px">Koi bhi news article paste karo — AI key facts + MCQ banayega</div>
-        <textarea id="newsInput" style="width:100%;min-height:130px;background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:10px;font-family:inherit;font-size:.75rem;color:var(--tx);resize:vertical;box-sizing:border-box" placeholder="Yahan news article paste karo...&#10;&#10;Example: 'India ne aaj X missile test ki. Ye missile 500km door tak maar sakti hai...'"></textarea>
+        <textarea id="newsInput" style="width:100%;min-height:130px;background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:10px;font-family:inherit;font-size:.75rem;color:var(--tx);resize:vertical;box-sizing:border-box" placeholder="Yahan news article paste karo..."></textarea>
         <button onclick="summarizeNews()" class="btn" style="width:100%;margin-top:8px">🤖 Summary + MCQ Banao</button>
         <div id="newsSummaryOut" style="margin-top:10px"></div>
       </div>
@@ -1138,63 +1112,48 @@ body::before{
         <button class="chip" onclick="askQ('UPSC prelims syllabus Hindi mein')">UPSC</button>
       </div>
       <div class="chat-area" id="chatArea"></div>
-      <!-- Image preview -->
-      <div id="imgPreviewWrap" style="display:none;margin-bottom:6px;position:relative;display:none">
-        <img id="imgPreview" style="max-height:100px;border-radius:10px;border:1.5px solid var(--ac);object-fit:cover;" src="" alt="">
-        <button onclick="clearImg()" style="position:absolute;top:-6px;right:-6px;background:var(--a2);border:none;border-radius:50%;width:20px;height:20px;color:#fff;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900">✕</button>
+      <div id="imgPreviewWrap" style="display:none;margin-bottom:6px;position:relative">
+        <img id="imgPreview" style="max-height:100px;border-radius:8px;object-fit:contain">
+        <button onclick="clearImg()" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);border:none;border-radius:50%;color:#fff;width:20px;height:20px;cursor:pointer;font-size:.6rem">✕</button>
       </div>
-      <div class="cinp-row">
-        <!-- Hidden file input - accepts camera + gallery -->
-        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImgSelect(this)">
-        <!-- Camera button -->
-        <button onclick="document.getElementById('imgInput').click()" style="background:var(--cd2);border:1.5px solid var(--br2);border-radius:12px;color:var(--t3);width:40px;height:40px;cursor:pointer;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;">📷</button>
-        <input type="text" class="cinp" id="chatInp" placeholder="Photo ya text se poochho..." onkeypress="if(event.key==='Enter')sendChat()">
-        <button class="csend" onclick="sendChat()">➤</button>
+      <div style="display:flex;gap:6px;align-items:flex-end">
+        <button class="ibtn" onclick="document.getElementById('imgUploadInp').click()" title="Image upload">📷</button>
+        <input type="file" id="imgUploadInp" accept="image/*" style="display:none" onchange="handleImgUpload(this)">
+        <textarea id="askInput" class="fi" rows="1" placeholder="Kuch bhi poochho..." style="flex:1;resize:none;min-height:38px;max-height:120px;line-height:1.4;padding-top:9px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askQ();}"></textarea>
+        <button class="btn" style="margin:0;min-width:44px;height:38px;padding:0" onclick="askQ()">➤</button>
       </div>
     </div>
-    <!-- REPORT -->
+    <!-- MOCK TEST -->
     <div class="tab" id="tab-mock">
       <div id="mock-home">
-        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">📝 MOCK TEST चुनो</div>
-        <div style="display:grid;gap:8px;">
-          <div onclick="startMock('ssc_gd')" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🪖</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC GD Constable</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">80 Qs · 60 min · GK+Reasoning+Maths+Hindi</div></div>
+        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">📝 MOCK TEST</div>
+        <div style="display:grid;gap:10px;">
+          <div onclick="startMock('ssc_gd')" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC GD / Bihar Police</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">80 Qs · 60 min · GK+Reasoning+Maths+Hindi</div>
           </div>
-          <div onclick="startMock('bihar_police')" style="background:linear-gradient(135deg,#059669,#0891b2);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">👮</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">Bihar Police Sipahi</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 120 min · GK+Hindi+Maths+Science</div></div>
+          <div onclick="startMock('ssc_cgl')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">SSC CGL Tier-1</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 60 min · GK+Reasoning+Maths+Hindi</div>
           </div>
-          <div onclick="startMock('ssc_cgl')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">📊</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC CGL Tier-1</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 60 min · GK+Reasoning+Maths+English</div></div>
+          <div onclick="startMock('bihar_police')" style="background:linear-gradient(135deg,#059669,#0891b2);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">Bihar Police Sipahi</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 120 min · GK+Science+Maths+Hindi</div>
           </div>
-          <div onclick="startMock('ssc_chsl')" style="background:linear-gradient(135deg,#7c3aed,#db2777);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🖥️</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC CHSL Tier-1</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 60 min · GK+Reasoning+Maths+English</div></div>
+          <div onclick="startMock('rrb_ntpc')" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">RRB NTPC</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">100 Qs · 90 min</div>
           </div>
-          <div onclick="startMock('rrb_ntpc')" style="background:linear-gradient(135deg,#0284c7,#0d9488);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🚂</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">RRB NTPC</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 90 min · GK+Maths+Reasoning</div></div>
+          <div onclick="startMock('bssc')" style="background:linear-gradient(135deg,#dc2626,#f97316);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:#fff">BSSC</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);margin-top:4px">150 Qs · 135 min</div>
           </div>
-          <div onclick="startMock('rrb_group_d')" style="background:linear-gradient(135deg,#b45309,#92400e);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🔧</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">RRB Group D</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 90 min · GK+Maths+Reasoning+Science</div></div>
-          </div>
-          <div onclick="startMock('bssc')" style="background:linear-gradient(135deg,#be185d,#9333ea);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">📋</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">BSSC Inter Level</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">150 Qs · 135 min · GK+Hindi+Maths+Science</div></div>
-          </div>
-          <div onclick="startMock('bpsc')" style="background:linear-gradient(135deg,#1d4ed8,#065f46);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🎖️</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">BPSC Prelims</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">150 Qs · 120 min · GK+History+Polity+Geography</div></div>
-          </div>
-          <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">⚙️</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:var(--tx)">Custom Mock</div><div style="font-size:.6rem;color:var(--t2)">Khud set karo — subject, questions, time</div></div>
+          <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:14px;padding:16px;cursor:pointer">
+            <div style="font-size:.9rem;font-weight:900;color:var(--tx)">⚙️ Custom Mock</div>
+            <div style="font-size:.65rem;color:var(--t2);margin-top:4px">Khud set karo — subject, questions, time</div>
           </div>
         </div>
-        <div style="margin-top:14px">
+        <div style="margin-top:16px">
           <div style="font-size:.66rem;font-weight:800;color:var(--t2);margin-bottom:8px">📊 Recent Mocks</div>
           <div id="mock-history-list"><div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div></div>
         </div>
@@ -1218,6 +1177,12 @@ body::before{
             <button class="chip" onclick="setMockOpt('time',60,this)">60 min</button>
           </div>
         </div>
+        <div class="cc" style="margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:.68rem;font-weight:700">Negative Marking (-0.25)?</div>
+            <button id="negMarkToggle" onclick="toggleNegMark(this)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:20px;padding:4px 12px;font-size:.65rem;cursor:pointer">OFF</button>
+          </div>
+        </div>
         <div class="cc" style="margin-bottom:14px">
           <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Subjects?</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap" id="mock-subj-chips">
@@ -1225,20 +1190,10 @@ body::before{
             <button class="chip on" onclick="toggleMockSubj('reasoning',this)">Reasoning</button>
             <button class="chip on" onclick="toggleMockSubj('maths',this)">Maths</button>
             <button class="chip on" onclick="toggleMockSubj('hindi',this)">Hindi</button>
-            <button class="chip" onclick="toggleMockSubj('english',this)">English</button>
             <button class="chip" onclick="toggleMockSubj('science',this)">Science</button>
           </div>
         </div>
-        <div class="cc" style="margin-bottom:10px">
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:.68rem;font-weight:700">Negative Marking?</div>
-              <div style="font-size:.6rem;color:var(--t2)">Galat answer pe -0.25 katega</div>
-            </div>
-            <button class="tog" id="negMarkTog" onclick="toggleNegMark(this)"></button>
-          </div>
-        </div>
-        <button class="btn" onclick="launchCustomMock()" style="width:100%">🚀 Mock Shuru Karo</button>
+        <button class="btn" onclick="launchMockWithConfig('Custom')" style="width:100%">🚀 Mock Shuru Karo</button>
         <button onclick="showV('mock-home','mock-setup')" style="background:none;border:none;color:var(--t2);font-size:.7rem;padding:8px;cursor:pointer;display:block;margin:8px auto">← Wapas</button>
       </div>
       <div id="mock-test" style="display:none">
@@ -1271,6 +1226,7 @@ body::before{
         <button class="btn" onclick="showV('mock-home','mock-result');renderMockHistory()" style="width:100%;margin-top:12px">✅ Done</button>
       </div>
     </div>
+    <!-- REPORT -->
     <div class="tab" id="tab-report">
       <div class="sgrid">
         <div class="sbox"><div class="snum" id="rStreak">0</div><div class="slbl">🔥 STREAK</div></div>
@@ -1308,37 +1264,84 @@ body::before{
         <div class="sec">📢 WhatsApp Channel</div>
         <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:0;background:linear-gradient(135deg,#25D366,#128C7E)">📢 PS Channel Join Karo</a>
       </div>
-      <div class="scard">
-        <div class="sec">💾 Data</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:7px" id="dataInfo">Loading...</div>
-        <button class="dbtn" onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}">🔄 Aaj Reset</button>
-        <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
-      </div>
-      <div class="scard">
-        <div class="sec">🔐 Account</div>
-        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
-      </div>
-      <!-- YOGA -->
-      <div class="scard">
-        <div class="sec">🧘 Yoga / Meditation</div>
-        <div class="yscene" style="background:transparent;padding:0;border-radius:0;border:none">
-          <div style="width:100%;height:120px;position:relative;margin-bottom:8px">
-            <svg id="yogaSVG" viewBox="0 0 300 130" style="width:100%;height:100%"></svg>
+      <!-- DAILY CHALLENGE SETTINGS -->
+      <div class="scard" id="challengeCard" style="border:1px solid rgba(255,200,0,.25);background:linear-gradient(135deg,rgba(255,200,0,.07),rgba(255,130,0,.05))">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:.78rem;font-weight:800">🏆 Aaj Ka Challenge</div>
+            <div style="font-size:.6rem;color:var(--t2)" id="challengeSubjLbl">GK</div>
           </div>
-          <div class="yring">
-            <svg width="74" height="74"><circle class="yrb" cx="37" cy="37" r="31"/><circle class="yrf" id="yogaRing" cx="37" cy="37" r="31" stroke-dasharray="194.8" stroke-dashoffset="0"/></svg>
-            <div class="ynum" id="yogaNum">1:00</div>
-          </div>
-          <div style="font-size:.86rem;font-weight:800;margin-bottom:2px" id="yStepName">🙏 Taiyar Ho!</div>
-          <div style="font-size:.68rem;color:var(--t2);line-height:1.5;margin-bottom:9px" id="yStepDesc">Start dabao — yoga session shuru hoga!</div>
-          <div style="display:flex;gap:7px;justify-content:center">
-            <button class="ybtn go" id="yBtn" onclick="yogaToggle()">▶ Start</button>
-            <button class="ybtn" onclick="yogaReset()">↺ Reset</button>
-          </div>
+          <div style="font-size:.68rem;font-weight:800;color:var(--ac)" id="challengeCount">0/30</div>
         </div>
-        <div class="sec" style="margin-top:10px">📋 Steps</div>
-        <div id="yStepList"></div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:8px" id="challengeDesc">30 questions solve karo aaj</div>
+        <div style="height:8px;background:rgba(0,0,0,.15);border-radius:4px;overflow:hidden;margin-bottom:12px">
+          <div id="challengeBar" style="height:100%;border-radius:4px;background:var(--ac);width:0%;transition:width .5s"></div>
+        </div>
+        <div style="font-size:.65rem;font-weight:800;color:var(--t2);margin-bottom:6px">🎯 Target Set Karo</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <button onclick="setChallengeTarget(10)" class="chip" id="ct10">10</button>
+          <button onclick="setChallengeTarget(20)" class="chip" id="ct20">20</button>
+          <button onclick="setChallengeTarget(30)" class="chip on" id="ct30">30</button>
+          <button onclick="setChallengeTarget(50)" class="chip" id="ct50">50</button>
+        </div>
+        <div style="font-size:.65rem;font-weight:800;color:var(--t2);margin-bottom:6px">📚 Subject Fix Karo (optional)</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button onclick="setChallengeSubj('random')" class="chip on" id="cs_random">🎲 Random</button>
+          <button onclick="setChallengeSubj('gk')" class="chip" id="cs_gk">GK</button>
+          <button onclick="setChallengeSubj('maths')" class="chip" id="cs_maths">Maths</button>
+          <button onclick="setChallengeSubj('reasoning')" class="chip" id="cs_reasoning">Reasoning</button>
+          <button onclick="setChallengeSubj('hindi')" class="chip" id="cs_hindi">Hindi</button>
+        </div>
       </div>
+      <!-- XP + BADGES -->
+      <div class="scard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="sec" style="margin:0">⭐ XP &amp; Badges</div>
+          <div style="font-size:.72rem;font-weight:900;color:var(--ye)" id="xpDisplay">0 XP</div>
+        </div>
+        <div style="height:8px;background:var(--cd2);border-radius:4px;overflow:hidden;margin-bottom:8px">
+          <div id="xpBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--ac),var(--ye));width:0%;transition:width .6s"></div>
+        </div>
+        <div style="font-size:.6rem;color:var(--t2);margin-bottom:10px" id="xpLevelLbl">Level 1 — Beginner</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="badgeGrid"></div>
+      </div>
+
+      <!-- EXAM READINESS -->
+      <div class="scard">
+        <div class="sec">📊 Exam Readiness Score</div>
+        <div id="readinessContent"><div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div></div>
+      </div>
+
+      <!-- STUDY HOURS LOG -->
+      <div class="scard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="sec" style="margin:0">⏰ Study Hours Log</div>
+          <button onclick="logStudyTime()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.65rem;font-weight:800;padding:5px 10px;cursor:pointer">+ Log Karo</button>
+        </div>
+        <div id="studyLogContent"></div>
+      </div>
+
+      <!-- ERROR NOTEBOOK -->
+      <div class="scard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="sec" style="margin:0">📕 Error Notebook</div>
+          <div style="font-size:.6rem;color:var(--t2)" id="errorCount">0 errors</div>
+        </div>
+        <div id="errorNotebookList"><div class="empty" style="font-size:.7rem">Galat jawab yahan save honge</div></div>
+      </div>
+
+      <!-- FORMULA SHEET -->
+      <div class="scard">
+        <div class="sec">📐 Formula Sheet</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px" id="formulaSubjChips">
+          <button class="chip on" onclick="showFormulas('maths',this)">📐 Maths</button>
+          <button class="chip" onclick="showFormulas('science',this)">🔬 Science</button>
+          <button class="chip" onclick="showFormulas('gk',this)">🌍 GK Tricks</button>
+        </div>
+        <input type="text" id="formulaSearch" class="fi" placeholder="🔍 Formula dhundo..." oninput="filterFormulas()" style="margin-bottom:8px">
+        <div id="formulaList"></div>
+      </div>
+
       <!-- EXAM DATES -->
       <div class="scard">
         <div class="sec">📅 Exam Countdown Set Karo</div>
@@ -1357,19 +1360,55 @@ body::before{
         </div>
         <button class="add-btn2" onclick="addExamDate()" style="width:100%;padding:9px">+ Exam Add Karo</button>
       </div>
-      <!-- COMMUNITY CHAT -->
-      <div class="scard">
-        <div class="sec">💬 Community Chat</div>
-        <div style="font-size:.63rem;color:var(--t2);margin-bottom:10px">Sab students ek saath — doubt poochho, discuss karo!</div>
-        <div id="communityMsgs" style="height:300px;overflow-y:auto;margin-bottom:10px;padding:4px"></div>
-        <div style="display:flex;gap:6px">
-          <input type="text" class="fi" id="communityInp" placeholder="Message likho..." maxlength="200" style="flex:1;font-size:.75rem" onkeydown="if(event.key==='Enter')sendCommunityMsg()">
-          <button onclick="sendCommunityMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.8rem;font-weight:800;padding:8px 14px;cursor:pointer">Send</button>
-        </div>
-      </div>
+
       <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v4.0 🚀 · 1,110+ Questions Built-in</div>
     </div>
   </div>
+      <div class="scard">
+        <div class="sec">💾 Data</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:7px" id="dataInfo">Loading...</div>
+        <button class="dbtn" onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}">🔄 Aaj Reset</button>
+        <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
+      </div>
+      <div class="scard">
+        <div class="sec">🔐 Account</div>
+        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
+      </div>
+      <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v5.0 🚀 · 1,110+ Questions</div>
+    </div>
+
+    <!-- COMMUNITY TAB -->
+    <div class="tab" id="tab-community" style="display:flex;flex-direction:column;height:100%">
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(255,107,138,.1));border:1px solid rgba(92,106,240,.2);border-radius:13px;padding:10px 12px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:1.4rem">💬</div>
+          <div>
+            <div style="font-size:.85rem;font-weight:800">Community Chat</div>
+            <div style="font-size:.6rem;color:var(--t2)">Sab students ek saath — doubt poochho, tips share karo!</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+            <div style="width:7px;height:7px;border-radius:50%;background:var(--gr)" id="chatOnline"></div>
+            <span style="font-size:.58rem;color:var(--t2)" id="chatOnlineLbl">Live</span>
+          </div>
+        </div>
+      </div>
+      <!-- Quick chips -->
+      <div class="chips" style="margin-bottom:8px">
+        <button class="chip" onclick="communityQuick('SSC GD 2025 kab aayega?')">SSC GD?</button>
+        <button class="chip" onclick="communityQuick('Bihar Police date?')">BP Date?</button>
+        <button class="chip" onclick="communityQuick('Maths shortcut batao!')">Maths Tips</button>
+        <button class="chip" onclick="communityQuick('GK trick share karo!')">GK Tricks</button>
+      </div>
+      <!-- Messages -->
+      <div id="communityMsgs" style="flex:1;overflow-y:auto;padding:4px;margin-bottom:8px;min-height:300px"></div>
+      <!-- Input -->
+      <div style="display:flex;gap:6px;padding-bottom:4px">
+        <input type="text" class="fi" id="communityInp" placeholder="Message likho... (Enter = Send)" maxlength="200" style="flex:1;font-size:.75rem" onkeydown="if(event.key==='Enter')sendCommunityMsg()">
+        <button onclick="sendCommunityMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.85rem;font-weight:800;padding:8px 14px;cursor:pointer">➤</button>
+      </div>
+    </div>
+
   <!-- POMODORO FAB -->
   <button class="pomo-fab" id="pomoFab" onclick="togglePomo()" title="Pomodoro Timer">⏱️</button>
   <div class="pomo-modal" id="pomoModal">
@@ -1394,6 +1433,7 @@ body::before{
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
     <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
     <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Report</button>
+    <button class="tb" onclick="sw('community')" id="tb-community"><span>💬</span>Chat</button>
     <button class="tb" onclick="sw('settings')" id="tb-settings"><span>⚙️</span>Settings</button>
   </div>
 
@@ -3664,25 +3704,18 @@ QB.maths = QB.maths.concat([
 // ═══════════════════════════════════════════════
 
 // ── DATA ──
-var YOGA_STEPS=[
-  {name:"🙏 Pranayam Taiyari",desc:"Seedhe baitho. 3 gehri sansein lo.",dur:60,color:"#7c6fff"},
-  {name:"🫁 Anulom-Vilom",desc:"Daaya naak band (4s). Baaya se choddo (4s). 10 baar.",dur:120,color:"#60a5fa"},
-  {name:"🐝 Bhramari",desc:"Kaanon pe ungliyan. Hmm... 6 baar.",dur:90,color:"#c084fc"},
-  {name:"☀️ Surya Namaskar",desc:"3-4 rounds dheere dheere.",dur:150,color:"#fbbf24"},
-  {name:"🧘 Vajrasana",desc:"Ghutno pe baitho. 1 min raho.",dur:60,color:"#4ade80"},
-  {name:"🌊 Bhujangasana",desc:"Pet ke bal. Dheere upar. 3 baar.",dur:60,color:"#fb923c"},
-  {name:"💤 Shavasana",desc:"Pith ke bal. Sab dhila. Sirf saans.",dur:60,color:"#6b72a0"}
-];
+
+
 var LVLARR=['easy','moderate','hard','moderate','easy'];
 var LVLCLS={easy:'le',moderate:'lm',hard:'lh'};
 var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:[],xp:0,dailyChallenge:{date:'',count:0,target:30,subj:'gk'},srDue:[],srDone:{}};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:[],xp:0,badges:[],errorNotes:[],studyLog:{},formulaFav:[],dailyChallenge:{date:'',count:0,target:30,subj:'gk'},srDue:[],srDone:{}};
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
 var pracQs=[],pracAns={},pracC=0,pracT=0;
 var charts={w:null,s:null,m:null};
-var yIdx=0,yLeft=0,yRun=false,yInt=null;
+
 var _caTopics=[];
 var _caHistory={};
 var _rwaHistory={};  // topic-wise asked questions history
@@ -3781,7 +3814,8 @@ function sw(tab){
   if(tab==='report'){initReport();renderWeakTopics();}
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
-  if(tab==='settings'){renderExamDatesList();initCommunityChat();initYoga();}
+  if(tab==='settings'){renderExamDatesList();initDailyChallenge();}
+  if(tab==='community'){initCommunityChat();}
 }
 function clearRWACache(){
   try{
@@ -4131,7 +4165,6 @@ function initApp(){
   updateHeader();
   renderHome();
   renderSubjects();
-  initYoga();
   initCA();
   initRWA();
   var h=new Date().getHours();
@@ -4199,7 +4232,6 @@ function saveGKey(){
 // ── HOME ──
 function renderHome(){
   renderTasks();updateProgress();renderMood();renderWater();updateHeader();
-  initDailyChallenge();
   renderExamCountdown();
   renderSRHomeCard();
   var lbl=document.getElementById('bmCountLbl');
@@ -4467,67 +4499,6 @@ function ansP(qi,oi){
   toast(ok?'✅ Sahi!':'❌ Galat!',ok?'':'e');
   renderPracQs();
   updateDailyChallenge();
-}
-
-// ── YOGA ──
-function yogaReset(){
-  clearInterval(yInt);yInt=null;
-  yIdx=0;yLeft=YOGA_STEPS[0].dur;yRun=false;
-  renderYogaUI();
-}
-
-function initYoga(){yogaReset();}
-
-function drawYogaSVG(poseName){
-  var svg=document.getElementById('yogaSVG');
-  if(!svg) return;
-  // Simple stick figure poses
-  var poses={
-    default:'<circle cx="150" cy="25" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="39" x2="150" y2="85" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="120" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="180" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="85" x2="125" y2="115" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="85" x2="175" y2="115" stroke="var(--ac)" stroke-width="3"/>',
-    stretch:'<circle cx="150" cy="20" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="34" x2="150" y2="80" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="50" x2="105" y2="35" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="50" x2="195" y2="35" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="80" x2="125" y2="115" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="80" x2="175" y2="115" stroke="var(--ac)" stroke-width="3"/>',
-    sit:'<circle cx="150" cy="30" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="44" x2="150" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="120" y2="70" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="180" y2="70" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="75" x2="110" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="110" y1="90" x2="85" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="75" x2="190" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="190" y1="90" x2="215" y2="90" stroke="var(--ac)" stroke-width="3"/>',
-    lie:'<circle cx="60" cy="65" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="74" y1="65" x2="200" y2="65" stroke="var(--ac)" stroke-width="3"/><line x1="140" y1="65" x2="130" y2="45" stroke="var(--ac)" stroke-width="3"/><line x1="140" y1="65" x2="150" y2="45" stroke="var(--ac)" stroke-width="3"/><line x1="175" y1="65" x2="165" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="175" y1="65" x2="185" y2="90" stroke="var(--ac)" stroke-width="3"/>'
-  };
-  var n=(poseName||'').toLowerCase();
-  var key='default';
-  if(n.includes('बैठ')||n.includes('वज्र')||n.includes('पद्म')||n.includes('सुख')) key='sit';
-  else if(n.includes('लेट')||n.includes('शव')||n.includes('भुज')) key='lie';
-  else if(n.includes('ताड़')||n.includes('वृक्ष')||n.includes('त्रिकोण')) key='stretch';
-  svg.innerHTML=poses[key];
-}
-
-function renderYogaUI(){
-  var step=YOGA_STEPS[Math.min(yIdx,YOGA_STEPS.length-1)];
-  var m=Math.floor(yLeft/60),s=yLeft%60;
-  var yn=document.getElementById('yogaNum');if(yn)yn.textContent=m+':'+(s<10?'0':'')+s;
-  var ysn=document.getElementById('yStepName');if(ysn)ysn.textContent=step.name;
-  drawYogaSVG(step.name);
-  var ysd=document.getElementById('yStepDesc');if(ysd)ysd.textContent=step.desc;
-  var yb=document.getElementById('yBtn');if(yb)yb.textContent=yRun?'⏸ Pause':'▶ Start';
-  var total=YOGA_STEPS[yIdx].dur;
-  var ring=document.getElementById('yogaRing');
-  if(ring) ring.style.strokeDashoffset=194.8*(1-yLeft/total);
-  var yl=document.getElementById('yStepList');
-  if(yl) yl.innerHTML=YOGA_STEPS.map(function(s,i){
-    var cls='ysc'+(i===yIdx&&yRun?' cur':i<yIdx?' done':'');
-    return '<div class="'+cls+'"><div style="font-size:1.1rem">'+s.name.split(' ')[0]+'</div>'
-      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+s.name.split(' ').slice(1).join(' ')+'</div>'
-      +'<div style="font-size:.62rem;color:var(--t2)">'+s.desc+'</div></div>'
-      +'<div style="font-size:.64rem;font-weight:800;color:var(--ac)">'+Math.ceil(s.dur/60)+'m</div></div>';
-  }).join('');
-}
-
-function yogaToggle(){
-  if(yRun){clearInterval(yInt);yInt=null;yRun=false;renderYogaUI();return;}
-  yRun=true;renderYogaUI();
-  yInt=setInterval(function(){
-    yLeft--;
-    if(yLeft<=0){
-      if(yIdx<YOGA_STEPS.length-1){yIdx++;yLeft=YOGA_STEPS[yIdx].dur;toast('✅ '+YOGA_STEPS[yIdx].name,'i');}
-      else{clearInterval(yInt);yInt=null;yRun=false;toast('🎉 Yoga complete!','i');}
-    }
-    renderYogaUI();
-  },1000);
 }
 
 // ── CURRENT AFFAIRS ──
@@ -5802,14 +5773,17 @@ function renderExamCountdown(){
 // ═══════════════════════════════════════════════════════════════
 var CHALLENGE_SUBJECTS=['gk','history','maths','science','reasoning','hindi'];
 var CHALLENGE_NAMES={gk:'GK',history:'History',maths:'Maths',science:'Science',reasoning:'Reasoning',hindi:'Hindi'};
+var _challengeFixedSubj='random'; // 'random' or a subject key
 
 function initDailyChallenge(){
   var t=today();
   if(!S.dailyChallenge) S.dailyChallenge={date:'',count:0,target:30,subj:'gk'};
   if(S.dailyChallenge.date!==t){
-    // New day — pick random subject, reset
-    var idx=Math.floor(Math.random()*CHALLENGE_SUBJECTS.length);
-    S.dailyChallenge={date:t,count:0,target:30,subj:CHALLENGE_SUBJECTS[idx]};
+    // New day — pick subject (random unless fixed)
+    var subj=_challengeFixedSubj==='random'
+      ?CHALLENGE_SUBJECTS[Math.floor(Math.random()*CHALLENGE_SUBJECTS.length)]
+      :_challengeFixedSubj;
+    S.dailyChallenge={date:t,count:0,target:S.dailyChallenge.target||30,subj:subj};
     save();
   }
   renderDailyChallenge();
@@ -5825,22 +5799,51 @@ function renderDailyChallenge(){
   if(!card) return;
   var subjName=CHALLENGE_NAMES[dc.subj]||'GK';
   if(lbl) lbl.textContent=subjName;
-  if(desc) desc.textContent=dc.count>=dc.target?'🎉 Challenge complete! '+dc.count+'/'+dc.target:dc.target+' questions solve karo aaj ('+subjName+')';
-  var pct=Math.min(100,Math.round(dc.count/dc.target*100));
-  if(bar) bar.style.width=pct+'%';
-  if(bar) bar.style.background=pct>=100?'var(--gr)':'var(--ac)';
-  if(cnt) cnt.textContent=dc.count+'/'+dc.target;
-  if(card&&pct>=100) card.style.borderColor='rgba(0,200,100,.5)';
+  var done=dc.count>=dc.target;
+  if(desc) desc.textContent=done?'🎉 Challenge complete! Kal naya challenge milega!':dc.target+' questions solve karo aaj ('+subjName+')';
+  var pct=Math.min(100,Math.round(dc.count/(dc.target||30)*100));
+  if(bar){bar.style.width=pct+'%';bar.style.background=done?'var(--gr)':'var(--ac)';}
+  if(cnt) cnt.textContent=dc.count+'/'+(dc.target||30);
+  if(card) card.style.borderColor=done?'rgba(0,200,100,.5)':'rgba(255,200,0,.25)';
+  // Highlight active target chip
+  [10,20,30,50].forEach(function(t){
+    var el=document.getElementById('ct'+t);
+    if(el) el.classList.toggle('on',t===(dc.target||30));
+  });
+  // Highlight active subj chip
+  ['random','gk','maths','reasoning','hindi'].forEach(function(s){
+    var el=document.getElementById('cs_'+s);
+    if(el) el.classList.toggle('on',s===(_challengeFixedSubj||'random'));
+  });
 }
 
 function updateDailyChallenge(){
   if(!S.dailyChallenge) return;
+  // Count ALL questions answered (any subject)
   S.dailyChallenge.count=(S.dailyChallenge.count||0)+1;
   save();
   renderDailyChallenge();
-  if(S.dailyChallenge.count===S.dailyChallenge.target){
-    toast('🏆 Daily Challenge Complete!','i');
-  }
+  var dc=S.dailyChallenge;
+  if(dc.count===dc.target) toast('🏆 Daily Challenge Complete! Shabash!','i');
+}
+
+function setChallengeTarget(n){
+  if(!S.dailyChallenge) S.dailyChallenge={date:today(),count:0,target:30,subj:'gk'};
+  S.dailyChallenge.target=n;
+  save();
+  renderDailyChallenge();
+  toast('Target: '+n+' questions ✅','i');
+}
+
+function setChallengeSubj(subj){
+  _challengeFixedSubj=subj;
+  // Reset today challenge with new subj
+  var s=subj==='random'?CHALLENGE_SUBJECTS[Math.floor(Math.random()*CHALLENGE_SUBJECTS.length)]:subj;
+  if(!S.dailyChallenge) S.dailyChallenge={date:today(),count:0,target:30,subj:s};
+  S.dailyChallenge.subj=s;
+  save();
+  renderDailyChallenge();
+  toast('Subject: '+(subj==='random'?'Random':''+CHALLENGE_NAMES[subj])+' ✅','i');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -6193,23 +6196,24 @@ function loadMonthlyDigest(month,year,el){
     +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
     +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
     +'</div></div>';
-  var prompt=months[month]+' '+year+' month ki India ki top 15-20 REAL current affairs banao.\n'
-    +'Bihar Police/SSC/RRB/BSSC exam ke liye relevant.\n'
-    +'Categories: Niyukti, Awards, Sports, Science/Tech, Economy, International, National, Bihar.\n\n'
-    +'FORMAT (SIRF JSON):\n'
-    +'{"month":"'+months[month]+' '+year+'","items":['
-    +'{"cat":"Category","headline":"Poora fact yahan","detail":"1-2 line context"}'
-    +']}\n\nRULES: Hindi mein, factual, important facts jo exam mein aate hain. SIRF valid JSON.';
+  var hindiMonths=['जनवरी','फरवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+  var hindiMonth=hindiMonths[month]+' '+year;
+  var prompt=hindiMonth+' ki Bihar Police/SSC/RRB exam ke liye top 12 current affairs do.\n\n'
+    +'⚠️ SABHI headline aur detail HINDI (Devanagari) mein likhni hain.\n'
+    +'Categories: नियुक्ति, पुरस्कार, खेल, विज्ञान, अर्थव्यवस्था, अंतर्राष्ट्रीय, राष्ट्रीय, बिहार\n\n'
+    +'FORMAT (SIRF JSON, kuch nahi):\n'
+    +'{"month":"'+hindiMonth+'","items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य हिंदी में","detail":"1 line context"}]}\n\n'
+    +'SIRF valid JSON. No markdown. Hindi only.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
     body:JSON.stringify({
       model:'llama-3.3-70b-versatile',
       messages:[
-        {role:'system',content:'JSON generator. Hindi. No markdown.'},
+        {role:'system',content:'Tu sirf Hindi (Devanagari) mein JSON output karta hai. Koi English nahi. No markdown. Only valid JSON.'},
         {role:'user',content:prompt}
       ],
-      max_tokens:3000,temperature:0.3
+      max_tokens:2000,temperature:0.2
     })
   }).then(function(r){return r.json();})
   .then(function(data){
@@ -6398,6 +6402,321 @@ function srRate(quality){
 
 // PATCH renderHome for SR card
 // [SR home consolidated]
+
+
+// ═══════════════════════════════════════════════════════════════
+// ⭐ XP + BADGES SYSTEM
+// ═══════════════════════════════════════════════════════════════
+var XP_PER_Q=2, XP_PER_MOCK=20, XP_PER_STREAK=10;
+var LEVELS=[
+  {min:0,max:99,name:'Beginner 🌱',color:'#60a5fa'},
+  {min:100,max:299,name:'Learner 📚',color:'#34d399'},
+  {min:300,max:599,name:'Practitioner ⚡',color:'#fbbf24'},
+  {min:600,max:999,name:'Expert 🔥',color:'#f97316'},
+  {min:1000,max:1999,name:'Master 🏆',color:'#a78bfa'},
+  {min:2000,max:99999,name:'Champion 👑',color:'#ec4899'}
+];
+var ALL_BADGES=[
+  {id:'first_q',icon:'🎯',name:'Pehla Sawaal',desc:'Pehla question solve kiya',check:function(){return (S.xp||0)>=2;}},
+  {id:'q50',icon:'📚',name:'50 Questions',desc:'50 questions solve kiye',check:function(){return getTotalQ()>=50;}},
+  {id:'q200',icon:'🔥',name:'200 Questions',desc:'200 questions solve kiye',check:function(){return getTotalQ()>=200;}},
+  {id:'q500',icon:'💪',name:'500 Club',desc:'500 questions solve kiye',check:function(){return getTotalQ()>=500;}},
+  {id:'streak3',icon:'⚡',name:'3-Day Streak',desc:'3 din lagatar practice',check:function(){return calcStreak()>=3;}},
+  {id:'streak7',icon:'🌟',name:'Week Warrior',desc:'7 din lagatar practice',check:function(){return calcStreak()>=7;}},
+  {id:'mock1',icon:'📝',name:'Pehla Mock',desc:'Pehla mock test diya',check:function(){return (S.mocks||[]).length>=1;}},
+  {id:'mock5',icon:'🏅',name:'Mock Pro',desc:'5 mock test diye',check:function(){return (S.mocks||[]).length>=5;}},
+  {id:'mock10',icon:'🏆',name:'Mock Master',desc:'10 mock test diye',check:function(){return (S.mocks||[]).length>=10;}},
+  {id:'xp500',icon:'⭐',name:'500 XP',desc:'500 XP earn kiya',check:function(){return (S.xp||0)>=500;}},
+  {id:'xp1000',icon:'👑',name:'1000 XP',desc:'1000 XP earn kiya',check:function(){return (S.xp||0)>=1000;}},
+  {id:'error10',icon:'📕',name:'Honest Learner',desc:'10 galat jawab save',check:function(){return (S.errorNotes||[]).length>=10;}},
+  {id:'bookmark5',icon:'📌',name:'Collector',desc:'5 questions bookmark kiye',check:function(){return (S.bookmarks||[]).length>=5;}}
+];
+
+function getTotalQ(){
+  var t=0;
+  Object.values(S.sStats||{}).forEach(function(s){t+=(s.t||0);});
+  return t;
+}
+
+function getLevelInfo(xp){
+  for(var i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min) return LEVELS[i];}
+  return LEVELS[0];
+}
+
+function addXP(amount){
+  S.xp=(S.xp||0)+amount;
+  save();
+  checkBadges();
+  renderXPBar();
+}
+
+function checkBadges(){
+  if(!S.badges) S.badges=[];
+  var newBadge=false;
+  ALL_BADGES.forEach(function(b){
+    if(S.badges.indexOf(b.id)===-1 && b.check()){
+      S.badges.push(b.id);
+      newBadge=true;
+      toast('🏅 Badge unlock: '+b.name,'i');
+    }
+  });
+  if(newBadge) save();
+}
+
+function renderXPBar(){
+  var xp=S.xp||0;
+  var lv=getLevelInfo(xp);
+  var next=LEVELS.find(function(l){return l.min>xp;});
+  var pct=next?Math.round((xp-lv.min)/(next.min-lv.min)*100):100;
+  var el=document.getElementById('xpDisplay');
+  var bar=document.getElementById('xpBar');
+  var lbl=document.getElementById('xpLevelLbl');
+  if(el) el.textContent=xp+' XP';
+  if(bar){bar.style.width=pct+'%';bar.style.background='linear-gradient(90deg,'+lv.color+','+((next||lv).color)+')';}
+  if(lbl) lbl.textContent=lv.name+(next?' — '+next.min+' XP mein next level':' — Max Level! 👑');
+  renderBadges();
+}
+
+function renderBadges(){
+  var el=document.getElementById('badgeGrid');
+  if(!el) return;
+  var earned=S.badges||[];
+  el.innerHTML=ALL_BADGES.map(function(b){
+    var has=earned.indexOf(b.id)!==-1;
+    return '<div title="'+b.name+': '+b.desc+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border-radius:10px;background:'+(has?'rgba(124,111,255,.15)':'var(--cd2)')+';border:1px solid '+(has?'var(--ac)':'var(--br)')+';min-width:52px;cursor:default;opacity:'+(has?'1':'.45')+'">'
+      +'<div style="font-size:1.4rem">'+b.icon+'</div>'
+      +'<div style="font-size:.52rem;font-weight:800;text-align:center;line-height:1.2">'+b.name+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📊 EXAM READINESS SCORE
+// ═══════════════════════════════════════════════════════════════
+var EXAM_SUBJECTS_CONFIG={
+  gk:{name:'GK',weight:0.25,icon:'🌍'},
+  maths:{name:'Maths',weight:0.25,icon:'📐'},
+  reasoning:{name:'Reasoning',weight:0.25,icon:'🧠'},
+  hindi:{name:'Hindi',weight:0.15,icon:'📝'},
+  science:{name:'Science',weight:0.1,icon:'🔬'}
+};
+
+function renderReadiness(){
+  var el=document.getElementById('readinessContent');
+  if(!el) return;
+  var stats=S.sStats||{};
+  var hasData=Object.values(stats).some(function(s){return (s.t||0)>5;});
+  if(!hasData){el.innerHTML='<div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div>';return;}
+  var totalScore=0,totalWeight=0;
+  var rows='';
+  Object.entries(EXAM_SUBJECTS_CONFIG).forEach(function(entry){
+    var key=entry[0], cfg=entry[1];
+    var st=stats[key]||{d:0,t:0};
+    if(st.t<3){return;}
+    var acc=Math.round(st.d/st.t*100);
+    var color=acc>=70?'var(--gr)':acc>=50?'var(--or)':'var(--a2)';
+    totalScore+=acc*cfg.weight; totalWeight+=cfg.weight;
+    rows+='<div style="margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:3px">'
+      +'<span>'+cfg.icon+' '+cfg.name+'</span>'
+      +'<span style="font-weight:800;color:'+color+'">'+acc+'%</span></div>'
+      +'<div style="height:6px;background:var(--cd2);border-radius:3px;overflow:hidden">'
+      +'<div style="height:100%;width:'+acc+'%;background:'+color+';border-radius:3px;transition:width .6s"></div></div>'
+      +'</div>';
+  });
+  if(!totalWeight){el.innerHTML='<div class="empty" style="font-size:.7rem">Aur practice karo!</div>';return;}
+  var overall=Math.round(totalScore/totalWeight);
+  var grade=overall>=80?'Exam Ready! 🚀':overall>=65?'Almost Ready 💪':overall>=50?'Keep Going 📚':'Aur Mehnat Chahiye 🔥';
+  var gcol=overall>=80?'var(--gr)':overall>=65?'var(--teal)':overall>=50?'var(--or)':'var(--a2)';
+  el.innerHTML='<div style="text-align:center;padding:12px;background:var(--cd2);border-radius:12px;margin-bottom:12px">'
+    +'<div style="font-size:2rem;font-weight:900;color:'+gcol+'">'+overall+'%</div>'
+    +'<div style="font-size:.72rem;font-weight:800;color:'+gcol+'">'+grade+'</div>'
+    +'<div style="font-size:.6rem;color:var(--t2);margin-top:2px">Overall Readiness</div></div>'
+    +rows
+    +'<div style="font-size:.6rem;color:var(--t3);text-align:center;margin-top:4px">Based on '+getTotalQ()+' questions solved</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ⏰ STUDY HOURS LOG
+// ═══════════════════════════════════════════════════════════════
+function logStudyTime(){
+  var mins=prompt('Kitne minutes padhe? (0-480)');
+  if(mins===null) return;
+  mins=parseInt(mins)||0;
+  if(mins<=0||mins>480){toast('Valid time daalo (1-480 min)','e');return;}
+  var t=today();
+  if(!S.studyLog) S.studyLog={};
+  S.studyLog[t]=(S.studyLog[t]||0)+mins;
+  save();
+  addXP(Math.floor(mins/10));
+  toast('✅ '+mins+' min log hua! +'+(Math.floor(mins/10))+' XP','i');
+  renderStudyLog();
+}
+
+function renderStudyLog(){
+  var el=document.getElementById('studyLogContent');
+  if(!el) return;
+  var log=S.studyLog||{};
+  var keys=Object.keys(log).sort().reverse().slice(0,7);
+  if(!keys.length){el.innerHTML='<div class="empty" style="font-size:.7rem">Aaj kitna padhe? Log karo!</div>';return;}
+  var totalMins=keys.reduce(function(a,k){return a+(log[k]||0);},0);
+  var html='<div style="display:flex;justify-content:space-between;font-size:.65rem;color:var(--t2);margin-bottom:8px">'
+    +'<span>Last 7 days</span><span style="font-weight:800;color:var(--ac)">Total: '+(Math.floor(totalMins/60))+'h '+(totalMins%60)+'m</span></div>';
+  var maxMin=Math.max.apply(null,keys.map(function(k){return log[k]||0;}));
+  keys.forEach(function(k){
+    var m=log[k]||0;
+    var pct=maxMin?Math.round(m/maxMin*100):0;
+    var parts=k.split('-');
+    var dlbl=parts[2]+'/'+parts[1];
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+      +'<div style="font-size:.6rem;color:var(--t2);min-width:32px">'+dlbl+'</div>'
+      +'<div style="flex:1;height:14px;background:var(--cd2);border-radius:4px;overflow:hidden">'
+      +'<div style="height:100%;width:'+pct+'%;background:var(--teal);border-radius:4px;transition:width .5s"></div></div>'
+      +'<div style="font-size:.6rem;font-weight:800;min-width:36px;text-align:right">'+(m>=60?(Math.floor(m/60))+'h '+(m%60)+'m':m+'m')+'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📕 ERROR NOTEBOOK
+// ═══════════════════════════════════════════════════════════════
+function saveToErrorNotes(q,subj){
+  if(!S.errorNotes) S.errorNotes=[];
+  // Don't duplicate
+  if(S.errorNotes.some(function(e){return e.q===q.q;})) return;
+  S.errorNotes.unshift({q:q.q,opts:q.opts||[],ans:q.ans,sol:q.sol||'',subj:subj||'',date:today()});
+  if(S.errorNotes.length>100) S.errorNotes=S.errorNotes.slice(0,100);
+  save();
+  checkBadges();
+}
+
+function renderErrorNotebook(){
+  var el=document.getElementById('errorNotebookList');
+  var cnt=document.getElementById('errorCount');
+  if(!el) return;
+  var notes=S.errorNotes||[];
+  if(cnt) cnt.textContent=notes.length+' errors';
+  if(!notes.length){el.innerHTML='<div class="empty" style="font-size:.7rem">Galat jawab yahan save honge automatically!</div>';return;}
+  var html='<div style="display:flex;justify-content:flex-end;margin-bottom:6px">'
+    +'<button onclick="clearErrorNotes()" style="background:transparent;border:1px solid var(--br2);border-radius:6px;color:var(--t2);font-size:.55rem;padding:3px 8px;cursor:pointer">🗑️ Clear All</button></div>';
+  notes.slice(0,20).forEach(function(e,i){
+    html+='<div style="background:var(--cd2);border:1px solid rgba(255,80,80,.2);border-radius:10px;padding:10px;margin-bottom:6px">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+      +'<span style="font-size:.6rem;color:var(--a2);font-weight:800">❌ Galat</span>'
+      +'<span style="font-size:.58rem;color:var(--t3)">'+e.date+(e.subj?' · '+e.subj:'')+'</span></div>'
+      +'<div style="font-size:.74rem;font-weight:600;line-height:1.4;margin-bottom:6px">'+esc(e.q)+'</div>'
+      +(e.sol?'<div style="font-size:.65rem;color:var(--t2);border-top:1px solid var(--br);padding-top:6px;margin-top:2px">💡 '+esc(e.sol)+'</div>':'')
+      +'</div>';
+  });
+  if(notes.length>20) html+='<div style="font-size:.62rem;color:var(--t2);text-align:center;padding:4px">...aur '+(notes.length-20)+' errors</div>';
+  el.innerHTML=html;
+}
+
+function clearErrorNotes(){
+  if(!confirm('Sab error notes delete karein?')) return;
+  S.errorNotes=[];save();renderErrorNotebook();toast('Error notes clear!','i');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📐 FORMULA SHEET
+// ═══════════════════════════════════════════════════════════════
+var FORMULAS={
+  maths:[
+    {title:'प्रतिशत (Percentage)',items:['X का Y% = X×Y÷100','A से B कितना % ज्यादा = (B-A)÷A × 100','A से B कितना % कम = (A-B)÷A × 100']},
+    {title:'लाभ-हानि (Profit-Loss)',items:['लाभ% = लाभ÷CP × 100','हानि% = हानि÷CP × 100','SP = CP × (100+P%)÷100','CP = SP × 100÷(100+P%)','Dishonest seller: लाभ% = (True-False)÷False × 100']},
+    {title:'साधारण ब्याज (SI)',items:['SI = P×R×T÷100','A = P + SI','P = SI×100÷(R×T)','R = SI×100÷(P×T)']},
+    {title:'चक्रवृद्धि ब्याज (CI)',items:['A = P×(1+R÷100)^T','CI = A - P','Half yearly: A = P×(1+R÷200)^(2T)','Quarterly: A = P×(1+R÷400)^(4T)']},
+    {title:'अनुपात-समानुपात',items:['a:b = c:d → ad = bc','Mean proportion: b² = ac','Part = Total × ratio÷sum of ratio']},
+    {title:'औसत (Average)',items:['Average = Sum÷Count','New avg = (Old sum ± new)÷new count','Weighted avg = Σ(value×weight)÷Σweight']},
+    {title:'त्रिभुज (Triangle)',items:['Area = ½×base×height','Heron formula: s=(a+b+c)÷2, Area=√(s(s-a)(s-b)(s-c))','Right angle: c²=a²+b² (Pythagoras)','Equilateral: Area=√3÷4×a²']},
+    {title:'वृत्त (Circle)',items:['Area = πr²','Circumference = 2πr','Arc length = (θ÷360)×2πr','Sector area = (θ÷360)×πr²']},
+    {title:'समय-कार्य (Time-Work)',items:['A की 1 दिन की कार्य = 1÷n','A+B मिलकर = (a×b)÷(a+b) दिन','Efficiency ratio = 1÷time']},
+    {title:'चाल-समय-दूरी',items:['Distance = Speed × Time','Average speed = 2ab÷(a+b) (same dist)','Train length = (S1±S2)×T (meeting/chasing)','Relative speed: same dir=S1-S2, opp=S1+S2']}
+  ],
+  science:[
+    {title:'Newton के नियम',items:['1st: F=0 → a=0 (inertia)','2nd: F = ma','3rd: Every action has equal & opposite reaction','Momentum p = mv']},
+    {title:'Ohm का नियम',items:['V = IR','Power P = VI = I²R = V²/R','Series: R_total = R1+R2+R3','Parallel: 1/R = 1/R1+1/R2+1/R3']},
+    {title:'रासायनिक सूत्र',items:['पानी = H₂O','नमक = NaCl','चूना = CaCO₃','सोडा = Na₂CO₃','बेकिंग सोडा = NaHCO₃','एसिड: HCl, H₂SO₄, HNO₃','Base: NaOH, KOH, Ca(OH)₂']},
+    {title:'pH Scale',items:['pH 0-6 = Acidic (अम्लीय)','pH 7 = Neutral (उदासीन)','pH 8-14 = Basic/Alkaline (क्षारीय)','Blood pH = 7.35-7.45','Gastric acid pH = 1.5-3.5']},
+    {title:'गति के समीकरण',items:['v = u + at','s = ut + ½at²','v² = u² + 2as','s_n = u + a(2n-1)/2']}
+  ],
+  gk:[
+    {title:'भारत के राष्ट्रीय प्रतीक',items:['राष्ट्रीय पशु = बाघ','राष्ट्रीय पक्षी = मोर','राष्ट्रीय फूल = कमल','राष्ट्रीय फल = आम','राष्ट्रीय खेल = हॉकी','राष्ट्रीय वृक्ष = बरगद','राष्ट्रीय नदी = गंगा']},
+    {title:'संविधान के अनुच्छेद',items:['अनुच्छेद 14 = समानता का अधिकार','अनुच्छेद 19 = स्वतंत्रता का अधिकार','अनुच्छेद 21 = जीवन का अधिकार','अनुच्छेद 32 = संवैधानिक उपचार','अनुच्छेद 370 = जम्मू-कश्मीर (निरस्त 2019)','अनुच्छेद 44 = UCC']},
+    {title:'महत्वपूर्ण दिन',items:['26 Jan = Republic Day','15 Aug = Independence Day','2 Oct = Gandhi Jayanti','5 Sep = Teachers Day','14 Nov = Childrens Day','1 May = Labour Day','21 Jun = World Yoga Day']},
+    {title:'भारत की रैंकिंग ट्रिक्स',items:['जनसंख्या = 1st (140 cr+)','क्षेत्रफल = 7th','GDP = 5th (2025)','सेना = 4th','दूध उत्पादन = 1st','गेहूं = 2nd','चावल = 2nd']},
+    {title:'प्रमुख नदियां (Trick)',items:['गंगा की सहायक: यमुना, घाघरा, गोमती, सोन, कोसी','ब्रह्मपुत्र = सियांग (Tibet), जमुना (Bangladesh)','दक्षिण: कृष्णा, गोदावरी, कावेरी, महानदी','पूर्व→पश्चिम: नर्मदा, ताप्ती']}
+  ]
+};
+var _curFormulaSubj='maths';
+
+function showFormulas(subj,el){
+  _curFormulaSubj=subj;
+  document.querySelectorAll('#formulaSubjChips .chip').forEach(function(c){c.classList.remove('on');});
+  if(el) el.classList.add('on');
+  filterFormulas();
+}
+
+function filterFormulas(){
+  var el=document.getElementById('formulaList');
+  if(!el) return;
+  var q=(document.getElementById('formulaSearch')||{}).value||'';
+  q=q.trim().toLowerCase();
+  var data=FORMULAS[_curFormulaSubj]||[];
+  var html='';
+  data.forEach(function(group){
+    var items=group.items.filter(function(it){
+      return !q||(group.title.toLowerCase().includes(q)||it.toLowerCase().includes(q));
+    });
+    if(!items.length) return;
+    html+='<div style="margin-bottom:10px">'
+      +'<div style="font-size:.65rem;font-weight:800;color:var(--ac);margin-bottom:5px">'+esc(group.title)+'</div>';
+    items.forEach(function(it){
+      html+='<div style="display:flex;gap:6px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--br);font-size:.72rem;line-height:1.4">'
+        +'<span style="color:var(--ac);flex-shrink:0">▸</span>'
+        +'<span>'+esc(it)+'</span>'
+        +'</div>';
+    });
+    html+='</div>';
+  });
+  el.innerHTML=html||'<div class="empty" style="font-size:.7rem">Koi formula nahi mila</div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PATCH: ansP — also award XP + save errors
+// ═══════════════════════════════════════════════════════════════
+var _origAnsP2=ansP;
+function ansP(qi,oi){
+  _origAnsP2(qi,oi);
+  var q=pracQs[qi];
+  if(!q) return;
+  var correctIdx=q._sans!==undefined?q._sans:q.ans;
+  var ok=oi===correctIdx;
+  addXP(XP_PER_Q);
+  if(!ok && q.q) saveToErrorNotes(q, curSubj?curSubj.id:'');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PATCH: sw settings — init all new panels
+// ═══════════════════════════════════════════════════════════════
+var _origSwSett=sw;
+function sw(tab){
+  _origSwSett(tab);
+  if(tab==='settings'){
+    renderXPBar();
+    renderReadiness();
+    renderStudyLog();
+    renderErrorNotebook();
+    showFormulas(_curFormulaSubj||'maths',null);
+    filterFormulas();
+  }
+}
+
+function communityQuick(msg){
+  var inp=document.getElementById('communityInp');
+  if(inp){inp.value=msg;sendCommunityMsg();}
+}
 
 </script>
 </body>
