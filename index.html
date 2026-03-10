@@ -1245,109 +1245,129 @@ body::before{
     </div>
     <!-- SETTINGS -->
     <div class="tab" id="tab-settings">
-      <!-- 📊 REPORT SECTION -->
-      <div class="scard">
-        <div class="sec">📊 Report &amp; Stats</div>
-        <div class="sgrid" style="margin-bottom:12px">
-          <div class="sbox"><div class="snum" id="rStreak">0</div><div class="slbl">🔥 STREAK</div></div>
-          <div class="sbox"><div class="snum" id="rBest">0%</div><div class="slbl">🏆 BEST</div></div>
-          <div class="sbox"><div class="snum" id="rAvg">0%</div><div class="slbl">📅 AVG</div></div>
-          <div class="sbox"><div class="snum" id="rMocks">0</div><div class="slbl">📝 MOCKS</div></div>
+
+      <!-- ═══ PROFILE HERO CARD ═══ -->
+      <div style="background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:18px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.07);border-radius:50%"></div>
+        <div style="position:absolute;bottom:-30px;right:30px;width:70px;height:70px;background:rgba(255,255,255,.05);border-radius:50%"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0" id="profileAvatar">👤</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.95rem;font-weight:900;color:#fff" id="profileNameDisp">Student</div>
+            <div style="font-size:.6rem;color:rgba(255,255,255,.75);margin-top:1px" id="profileEmailDisp">Loading...</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.65rem;color:rgba(255,255,255,.8);font-weight:700" id="xpDisplay">0 XP</div>
+            <div style="font-size:.55rem;color:rgba(255,255,255,.6);margin-top:1px" id="xpLevelLbl">Level 1</div>
+          </div>
         </div>
-        <div style="margin-bottom:10px"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📊 Daily Progress</div><div class="ch"><canvas id="weekChart"></canvas></div></div>
-        <div style="margin-bottom:10px"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📚 Subject Accuracy</div><div class="ch"><canvas id="subjChart"></canvas></div></div>
-        <div style="margin-bottom:10px"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📝 Mock Scores</div><div class="ch"><canvas id="mockChart"></canvas></div></div>
-        <div style="margin-bottom:10px"><div style="font-size:.66rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📅 Activity Heatmap (90 days)</div><div class="hm-w" id="hmWrap"><div class="hm" id="hmGrid"></div></div></div>
-        <div style="margin-bottom:4px"><div style="font-size:.66rem;font-weight:800;margin-bottom:6px;color:var(--t2)">📊 Weak Topic Finder</div><div id="weakTopicList"><div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div></div></div>
-        <div><div style="font-size:.66rem;font-weight:800;margin-bottom:6px;color:var(--t2)">📜 Test History</div><div id="testHist"></div></div>
-      </div>
-      <!-- 👤 PROFILE -->
-      <div class="scard">
-        <div class="sec">👤 Profile</div>
-        <div style="display:flex;gap:5px"><input type="text" class="fi" id="nameInp" placeholder="Apna naam..."><button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveName()">Save</button></div>
-      </div>
-      <!-- 🤖 GROQ KEY -->
-      <div class="scard">
-        <div class="sec">🤖 Groq AI Key (FREE)</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">console.groq.com se FREE key lo — No quota!</div>
-        <div style="display:flex;gap:5px;margin-bottom:5px">
-          <input type="text" class="fi" id="geminiKey" placeholder="gsk_...">
-          <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveGKey()">Save</button>
+        <div style="height:5px;background:rgba(0,0,0,.2);border-radius:3px;overflow:hidden;margin-bottom:4px">
+          <div id="xpBar" style="height:100%;border-radius:3px;background:rgba(255,255,255,.6);width:0%;transition:width .6s"></div>
         </div>
-        <div style="font-size:.63rem;font-weight:700" id="gkStatus">⚪ Key nahi hai</div>
-        <a href="https://console.groq.com/keys" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Groq Key Lo</a>
+        <div style="display:flex;gap:6px;margin-top:10px">
+          <input type="text" id="nameInp" placeholder="Naam update karo..." style="flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-family:inherit;font-size:.72rem;padding:6px 10px;outline:none" onclick="this.style.background='rgba(255,255,255,.25)'">
+          <button onclick="saveName()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;padding:6px 12px;cursor:pointer;flex-shrink:0">Save</button>
+        </div>
       </div>
-      <!-- 📢 WHATSAPP -->
-      <div class="scard">
-        <div class="sec">📢 WhatsApp Channel</div>
-        <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:0;background:linear-gradient(135deg,#25D366,#128C7E)">📢 PS Channel Join Karo</a>
+
+      <!-- ═══ STATS GRID ═══ -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:linear-gradient(135deg,rgba(255,107,138,.15),rgba(255,107,138,.05));border:1px solid rgba(255,107,138,.2);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:#ff6b8a" id="rStreak">0</div>
+          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">🔥 STREAK</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(245,166,35,.15),rgba(245,166,35,.05));border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:#f5a623" id="rBest">0%</div>
+          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">🏆 BEST</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(92,106,240,.05));border:1px solid rgba(92,106,240,.2);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:var(--ac)" id="rAvg">0%</div>
+          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">📈 AVG</div>
+        </div>
+        <div style="background:linear-gradient(135deg,rgba(0,214,143,.15),rgba(0,214,143,.05));border:1px solid rgba(0,214,143,.2);border-radius:14px;padding:12px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:var(--gr)" id="rMocks">0</div>
+          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">📝 MOCKS</div>
+        </div>
       </div>
-      <!-- 🏆 DAILY CHALLENGE -->
-      <div class="scard" id="challengeCard" style="border:1px solid rgba(255,200,0,.25);background:linear-gradient(135deg,rgba(255,200,0,.07),rgba(255,130,0,.05))">
+
+      <!-- ═══ DAILY CHALLENGE ═══ -->
+      <div id="challengeCard" style="background:linear-gradient(135deg,rgba(255,200,0,.12),rgba(255,130,0,.08));border:1px solid rgba(255,200,0,.25);border-radius:16px;padding:14px;margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div>
-            <div style="font-size:.78rem;font-weight:800">🏆 Aaj Ka Challenge</div>
-            <div style="font-size:.6rem;color:var(--t2)" id="challengeSubjLbl">GK</div>
+            <div style="font-size:.82rem;font-weight:900">🏆 Aaj Ka Challenge</div>
+            <div style="font-size:.6rem;color:var(--t2);margin-top:1px" id="challengeSubjLbl">GK · Aaj shuru karo</div>
           </div>
-          <div style="font-size:.68rem;font-weight:800;color:var(--ac)" id="challengeCount">0/30</div>
+          <div style="background:rgba(255,200,0,.2);border-radius:10px;padding:4px 10px;text-align:center">
+            <div style="font-size:.85rem;font-weight:900;color:#f5a623" id="challengeCount">0/30</div>
+          </div>
         </div>
-        <div style="font-size:.65rem;color:var(--t2);margin-bottom:8px" id="challengeDesc">30 questions solve karo aaj</div>
-        <div style="height:8px;background:rgba(0,0,0,.15);border-radius:4px;overflow:hidden;margin-bottom:12px">
-          <div id="challengeBar" style="height:100%;border-radius:4px;background:var(--ac);width:0%;transition:width .5s"></div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:8px" id="challengeDesc">Aaj ke 30 questions solve karo!</div>
+        <div style="height:7px;background:rgba(0,0,0,.15);border-radius:4px;overflow:hidden;margin-bottom:12px">
+          <div id="challengeBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,#f5a623,#ff6b35);width:0%;transition:width .5s"></div>
         </div>
-        <div style="font-size:.65rem;font-weight:800;color:var(--t2);margin-bottom:6px">🎯 Target Set Karo</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+          <span style="font-size:.6rem;font-weight:700;color:var(--t2);align-self:center">Target:</span>
           <button onclick="setChallengeTarget(10)" class="chip" id="ct10">10</button>
           <button onclick="setChallengeTarget(20)" class="chip" id="ct20">20</button>
           <button onclick="setChallengeTarget(30)" class="chip on" id="ct30">30</button>
           <button onclick="setChallengeTarget(50)" class="chip" id="ct50">50</button>
         </div>
-        <div style="font-size:.65rem;font-weight:800;color:var(--t2);margin-bottom:6px">📚 Subject</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button onclick="setChallengeSubj('random')" class="chip on" id="cs_random">🎲 Random</button>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <span style="font-size:.6rem;font-weight:700;color:var(--t2);align-self:center">Subj:</span>
+          <button onclick="setChallengeSubj('random')" class="chip on" id="cs_random">🎲</button>
           <button onclick="setChallengeSubj('gk')" class="chip" id="cs_gk">GK</button>
           <button onclick="setChallengeSubj('maths')" class="chip" id="cs_maths">Maths</button>
           <button onclick="setChallengeSubj('reasoning')" class="chip" id="cs_reasoning">Reasoning</button>
           <button onclick="setChallengeSubj('hindi')" class="chip" id="cs_hindi">Hindi</button>
         </div>
       </div>
-      <!-- ⭐ XP + BADGES -->
-      <div class="scard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="sec" style="margin:0">⭐ XP &amp; Badges</div>
-          <div style="font-size:.72rem;font-weight:900;color:var(--ye)" id="xpDisplay">0 XP</div>
+
+      <!-- ═══ BADGES ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">🏅 Badges</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="badgeGrid">
+          <div style="font-size:.65rem;color:var(--t2)">Practice karo — badges milenge!</div>
         </div>
-        <div style="height:8px;background:var(--br);border-radius:4px;overflow:hidden;margin-bottom:6px">
-          <div id="xpBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--ac),var(--ye));width:0%;transition:width .6s"></div>
-        </div>
-        <div style="font-size:.6rem;color:var(--t2);margin-bottom:10px" id="xpLevelLbl">Level 1 — Beginner</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px" id="badgeGrid"></div>
       </div>
-      <!-- 📊 EXAM READINESS -->
-      <div class="scard">
-        <div class="sec">📊 Exam Readiness Score</div>
+
+      <!-- ═══ CHARTS ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:12px">📊 Progress Charts</div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:5px">7-Day Progress</div>
+          <div class="ch"><canvas id="weekChart"></canvas></div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:5px">Subject Accuracy</div>
+          <div class="ch"><canvas id="subjChart"></canvas></div>
+        </div>
+        <div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:5px">Mock Scores</div>
+          <div class="ch"><canvas id="mockChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ═══ ACTIVITY HEATMAP ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">📅 Activity (90 days)</div>
+        <div class="hm-w" id="hmWrap"><div class="hm" id="hmGrid"></div></div>
+      </div>
+
+      <!-- ═══ EXAM READINESS ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">🎯 Exam Readiness</div>
         <div id="readinessContent"><div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div></div>
       </div>
-      <!-- ⏰ STUDY HOURS LOG -->
-      <div class="scard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="sec" style="margin:0">⏰ Study Hours Log</div>
-          <button onclick="logStudyTime()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.65rem;font-weight:800;padding:5px 10px;cursor:pointer">+ Log</button>
-        </div>
-        <div id="studyLogContent"></div>
+
+      <!-- ═══ WEAK TOPICS ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">⚠️ Weak Topics</div>
+        <div id="weakTopicList"><div class="empty" style="font-size:.7rem">Practice karo — weak topics yahan dikhenge!</div></div>
       </div>
-      <!-- 📕 ERROR NOTEBOOK -->
-      <div class="scard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="sec" style="margin:0">📕 Error Notebook</div>
-          <div style="font-size:.6rem;color:var(--t2)" id="errorCount">0 errors</div>
-        </div>
-        <div id="errorNotebookList"><div class="empty" style="font-size:.7rem">Galat jawab yahan save honge</div></div>
-        <button onclick="clearErrorNotes()" style="margin-top:8px;background:none;border:1px solid var(--br2);border-radius:8px;color:var(--t2);font-size:.65rem;padding:5px 12px;cursor:pointer">🗑️ Clear All</button>
-      </div>
-      <!-- 📐 FORMULA SHEET -->
-      <div class="scard">
-        <div class="sec">📐 Formula Sheet</div>
+
+      <!-- ═══ FORMULA SHEET ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">📐 Formula Sheet</div>
         <div class="chips" id="formulaSubjChips" style="margin-bottom:8px">
           <button class="chip on" onclick="showFormulas('maths',this)">📐 Maths</button>
           <button class="chip" onclick="showFormulas('science',this)">🔬 Science</button>
@@ -1356,13 +1376,41 @@ body::before{
         <input type="text" id="formulaSearch" class="fi" placeholder="🔍 Formula dhundo..." oninput="filterFormulas()" style="margin-bottom:8px">
         <div id="formulaList"></div>
       </div>
-      <!-- 📅 EXAM DATES -->
-      <div class="scard">
-        <div class="sec">📅 Exam Countdown Set Karo</div>
-        <div style="font-size:.65rem;color:var(--t2);margin-bottom:10px">Apne upcoming exams ki date daalo — home pe countdown dikhega</div>
+
+      <!-- ═══ ERROR NOTEBOOK ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:.78rem;font-weight:800">📕 Error Notebook</div>
+            <div style="font-size:.58rem;color:var(--t2);margin-top:1px" id="errorCount">0 errors</div>
+          </div>
+          <button onclick="clearErrorNotes()" style="background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.2);border-radius:8px;color:#ff5555;font-size:.62rem;font-weight:700;padding:5px 10px;cursor:pointer">🗑️ Clear</button>
+        </div>
+        <div id="errorNotebookList"><div class="empty" style="font-size:.7rem">Galat jawab automatically yahan save honge!</div></div>
+      </div>
+
+      <!-- ═══ STUDY LOG ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:.78rem;font-weight:800">⏰ Study Log</div>
+          <button onclick="logStudyTime()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.65rem;font-weight:800;padding:6px 12px;cursor:pointer">+ Log</button>
+        </div>
+        <div id="studyLogContent"><div class="empty" style="font-size:.7rem">Aaj kitna padhe? Log button dabao!</div></div>
+      </div>
+
+      <!-- ═══ TEST HISTORY ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">📜 Test History</div>
+        <div id="testHist"><div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div></div>
+      </div>
+
+      <!-- ═══ EXAM DATES ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:4px">📅 Exam Countdown</div>
+        <div style="font-size:.6rem;color:var(--t2);margin-bottom:10px">Upcoming exams add karo — Home pe countdown dikhega</div>
         <div id="examDatesList" style="margin-bottom:10px"></div>
-        <div style="display:flex;gap:6px;margin-bottom:6px">
-          <select class="fi" id="examNameSel" style="flex:1;font-size:.68rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+          <select class="fi" id="examNameSel" style="font-size:.68rem">
             <option value="SSC GD">🪖 SSC GD</option>
             <option value="Bihar Police">👮 Bihar Police</option>
             <option value="SSC CGL">📊 SSC CGL</option>
@@ -1370,25 +1418,54 @@ body::before{
             <option value="BSSC">📋 BSSC</option>
             <option value="BPSC">🎖️ BPSC</option>
           </select>
-          <input type="date" class="fi" id="examDateInp" style="flex:1;font-size:.68rem">
+          <input type="date" class="fi" id="examDateInp" style="font-size:.68rem">
         </div>
-        <button class="add-btn2" onclick="addExamDate()" style="width:100%;padding:9px">+ Exam Add Karo</button>
+        <button onclick="addExamDate()" class="btn" style="width:100%;padding:9px;margin:0">➕ Exam Add Karo</button>
       </div>
-      <!-- 💾 DATA -->
-      <div class="scard">
-        <div class="sec">💾 Data</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:7px" id="dataInfo">Loading...</div>
-        <button class="dbtn" onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}">🔄 Aaj Reset</button>
-        <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
-      </div>
-      <!-- 🔐 ACCOUNT -->
-      <div class="scard">
-        <div class="sec">🔐 Account</div>
-        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
-      </div>
-      <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v5.0 🚀 · 1,110+ Questions</div>
-    </div>
 
+      <!-- ═══ AI KEY ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:4px">🤖 Groq AI Key</div>
+        <div style="font-size:.62rem;color:var(--t2);margin-bottom:8px">console.groq.com se FREE key lo</div>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <input type="password" class="fi" id="geminiKey" placeholder="gsk_..." style="flex:1">
+          <button onclick="saveGKey()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;padding:6px 12px;cursor:pointer;flex-shrink:0">Save</button>
+        </div>
+        <div style="font-size:.63rem;font-weight:700;margin-bottom:10px" id="gkStatus">⚪ Key nahi hai</div>
+        <a href="https://console.groq.com/keys" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#f55036,#ff8c00);border-radius:10px;color:#fff;font-size:.75rem;font-weight:800;padding:10px;text-decoration:none">🔑 FREE Groq Key Lo →</a>
+      </div>
+
+      <!-- ═══ WHATSAPP ═══ -->
+      <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:16px;padding:14px;margin-bottom:14px;text-decoration:none">
+        <div style="font-size:1.5rem">📢</div>
+        <div>
+          <div style="font-size:.8rem;font-weight:900;color:#fff">PS WhatsApp Channel</div>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.8)">Daily CA, tips, updates join karo</div>
+        </div>
+        <div style="margin-left:auto;color:rgba(255,255,255,.8);font-size:.9rem">›</div>
+      </a>
+
+      <!-- ═══ DATA + DANGER ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:800;margin-bottom:4px">💾 Data</div>
+        <div style="font-size:.65rem;color:var(--t2);margin-bottom:10px" id="dataInfo">Loading...</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.2);border-radius:10px;color:#f5a623;font-size:.68rem;font-weight:700;padding:9px;cursor:pointer">🔄 Aaj Reset</button>
+          <button onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}" style="background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);border-radius:10px;color:#ff5555;font-size:.68rem;font-weight:700;padding:9px;cursor:pointer">🗑️ Sab Delete</button>
+        </div>
+      </div>
+
+      <!-- ═══ ACCOUNT ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:32px;height:32px;background:rgba(255,80,80,.1);border-radius:8px;display:flex;align-items:center;justify-content:center">🔐</div>
+          <div style="font-size:.78rem;font-weight:800">Account</div>
+        </div>
+        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:.82rem;font-weight:800;padding:13px;cursor:pointer">🚪 Logout</button>
+      </div>
+
+      <div style="text-align:center;padding:4px 0 16px;font-size:.6rem;color:var(--t2)">PS Study App v5.0 🚀 · 2000+ Questions</div>
+    </div>
     <!-- COMMUNITY TAB -->
     <div class="tab" id="tab-community">
       <div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(255,107,138,.1));border:1px solid rgba(92,106,240,.2);border-radius:13px;padding:10px 12px;margin-bottom:10px">
@@ -3800,6 +3877,17 @@ function sw(tab){
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='settings'){
+    // Update profile hero
+    var pname=document.getElementById('profileNameDisp');
+    var pemail=document.getElementById('profileEmailDisp');
+    var pav=document.getElementById('profileAvatar');
+    var ninp=document.getElementById('nameInp');
+    if(pname) pname.textContent=S.name||'Student';
+    if(ninp) ninp.value=S.name||'';
+    if(auth&&auth.currentUser){
+      if(pemail) pemail.textContent=auth.currentUser.email||'';
+      if(pav&&auth.currentUser.photoURL) pav.innerHTML='<img src="'+auth.currentUser.photoURL+'" style="width:100%;height:100%;border-radius:12px;object-fit:cover">';
+    }
     renderExamDatesList();initDailyChallenge();initReport();
     renderXPBar();renderReadiness();renderStudyLog();renderErrorNotebook();
     showFormulas(_curFormulaSubj||'maths',null);filterFormulas();
