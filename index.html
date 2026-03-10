@@ -805,6 +805,18 @@ body::before{
 .dot{display:inline-block;width:5px;height:5px;background:var(--t2);border-radius:50%;margin:0 2px;animation:td 1.2s infinite;}
 .dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
 @keyframes td{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* Community tab — flex only when active */
+#tab-community.active {
+  display: flex !important;
+  flex-direction: column;
+  height: calc(100vh - var(--nav) - 50px);
+}
+#tab-community .commMsgsWrap {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 </style>
 </head>
 <body>
@@ -1223,19 +1235,8 @@ body::before{
       <div class="card"><div class="sec">📜 Test History</div><div id="testHist"></div></div>
     </div>
     <!-- SETTINGS -->
-    <!-- ═══ FORMULA SHEET ═══ -->
-    <div class="tab" id="tab-formula">
-      <div style="font-size:1rem;font-weight:900;margin-bottom:10px">📐 Formula Sheet</div>
-      <div class="chips" id="fmlSubjC" style="margin-bottom:10px">
-        <button class="chip on" onclick="showFormulas('maths',this)">📐 Maths</button>
-        <button class="chip" onclick="showFormulas('science',this)">🔬 Science</button>
-        <button class="chip" onclick="showFormulas('gktricks',this)">🌍 GK Tricks</button>
-      </div>
-      <input type="text" id="fmlSearch" class="fi" placeholder="🔍 Formula search karo..." oninput="filterFormulas()" style="margin-bottom:10px">
-      <div id="fmlList"></div>
-    </div>
     <!-- ═══ COMMUNITY CHAT ═══ -->
-    <div class="tab" id="tab-community" style="display:flex;flex-direction:column;height:100%;padding:0">
+    <div class="tab" id="tab-community" style="padding:0">
       <div style="padding:10px 14px 6px;flex-shrink:0;border-bottom:1px solid var(--br)">
         <div style="font-size:.75rem;font-weight:900;margin-bottom:8px">💬 Community Chat</div>
         <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px">
@@ -1291,7 +1292,6 @@ body::before{
     <button class="tb" onclick="sw('practice')" id="tb-practice"><span>📚</span>Practice</button>
     <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>Topic</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
-    <button class="tb" onclick="sw('formula')" id="tb-formula"><span>📐</span>Formula</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
     <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
     <button class="tb" onclick="sw('community')" id="tb-community"><span>💬</span>Chat</button>
@@ -3604,6 +3604,10 @@ var _caHistory={};
 var _rwaHistory={};  // topic-wise asked questions history
 
 // ── UTILS ──
+// Rate-limit aware Groq caller
+var _gModels=['llama-3.1-8b-instant','llama-3.3-70b-versatile','meta-llama/llama-4-scout-17b-16e-instruct'];
+
+
 function save(){
   var d=JSON.stringify(S);
   try{localStorage.setItem('ps_v3',d);}catch(e){}
@@ -3695,7 +3699,6 @@ function sw(tab){
   if(tab==='ca') loadDailyCA(false);
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='community') initCommChat();
-  if(tab==='formula'){showFormulas(_fmlSubj||'maths',null);}
   if(tab==='settings'){
     var ki=document.getElementById('geminiKey');
     if(ki&&!ki.value.trim()){var sk=getGKey();if(sk)ki.value=sk;}
@@ -4744,11 +4747,32 @@ function loadDailyCA(force){
     +'\n\nSIRF valid JSON. No markdown.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
+    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
   })
   .then(function(r){return r.json();})
   .then(function(data){
-    if(data.error) throw new Error(data.error.message);
+    if(data.error){
+      var emsg=data.error.message||'API Error';
+      if(emsg.toLowerCase().includes('rate limit')){
+        // Retry with fallback model after 1s
+        setTimeout(function(){
+          fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})})
+          .then(function(r2){return r2.json();})
+          .then(function(d2){
+            if(d2.error) throw new Error(d2.error.message);
+            var txt2=d2.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+            var s2=txt2.indexOf('{'),e2=txt2.lastIndexOf('}')+1;
+            var parsed2=JSON.parse(txt2.substring(s2,e2));
+            try{localStorage.setItem(cacheKey,JSON.stringify(parsed2));}catch(ex){}
+            // Re-trigger loadDailyCA with cached result
+            loadDailyCA(false);
+          })
+          .catch(function(fe){document.getElementById('daily-ca-content').innerHTML='<div style="padding:20px;text-align:center"><div style="font-size:1.5rem">⏸️</div><div style="font-size:.75rem;color:var(--ye);margin-top:8px;font-weight:700">Rate limit — thodi der baad retry karo</div><button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--ac);border:none;border-radius:10px;color:#000;font-family:inherit;font-size:.72rem;font-weight:800;padding:8px 16px;cursor:pointer">🔄 Retry</button></div>';});
+        },1500);
+        return;
+      }
+      throw new Error(emsg);
+    }
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     var parsed=JSON.parse(txt.substring(s,e));
