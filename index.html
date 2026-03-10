@@ -959,6 +959,13 @@ body::before{
             <div style="font-size:.6rem;color:rgba(255,255,255,.75)" id="srDueLbl2">0 questions due aaj</div>
           </div>
         </div>
+        <div onclick="showV('pv-errors','pv1');renderErrorNotebook()" style="background:var(--card);border:1px solid rgba(255,80,80,.25);border-radius:14px;padding:14px;cursor:pointer;margin-top:8px;display:flex;align-items:center;gap:10px">
+          <div style="font-size:1.5rem">📕</div>
+          <div>
+            <div style="font-size:.75rem;font-weight:800">Error Notebook</div>
+            <div style="font-size:.6rem;color:var(--t2)" id="errorCountHome">Galat jawab yahan milenge</div>
+          </div>
+        </div>
       </div>
       <div id="pv2" style="display:none">
         <button class="back" onclick="showV('pv1','pv2')">← Back</button>
@@ -1026,6 +1033,18 @@ body::before{
         </div>
         <div id="bookmark-list"></div>
       </div>
+      <!-- ERROR NOTEBOOK -->
+      <div id="pv-errors" style="display:none">
+        <button class="back" onclick="showV('pv1','pv-errors')">← Back</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-size:.85rem;font-weight:800">📕 Error Notebook</div>
+            <div style="font-size:.6rem;color:var(--t2)" id="errorCount">0 errors</div>
+          </div>
+          <button onclick="clearErrorNotes()" style="background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);border-radius:8px;color:#ff5555;font-size:.62rem;font-weight:700;padding:5px 10px;cursor:pointer">🗑️ Clear</button>
+        </div>
+        <div id="errorNotebookList"><div class="empty" style="font-size:.7rem">Galat jawab automatically yahan save honge!</div></div>
+      </div>
     </div>
     <!-- STUDY TAB (RWA + CA merged) -->
     <div class="tab" id="tab-study">
@@ -1035,6 +1054,7 @@ body::before{
         <button class="chip" id="study-tab-ca" onclick="studySubTab('ca',this)">📅 Daily CA</button>
         <button class="chip" id="study-tab-digest" onclick="studySubTab('digest',this)">📆 Monthly</button>
         <button class="chip" id="study-tab-news" onclick="studySubTab('news',this)">📰 Summarizer</button>
+        <button class="chip" id="study-tab-formula" onclick="studySubTab('formula',this)">📐 Formula</button>
       </div>
       <!-- RWA view -->
       <div id="study-view-rwa">
@@ -1099,6 +1119,18 @@ body::before{
         <textarea id="newsInput" style="width:100%;min-height:130px;background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:10px;font-family:inherit;font-size:.75rem;color:var(--tx);resize:vertical;box-sizing:border-box" placeholder="Yahan news article paste karo..."></textarea>
         <button onclick="summarizeNews()" class="btn" style="width:100%;margin-top:8px">🤖 Summary + MCQ Banao</button>
         <div id="newsSummaryOut" style="margin-top:10px"></div>
+      </div>
+      <!-- Formula view -->
+      <div id="study-view-formula" style="display:none">
+        <div style="font-size:.85rem;font-weight:900;margin-bottom:4px">📐 Formula Sheet</div>
+        <div style="font-size:.63rem;color:var(--t2);margin-bottom:10px">SSC · Bihar Police · RRB ke liye important formulas</div>
+        <div class="chips" id="formulaSubjChips" style="margin-bottom:8px">
+          <button class="chip on" onclick="showFormulas('maths',this)">📐 Maths</button>
+          <button class="chip" onclick="showFormulas('science',this)">🔬 Science</button>
+          <button class="chip" onclick="showFormulas('gk',this)">🌍 GK Tricks</button>
+        </div>
+        <input type="text" id="formulaSearch" class="fi" placeholder="🔍 Formula dhundo..." oninput="filterFormulas()" style="margin-bottom:8px">
+        <div id="formulaList"></div>
       </div>
     </div>
 
@@ -1246,75 +1278,70 @@ body::before{
     <!-- SETTINGS -->
     <div class="tab" id="tab-settings">
 
-      <!-- ═══ PROFILE HERO CARD ═══ -->
-      <div style="background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:18px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:rgba(255,255,255,.07);border-radius:50%"></div>
-        <div style="position:absolute;bottom:-30px;right:30px;width:70px;height:70px;background:rgba(255,255,255,.05);border-radius:50%"></div>
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div style="width:48px;height:48px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0" id="profileAvatar">👤</div>
+      <!-- ═══ PROFILE ═══ -->
+      <div style="background:linear-gradient(135deg,#5c6af0,#b04fe8);border-radius:20px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-20px;width:120px;height:120px;background:rgba(255,255,255,.07);border-radius:50%"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div id="profileAvatar" style="width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0">👤</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:.95rem;font-weight:900;color:#fff" id="profileNameDisp">Student</div>
-            <div style="font-size:.6rem;color:rgba(255,255,255,.75);margin-top:1px" id="profileEmailDisp">Loading...</div>
+            <div style="font-size:1rem;font-weight:900;color:#fff;line-height:1.2" id="profileNameDisp">Student</div>
+            <div style="font-size:.62rem;color:rgba(255,255,255,.65);margin-top:3px" id="profileEmailDisp">—</div>
           </div>
-          <div style="text-align:right">
-            <div style="font-size:.65rem;color:rgba(255,255,255,.8);font-weight:700" id="xpDisplay">0 XP</div>
-            <div style="font-size:.55rem;color:rgba(255,255,255,.6);margin-top:1px" id="xpLevelLbl">Level 1</div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:.78rem;font-weight:900;color:#fff" id="xpDisplay">0 XP</div>
+            <div style="font-size:.55rem;color:rgba(255,255,255,.65)" id="xpLevelLbl">Beginner</div>
           </div>
         </div>
-        <div style="height:5px;background:rgba(0,0,0,.2);border-radius:3px;overflow:hidden;margin-bottom:4px">
+        <div style="height:5px;background:rgba(0,0,0,.2);border-radius:3px;margin-bottom:12px">
           <div id="xpBar" style="height:100%;border-radius:3px;background:rgba(255,255,255,.6);width:0%;transition:width .6s"></div>
         </div>
-        <div style="display:flex;gap:6px;margin-top:10px">
-          <input type="text" id="nameInp" placeholder="Naam update karo..." style="flex:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-family:inherit;font-size:.72rem;padding:6px 10px;outline:none" onclick="this.style.background='rgba(255,255,255,.25)'">
-          <button onclick="saveName()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;padding:6px 12px;cursor:pointer;flex-shrink:0">Save</button>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="nameInp" placeholder="Apna naam likho..." style="flex:1;min-width:0;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:10px;color:#fff;font-family:inherit;font-size:.75rem;padding:8px 11px;outline:none">
+          <button onclick="saveName()" style="background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;font-size:.75rem;font-weight:800;padding:8px 16px;cursor:pointer;flex-shrink:0">Save</button>
         </div>
       </div>
 
-      <!-- ═══ STATS GRID ═══ -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-        <div style="background:linear-gradient(135deg,rgba(255,107,138,.15),rgba(255,107,138,.05));border:1px solid rgba(255,107,138,.2);border-radius:14px;padding:12px;text-align:center">
-          <div style="font-size:1.5rem;font-weight:900;color:#ff6b8a" id="rStreak">0</div>
-          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">🔥 STREAK</div>
+      <!-- ═══ STATS ROW ═══ -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
+        <div style="background:var(--card);border:1px solid var(--br);border-radius:12px;padding:10px 4px;text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:#ff6b8a;line-height:1.1" id="rStreak">0</div>
+          <div style="font-size:.46rem;color:var(--t2);margin-top:3px;font-weight:700;letter-spacing:.3px">🔥 STREAK</div>
         </div>
-        <div style="background:linear-gradient(135deg,rgba(245,166,35,.15),rgba(245,166,35,.05));border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:12px;text-align:center">
-          <div style="font-size:1.5rem;font-weight:900;color:#f5a623" id="rBest">0%</div>
-          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">🏆 BEST</div>
+        <div style="background:var(--card);border:1px solid var(--br);border-radius:12px;padding:10px 4px;text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:#f5a623;line-height:1.1" id="rBest">0%</div>
+          <div style="font-size:.46rem;color:var(--t2);margin-top:3px;font-weight:700;letter-spacing:.3px">🏆 BEST</div>
         </div>
-        <div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(92,106,240,.05));border:1px solid rgba(92,106,240,.2);border-radius:14px;padding:12px;text-align:center">
-          <div style="font-size:1.5rem;font-weight:900;color:var(--ac)" id="rAvg">0%</div>
-          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">📈 AVG</div>
+        <div style="background:var(--card);border:1px solid var(--br);border-radius:12px;padding:10px 4px;text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:var(--ac);line-height:1.1" id="rAvg">0%</div>
+          <div style="font-size:.46rem;color:var(--t2);margin-top:3px;font-weight:700;letter-spacing:.3px">📈 AVG</div>
         </div>
-        <div style="background:linear-gradient(135deg,rgba(0,214,143,.15),rgba(0,214,143,.05));border:1px solid rgba(0,214,143,.2);border-radius:14px;padding:12px;text-align:center">
-          <div style="font-size:1.5rem;font-weight:900;color:var(--gr)" id="rMocks">0</div>
-          <div style="font-size:.58rem;font-weight:700;color:var(--t2);margin-top:2px">📝 MOCKS</div>
+        <div style="background:var(--card);border:1px solid var(--br);border-radius:12px;padding:10px 4px;text-align:center">
+          <div style="font-size:1.3rem;font-weight:900;color:var(--gr);line-height:1.1" id="rMocks">0</div>
+          <div style="font-size:.46rem;color:var(--t2);margin-top:3px;font-weight:700;letter-spacing:.3px">📝 MOCKS</div>
         </div>
       </div>
 
       <!-- ═══ DAILY CHALLENGE ═══ -->
-      <div id="challengeCard" style="background:linear-gradient(135deg,rgba(255,200,0,.12),rgba(255,130,0,.08));border:1px solid rgba(255,200,0,.25);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div style="font-size:.82rem;font-weight:900">🏆 Aaj Ka Challenge</div>
-            <div style="font-size:.6rem;color:var(--t2);margin-top:1px" id="challengeSubjLbl">GK · Aaj shuru karo</div>
-          </div>
-          <div style="background:rgba(255,200,0,.2);border-radius:10px;padding:4px 10px;text-align:center">
-            <div style="font-size:.85rem;font-weight:900;color:#f5a623" id="challengeCount">0/30</div>
-          </div>
+      <div id="challengeCard" style="background:var(--card);border:1.5px solid rgba(245,166,35,.35);border-radius:16px;padding:14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="font-size:.82rem;font-weight:900">🏆 Aaj Ka Challenge</div>
+          <div style="font-size:.95rem;font-weight:900;color:#f5a623" id="challengeCount">0/30</div>
         </div>
-        <div style="font-size:.65rem;color:var(--t2);margin-bottom:8px" id="challengeDesc">Aaj ke 30 questions solve karo!</div>
-        <div style="height:7px;background:rgba(0,0,0,.15);border-radius:4px;overflow:hidden;margin-bottom:12px">
+        <div style="font-size:.6rem;color:var(--t2);margin-bottom:7px" id="challengeDesc">30 questions solve karo aaj</div>
+        <div style="font-size:.6rem;color:var(--t2);margin-bottom:4px" id="challengeSubjLbl">Subject: Random</div>
+        <div style="height:7px;background:var(--br);border-radius:4px;overflow:hidden;margin-bottom:10px">
           <div id="challengeBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,#f5a623,#ff6b35);width:0%;transition:width .5s"></div>
         </div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
-          <span style="font-size:.6rem;font-weight:700;color:var(--t2);align-self:center">Target:</span>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px">
+          <span style="font-size:.58rem;color:var(--t2);align-self:center;font-weight:700;flex-shrink:0">Target:</span>
           <button onclick="setChallengeTarget(10)" class="chip" id="ct10">10</button>
           <button onclick="setChallengeTarget(20)" class="chip" id="ct20">20</button>
           <button onclick="setChallengeTarget(30)" class="chip on" id="ct30">30</button>
           <button onclick="setChallengeTarget(50)" class="chip" id="ct50">50</button>
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <span style="font-size:.6rem;font-weight:700;color:var(--t2);align-self:center">Subj:</span>
-          <button onclick="setChallengeSubj('random')" class="chip on" id="cs_random">🎲</button>
+          <span style="font-size:.58rem;color:var(--t2);align-self:center;font-weight:700;flex-shrink:0">Subj:</span>
+          <button onclick="setChallengeSubj('random')" class="chip on" id="cs_random">🎲 Mix</button>
           <button onclick="setChallengeSubj('gk')" class="chip" id="cs_gk">GK</button>
           <button onclick="setChallengeSubj('maths')" class="chip" id="cs_maths">Maths</button>
           <button onclick="setChallengeSubj('reasoning')" class="chip" id="cs_reasoning">Reasoning</button>
@@ -1322,149 +1349,79 @@ body::before{
         </div>
       </div>
 
-      <!-- ═══ BADGES ═══ -->
+      <!-- ═══ GROQ KEY ═══ -->
       <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">🏅 Badges</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px" id="badgeGrid">
-          <div style="font-size:.65rem;color:var(--t2)">Practice karo — badges milenge!</div>
+        <div style="font-size:.82rem;font-weight:900;margin-bottom:2px">🤖 Groq AI Key</div>
+        <div style="font-size:.62rem;color:var(--t2);margin-bottom:10px">Free key — AI Tutor, Topic Questions, Daily CA sab kaam karega</div>
+        <div style="display:flex;gap:7px;margin-bottom:8px">
+          <input type="password" class="fi" id="geminiKey" placeholder="gsk_..." style="flex:1;min-width:0">
+          <button onclick="saveGKey()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.73rem;font-weight:800;padding:0 16px;cursor:pointer;flex-shrink:0">Save</button>
         </div>
+        <div style="font-size:.63rem;font-weight:700;margin-bottom:10px" id="gkStatus">⚪ Key nahi hai</div>
+        <button onclick="window.open('https://console.groq.com/keys','_blank')" style="width:100%;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:12px;color:#fff;font-size:.78rem;font-weight:800;padding:12px;cursor:pointer;font-family:inherit">🔑 FREE Groq Key Banao →</button>
       </div>
 
-      <!-- ═══ CHARTS ═══ -->
+      <!-- ═══ EXAM COUNTDOWN ═══ -->
       <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:12px">📊 Progress Charts</div>
-        <div style="margin-bottom:12px">
-          <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:5px">7-Day Progress</div>
-          <div class="ch"><canvas id="weekChart"></canvas></div>
-        </div>
-        <div style="margin-bottom:12px">
-          <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:5px">Subject Accuracy</div>
-          <div class="ch"><canvas id="subjChart"></canvas></div>
-        </div>
-        <div>
-          <div style="font-size:.6rem;font-weight:700;color:var(--t2);margin-bottom:5px">Mock Scores</div>
-          <div class="ch"><canvas id="mockChart"></canvas></div>
-        </div>
-      </div>
-
-      <!-- ═══ ACTIVITY HEATMAP ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">📅 Activity (90 days)</div>
-        <div class="hm-w" id="hmWrap"><div class="hm" id="hmGrid"></div></div>
-      </div>
-
-      <!-- ═══ EXAM READINESS ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">🎯 Exam Readiness</div>
-        <div id="readinessContent"><div class="empty" style="font-size:.7rem">Pehle kuch practice karo!</div></div>
-      </div>
-
-      <!-- ═══ WEAK TOPICS ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">⚠️ Weak Topics</div>
-        <div id="weakTopicList"><div class="empty" style="font-size:.7rem">Practice karo — weak topics yahan dikhenge!</div></div>
-      </div>
-
-      <!-- ═══ FORMULA SHEET ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">📐 Formula Sheet</div>
-        <div class="chips" id="formulaSubjChips" style="margin-bottom:8px">
-          <button class="chip on" onclick="showFormulas('maths',this)">📐 Maths</button>
-          <button class="chip" onclick="showFormulas('science',this)">🔬 Science</button>
-          <button class="chip" onclick="showFormulas('gk',this)">🌍 GK Tricks</button>
-        </div>
-        <input type="text" id="formulaSearch" class="fi" placeholder="🔍 Formula dhundo..." oninput="filterFormulas()" style="margin-bottom:8px">
-        <div id="formulaList"></div>
-      </div>
-
-      <!-- ═══ ERROR NOTEBOOK ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div style="font-size:.78rem;font-weight:800">📕 Error Notebook</div>
-            <div style="font-size:.58rem;color:var(--t2);margin-top:1px" id="errorCount">0 errors</div>
-          </div>
-          <button onclick="clearErrorNotes()" style="background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.2);border-radius:8px;color:#ff5555;font-size:.62rem;font-weight:700;padding:5px 10px;cursor:pointer">🗑️ Clear</button>
-        </div>
-        <div id="errorNotebookList"><div class="empty" style="font-size:.7rem">Galat jawab automatically yahan save honge!</div></div>
-      </div>
-
-      <!-- ═══ STUDY LOG ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:.78rem;font-weight:800">⏰ Study Log</div>
-          <button onclick="logStudyTime()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.65rem;font-weight:800;padding:6px 12px;cursor:pointer">+ Log</button>
-        </div>
-        <div id="studyLogContent"><div class="empty" style="font-size:.7rem">Aaj kitna padhe? Log button dabao!</div></div>
-      </div>
-
-      <!-- ═══ TEST HISTORY ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:10px">📜 Test History</div>
-        <div id="testHist"><div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div></div>
-      </div>
-
-      <!-- ═══ EXAM DATES ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:4px">📅 Exam Countdown</div>
-        <div style="font-size:.6rem;color:var(--t2);margin-bottom:10px">Upcoming exams add karo — Home pe countdown dikhega</div>
+        <div style="font-size:.82rem;font-weight:900;margin-bottom:2px">📅 Exam Countdown</div>
+        <div style="font-size:.62rem;color:var(--t2);margin-bottom:10px">Exam dates daalo — Home pe countdown dikhega</div>
         <div id="examDatesList" style="margin-bottom:10px"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-          <select class="fi" id="examNameSel" style="font-size:.68rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
+          <select class="fi" id="examNameSel" style="font-size:.72rem">
             <option value="SSC GD">🪖 SSC GD</option>
             <option value="Bihar Police">👮 Bihar Police</option>
             <option value="SSC CGL">📊 SSC CGL</option>
             <option value="RRB NTPC">🚂 RRB NTPC</option>
             <option value="BSSC">📋 BSSC</option>
             <option value="BPSC">🎖️ BPSC</option>
+            <option value="BSF">🛡️ BSF</option>
           </select>
-          <input type="date" class="fi" id="examDateInp" style="font-size:.68rem">
+          <input type="date" class="fi" id="examDateInp" style="font-size:.72rem">
         </div>
-        <button onclick="addExamDate()" class="btn" style="width:100%;padding:9px;margin:0">➕ Exam Add Karo</button>
-      </div>
-
-      <!-- ═══ AI KEY ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:4px">🤖 Groq AI Key</div>
-        <div style="font-size:.62rem;color:var(--t2);margin-bottom:8px">console.groq.com se FREE key lo</div>
-        <div style="display:flex;gap:6px;margin-bottom:6px">
-          <input type="password" class="fi" id="geminiKey" placeholder="gsk_..." style="flex:1">
-          <button onclick="saveGKey()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;padding:6px 12px;cursor:pointer;flex-shrink:0">Save</button>
-        </div>
-        <div style="font-size:.63rem;font-weight:700;margin-bottom:10px" id="gkStatus">⚪ Key nahi hai</div>
-        <a href="https://console.groq.com/keys" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#f55036,#ff8c00);border-radius:10px;color:#fff;font-size:.75rem;font-weight:800;padding:10px;text-decoration:none">🔑 FREE Groq Key Lo →</a>
+        <button onclick="addExamDate()" class="btn" style="width:100%;padding:10px;margin:0">➕ Exam Add Karo</button>
       </div>
 
       <!-- ═══ WHATSAPP ═══ -->
-      <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:16px;padding:14px;margin-bottom:14px;text-decoration:none">
-        <div style="font-size:1.5rem">📢</div>
-        <div>
-          <div style="font-size:.8rem;font-weight:900;color:#fff">PS WhatsApp Channel</div>
-          <div style="font-size:.6rem;color:rgba(255,255,255,.8)">Daily CA, tips, updates join karo</div>
+      <button onclick="window.open('https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E','_blank')" style="width:100%;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#25D366,#0f9d4e);border:none;border-radius:16px;padding:15px;margin-bottom:14px;cursor:pointer;font-family:inherit">
+        <div style="font-size:1.6rem;flex-shrink:0">📢</div>
+        <div style="text-align:left">
+          <div style="font-size:.82rem;font-weight:900;color:#fff">PS Study WhatsApp Channel</div>
+          <div style="font-size:.62rem;color:rgba(255,255,255,.8);margin-top:2px">Daily CA · Tips · Exam Updates</div>
         </div>
-        <div style="margin-left:auto;color:rgba(255,255,255,.8);font-size:.9rem">›</div>
-      </a>
+        <div style="margin-left:auto;color:rgba(255,255,255,.7);font-size:1.3rem;font-weight:300">›</div>
+      </button>
 
-      <!-- ═══ DATA + DANGER ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:14px">
-        <div style="font-size:.78rem;font-weight:800;margin-bottom:4px">💾 Data</div>
-        <div style="font-size:.65rem;color:var(--t2);margin-bottom:10px" id="dataInfo">Loading...</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <button onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.2);border-radius:10px;color:#f5a623;font-size:.68rem;font-weight:700;padding:9px;cursor:pointer">🔄 Aaj Reset</button>
-          <button onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}" style="background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);border-radius:10px;color:#ff5555;font-size:.68rem;font-weight:700;padding:9px;cursor:pointer">🗑️ Sab Delete</button>
+      <!-- ═══ DATA & ACCOUNT ═══ -->
+      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:16px">
+        <div style="font-size:.82rem;font-weight:900;margin-bottom:2px">⚙️ Account & Data</div>
+        <div style="font-size:.62rem;color:var(--t2);margin-bottom:12px" id="dataInfo">Data loading...</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px">
+          <button onclick="if(confirm('Aaj ka data reset karna hai?')){var k=today();if(S.log[k])delete S.log[k];save();toast('Aaj ka data reset!','s')}" style="background:rgba(245,166,35,.1);border:1.5px solid rgba(245,166,35,.3);border-radius:11px;color:#f5a623;font-size:.7rem;font-weight:700;padding:10px;cursor:pointer;font-family:inherit">🔄 Aaj Reset</button>
+          <button onclick="if(confirm('Poora data delete hoga — pakka?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];S.xp=0;S.badges=[];S.errorNotes=[];S.studyLog={};save();toast('Sab delete!','s')}" style="background:rgba(255,60,60,.08);border:1.5px solid rgba(255,60,60,.2);border-radius:11px;color:#ff5555;font-size:.7rem;font-weight:700;padding:10px;cursor:pointer;font-family:inherit">🗑️ Delete All</button>
         </div>
+        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4040,#b00000);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:.82rem;font-weight:800;padding:13px;cursor:pointer">🚪 Logout</button>
       </div>
 
-      <!-- ═══ ACCOUNT ═══ -->
-      <div style="background:var(--card);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <div style="width:32px;height:32px;background:rgba(255,80,80,.1);border-radius:8px;display:flex;align-items:center;justify-content:center">🔐</div>
-          <div style="font-size:.78rem;font-weight:800">Account</div>
-        </div>
-        <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:.82rem;font-weight:800;padding:13px;cursor:pointer">🚪 Logout</button>
-      </div>
+      <div style="text-align:center;padding:2px 0 18px;font-size:.58rem;color:var(--t2);opacity:.6">PS Study App · 2000+ Questions 🚀</div>
 
-      <div style="text-align:center;padding:4px 0 16px;font-size:.6rem;color:var(--t2)">PS Study App v5.0 🚀 · 2000+ Questions</div>
+      <!-- Hidden stubs — JS inhe dhundta hai, hidden rakhte hain -->
+      <div style="display:none" aria-hidden="true">
+        <div id="weakTopicList"></div>
+        <div id="readinessContent"></div>
+        <div id="studyLogContent"></div>
+        <div id="testHist"></div>
+        <div id="badgeGrid"></div>
+        <div id="errorCount"></div>
+        <div id="errorNotebookList"></div>
+        <div id="hmGrid"></div>
+        <div id="hmWrap"></div>
+        <canvas id="weekChart"></canvas>
+        <canvas id="subjChart"></canvas>
+        <canvas id="mockChart"></canvas>
+        <div id="_formulaSubjChips_stub"></div>
+        <div id="_formulaSearch_stub"></div>
+        <div id="_formulaList_stub"></div>
+      </div>
     </div>
     <!-- COMMUNITY TAB -->
     <div class="tab" id="tab-community">
@@ -3884,6 +3841,9 @@ function sw(tab){
     var ninp=document.getElementById('nameInp');
     if(pname) pname.textContent=S.name||'Student';
     if(ninp) ninp.value=S.name||'';
+    // Populate saved key in input
+    var ki=document.getElementById('geminiKey');
+    if(ki){var sk=getGKey();ki.value=sk||'';}
     if(auth&&auth.currentUser){
       if(pemail) pemail.textContent=auth.currentUser.email||'';
       if(pav&&auth.currentUser.photoURL) pav.innerHTML='<img src="'+auth.currentUser.photoURL+'" style="width:100%;height:100%;border-radius:12px;object-fit:cover">';
@@ -6854,10 +6814,7 @@ function filterFormulas(){
     html+='<div style="margin-bottom:10px">'
       +'<div style="font-size:.65rem;font-weight:800;color:var(--ac);margin-bottom:5px">'+esc(group.title)+'</div>';
     items.forEach(function(it){
-      html+='<div style="display:flex;gap:6px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--br);font-size:.72rem;line-height:1.4">'
-        +'<span style="color:var(--ac);flex-shrink:0">▸</span>'
-        +'<span>'+esc(it)+'</span>'
-        +'</div>';
+      html+='<div style="padding:6px 0;border-bottom:1px solid var(--br);font-size:.72rem;line-height:1.5">'+esc(it)+'</div>';
     });
     html+='</div>';
   });
@@ -6884,6 +6841,8 @@ function studySubTab(tab, el){
   if(tab==='rwa'){ loadRWASubjects(); }
   if(tab==='ca'){ initCA(); if(getGKey()) loadDailyCA(false); }
   if(tab==='digest'){ initDigestMonths(); }
+  if(tab==='formula'){ showFormulas(_curFormulaSubj||'maths',null); filterFormulas(); }
+  if(tab==='formula'){ showFormulas(_curFormulaSubj||'maths',null); filterFormulas(); }
 }
 
 function initStudyTab(){
@@ -6907,6 +6866,7 @@ function communityQuick(msg){
 
 function loadRWASubjects(){ initRWA(); }
 function loadCASections(){ initCA(); }
+
 </script>
 </body>
 </html>
