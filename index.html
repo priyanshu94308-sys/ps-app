@@ -611,7 +611,7 @@ body::before{
 /* ═══════════════════════════════
    AI CHAT
 ═══════════════════════════════ */
-.chat-area{display:flex;flex-direction:column;gap:10px;padding-bottom:10px;min-height:160px;}
+.chat-area{display:flex;flex-direction:column;gap:10px;padding-bottom:10px;min-height:160px;max-height:calc(100vh - 260px);overflow-y:auto;}
 .cmsg{
   max-width:87%;padding:12px 16px;
   border-radius:20px;font-size:.8rem;line-height:1.7;
@@ -3759,27 +3759,6 @@ function toggleTheme(){
   S.dark=!S.dark;
   var r=document.documentElement;
   if(S.dark){
-    r.style.setProperty('--bg','#0b0d14');r.style.setProperty('--bg2','#0f1119');
-    r.style.setProperty('--card','#13161f');r.style.setProperty('--cd2','#181c28');
-    r.style.setProperty('--tx','#f0f3ff');r.style.setProperty('--t2','#5c6580');
-    r.style.setProperty('--t3','#8892b0');r.style.setProperty('--br','rgba(255,255,255,.07)');
-    r.style.setProperty('--br2','rgba(255,255,255,.11)');r.style.setProperty('--glass','rgba(255,255,255,.04)');
-    document.querySelector('.ibtn[onclick*="toggleTheme"]').textContent='☀️';
-  } else {
-    r.style.setProperty('--bg','#f0f4ff');r.style.setProperty('--bg2','#e8edf8');
-    r.style.setProperty('--card','#ffffff');r.style.setProperty('--cd2','#eef1fb');
-    r.style.setProperty('--tx','#1a1d2e');r.style.setProperty('--t2','#7b85a8');
-    r.style.setProperty('--t3','#5c6580');r.style.setProperty('--br','rgba(0,0,0,.08)');
-    r.style.setProperty('--br2','rgba(0,0,0,.13)');r.style.setProperty('--glass','rgba(0,0,0,.03)');
-    document.querySelector('.ibtn[onclick*="toggleTheme"]').textContent='🌙';
-  }
-  save();
-}
-
-function toggleTheme(){
-  S.dark=!S.dark;
-  var r=document.documentElement;
-  if(S.dark){
     r.style.setProperty('--bg','#0b0d14');
     r.style.setProperty('--bg2','#0f1119');
     r.style.setProperty('--card','#13161f');
@@ -3827,6 +3806,11 @@ function sw(tab){
   }
   if(tab==='community'){initCommunityChat();}
   if(tab==='study'){initStudyTab();}
+  if(tab==='home'){renderHome();}
+  if(tab==='ask'){
+    var ai=document.getElementById('aiStatus');
+    if(ai) ai.textContent=getGKey()?'✅ AI Ready — Kuch poochho!':'🔑 Settings mein Groq key daalo';
+  }
 }
 function clearRWACache(){
   try{
@@ -4519,6 +4503,8 @@ function ansP(qi,oi){
   if(!S.sStats[curSubj.id]) S.sStats[curSubj.id]={d:0,t:0,chs:{}};
   S.sStats[curSubj.id].t++;
   if(ok) S.sStats[curSubj.id].d++;
+  addXP(XP_PER_Q);
+  if(!ok && q.q) saveToErrorNotes(q, curSubj?curSubj.id:'');
   save();
   toast(ok?'✅ Sahi!':'❌ Galat!',ok?'':'e');
   renderPracQs();
@@ -6115,7 +6101,6 @@ function sendCommunityMsg(){
   }).catch(function(e){toast('Send failed: '+e.message.substring(0,40),'e');});
 }
 
-// [patches consolidated below]
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -6794,19 +6779,6 @@ function filterFormulas(){
 // ═══════════════════════════════════════════════════════════════
 // PATCH: ansP — also award XP + save errors
 // ═══════════════════════════════════════════════════════════════
-var _origAnsP2=ansP;
-function ansP(qi,oi){
-  _origAnsP2(qi,oi);
-  var q=pracQs[qi];
-  if(!q) return;
-  var correctIdx=q._sans!==undefined?q._sans:q.ans;
-  var ok=oi===correctIdx;
-  addXP(XP_PER_Q);
-  if(!ok && q.q) saveToErrorNotes(q, curSubj?curSubj.id:'');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Settings init merged into main sw()
 
 function studySubTab(tab, el){
   ['rwa','ca','digest','news'].forEach(function(t){
@@ -6838,17 +6810,6 @@ function initStudyTab(){
   studySubTab('rwa', document.getElementById('study-tab-rwa'));
 }
 
-function initReport(){
-  renderWeakTopics();
-  setTimeout(function(){
-    if(window.Chart){
-      buildWeekChart && buildWeekChart();
-      buildSubjChart && buildSubjChart();
-      buildMockChart && buildMockChart();
-      buildHeatmap && buildHeatmap();
-    }
-  }, 100);
-}
 
 function communityQuick(msg){
   var inp=document.getElementById('communityInp');
