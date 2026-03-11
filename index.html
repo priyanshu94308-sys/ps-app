@@ -4427,33 +4427,29 @@ function loadCAQuestions(id,name,more){
 
   var offset=cont.querySelectorAll('.qcard').length;
 
-  var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
-    +'\n\nTopic: "'+name+'" par 15 UNIQUE MCQ banao.'
-    +'\n\n⚠️ SABSE IMPORTANT: Sirf LATEST aur CURRENT data use karo ('+yr+' tak ka).'
-    +'\nJaise: CMs, Governors, appointments, awards — ABHI JO HAI wo likho, purana nahi.'
-    +'\nExample: MP CM = Mohan Yadav (NOT Shivraj), Bihar CM = Nitish Kumar, etc.'
-    +'\n\nSTRICT RULES:'
-    +'\n1. 4 options BILKUL ALAG — plausible wrong options'
-    +'\n2. ans index 0/1/2/3 equally vary karo — sirf 0 mat dena'
-    +'\n3. Factual, exam-style Hindi'
-    +'\n4. Sol mein latest fact explain karo'
+  var curYr=new Date().getFullYear();
+  var prompt='Topic: "'+name+'" — '+curYr+' latest. Date: '+currentDate+'.'
+    +'\n⚡ WEB SEARCH KARO: "'+name+' '+curYr+'" — is topic ki LATEST news chahiye.'
+    +'\nIs TOPIC par 10 MCQ banao — SSC GD/Bihar Police/BSSC exam style.'
+    +'\nSIRF is topic ke questions. '+curYr+' ya '+(curYr-1)+' ka fresh data.'
     +avoid
-    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या"}]';
-
+    +'\nRULES: 4 options (1 sahi+3 confusing). ans 0/1/2/3 equally distribute. Hindi Devanagari. Sol: answer + 1 related fact.'
+    +'\nSIRF JSON array (koi markdown nahi):\n'
+    +'[{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":1,"sol":"..."}]';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
-      model:'llama-3.3-70b-versatile',
+      model:'compound-beta',
       messages:[
-        {role:'system',content:'JSON generator. ONLY valid JSON array. Hindi Devanagari. No markdown.'},
+        {role:'system',content:'Tu SSC GD/Bihar Police CA expert hai jo web search karta hai. "'+name+'" ke baare mein LATEST '+curYr+' data search karke MCQ banao. SIRF valid JSON array, Hindi Devanagari, koi markdown nahi.'},
         {role:'user',content:prompt}
       ],
-      max_tokens:4500,
-      temperature:0.3
+      max_tokens:2000,
+      temperature:0.5
     })
   })
-  .then(function(r){return r.json();})
+  .then(function(r){return r.json();}))
   .then(function(data){
     if(data.error) throw new Error(data.error.message);
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
@@ -4604,17 +4600,25 @@ function loadDailyCA(force){
     +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
     +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
     +'</div></div>';
-  var prompt='Aaj ki date: '+dateStr+'.'
-    +'\n\nIndia ki aaj ki ('+dateStr+') REAL current affairs ke MCQ banao — Bihar Police/SSC/RRB exam style.'
-    +'\nCategories cover karo: niyukti, puraskar, khel, vigyan, arthvyavastha, antarrashtriya, rashtriya.'
-    +'\n\nAGAR AAJ KOI KHAAS KHABAR NAHI — toh {"noNews":true} return karo.'
-    +'\nWarna SIRF ASAL khabrein likho — kuch bhi mat banao.'
-    +'\n\nRULES:\n1. 4 options BILKUL ALAG, realistic\n2. ans index 0/1/2/3 vary karo\n3. Hindi only\n4. Headline mein poora fact likho'
-    +'\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य","mcq":{"q":"प्रश्न?","opts":["(A) सही","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":1,"sol":"व्याख्या"}}]}'
-    +'\n\nSIRF valid JSON. No markdown.';
+  var curYr=new Date().getFullYear();
+  var prompt='Date: '+dateStr+'.'
+    +'\n\n⚡ PEHLE WEB SEARCH KARO: "India current affairs '+dateStr+'" — aaj ki REAL news chahiye.'
+    +'\nSIRF '+curYr+' ke naye events use karo. Koi bhi '+(curYr-2)+' ya usse pehle ka data nahi.'
+    +'\n\nIn topics se variety rakho (ek-ek cover karo):\n'
+    +'1. Niyukti — cabinet, military, judiciary appointments\n'
+    +'2. Puraskar — national/international awards\n'
+    +'3. Khel — cricket, hockey, sports results\n'
+    +'4. Yojana — govt schemes, budget news\n'
+    +'5. Vigyan/ISRO — missions, discoveries\n'
+    +'6. Antarrashtriya — summits, India foreign news\n'
+    +'7. Arthvyavastha — GDP, RBI, economy\n'
+    +'8. Kanoon/SC — new laws, verdicts\n'
+    +'\nRULES: Min 8 MCQ. Headline mein naam+post+saal. 4 options (1 sahi+3 confusing). ans 0/1/2/3 vary karo. Sol mein 1 extra fact. Sirf Hindi Devanagari.\n'
+    +'\nSIRF JSON (koi markdown/preamble nahi):\n'
+    +'{"items":[{"cat":"नियुक्ति","headline":"...","mcq":{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"..."}}]}';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
+    body:JSON.stringify({model:'compound-beta',messages:[{role:'system',content:'Tu CA MCQ generator hai jo web search karta hai. Sirf '+curYr+' ke LATEST events use karo. SIRF valid JSON, Hindi Devanagari, koi markdown nahi.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.4})
   })
   .then(function(r){return r.json();})
   .then(function(data){
