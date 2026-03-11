@@ -1164,12 +1164,12 @@ body::before{
       </div>
       <div class="scard">
         <div class="sec">🔍 Tavily API Key (CA News - FREE)</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Tavily FREE key — 1000 searches/month। CA mein real 2026 news aayegi!</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Tavily se real 2026 news aayegi CA mein — 1000/month free!</div>
         <div style="display:flex;gap:5px;margin-bottom:5px">
           <input type="text" class="fi" id="tavilyKey" placeholder="tvly-...">
           <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveTavilyKey()">Save</button>
         </div>
-        <div style="font-size:.63rem;font-weight:700" id="tavilyStatus">⚪ Key nahi hai</div>
+        <div style="font-size:.63rem;font-weight:700" id="tavilyStatus">Key nahi hai</div>
         <a href="https://app.tavily.com/home" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Tavily Key Lo</a>
       </div>
       <div class="scard">
@@ -3500,7 +3500,6 @@ function save(){
     var exp=new Date();exp.setFullYear(exp.getFullYear()+1);
     if(d.length<3900) document.cookie='ps_v3='+encodeURIComponent(d)+';expires='+exp.toUTCString()+';path=/;SameSite=Lax';
   }catch(e){}
-  // Firestore sync — logged in ho toh
   if(currentUser) saveToFirestore();
 }
 function load(){
@@ -3542,7 +3541,6 @@ function toggleTheme(){
   }
   save();
 }
-
 function sw(tab){
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
@@ -3561,10 +3559,8 @@ function sw(tab){
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='report') initReport();
   if(tab==='settings'){updateGKStatus();updateTavilyStatus();}
-  // Stop mock timer on tab switch
-  if(tab!=='mock'&&typeof mockState!=='undefined'&&mockState&&mockState.timer){clearInterval(mockState.timer);mockState.timer=null;toast('⏸ Mock paused','i');}
-}
-function clearRWACache(){
+  if(tab!=='mock'&&typeof mockState!=='undefined'&&mockState&&mockState.timer){clearInterval(mockState.timer);mockState.timer=null;}
+}function clearRWACache(){
   try{
     Object.keys(localStorage).forEach(function(k){
       if(k.indexOf('rwa_')===0) localStorage.removeItem(k);
@@ -3791,19 +3787,15 @@ function getRWAQBQuestions(subjectKey,topic){
   if(!QB[qbKey]||!QB[qbKey].length) return [];
   var words=topic.toLowerCase().replace(/[^ऀ-ॿ\w\s]/g,'').split(/\s+/).filter(function(w){return w.length>2;});
   if(!words.length) return QB[qbKey].slice(0,5);
-  // First: strict match (any word in question)
   var strict=QB[qbKey].filter(function(q){
     var t=((q.q||'')+(q.sol||'')).toLowerCase();
     return words.some(function(w){return t.indexOf(w)>=0;});
   });
-  // If strict gives enough → use it
   if(strict.length>=3) return strict.slice(0,5);
-  // Fallback: return random from subject
   var all=QB[qbKey].slice();
   for(var i=all.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=all[i];all[i]=all[j];all[j]=tmp;}
   return all.slice(0,5);
 }
-
 function renderRWAQuestion(){
   var s=rwaQuizState;
   if(s.cur>=s.qs.length){
@@ -3992,14 +3984,14 @@ function saveTavilyKey(){
   var k=inp.value.trim();
   try{localStorage.setItem('ps_tvkey',k);}catch(e){}
   updateTavilyStatus();
-  toast(k?'✅ Tavily key saved!':'⚪ Key hata di','i');
+  toast(k?'Tavily key saved!':'Key hata di','i');
 }
 function updateTavilyStatus(){
   var k=getTavilyKey();
   var el=document.getElementById('tavilyStatus');
   if(!el) return;
-  if(k){el.textContent='✅ Tavily key set hai';el.style.color='var(--gr)';}
-  else{el.textContent='⚪ Key nahi hai';el.style.color='var(--t2)';}
+  if(k){el.textContent='Key set hai';el.style.color='var(--gr)';}
+  else{el.textContent='Key nahi hai';el.style.color='var(--t2)';}
   var inp=document.getElementById('tavilyKey');
   if(inp&&k) inp.value=k;
 }
@@ -4406,59 +4398,20 @@ function openCATopic(id,name){
   loadCAQuestions(id,name,false);
 }
 
-function loadCAQuestions(id,name,more){
-  var cont=document.getElementById('ca-detail-content');
-  if(!more){
-    cont.innerHTML='<div style="text-align:center;padding:30px">'
-      +'<div style="font-size:2.5rem">🤖</div>'
-      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Questions Ban Rahi Hain...</div>'
-      +'<div style="font-size:.68rem;color:var(--t2)">'+name+'</div>'
-      +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
-  } else {
-    var ind=document.createElement('div');
-    ind.id='ca_ind';
-    ind.innerHTML='<div style="text-align:center;padding:10px;color:var(--t2);font-size:.72rem">⏳ Aur questions aa rahe hain...</div>';
-    cont.appendChild(ind);
-  }
-
+function loadCAQuestions(subj,name,avoid,cont){
   var key=getGKey();
-  if(!key){
-    cont.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
-    return;
-  }
-
-  var yr=new Date().getFullYear();
-  var mn3=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var now=new Date();
-  var currentDate=now.getDate()+' '+mn3[now.getMonth()]+' '+yr;
-  var hist=_getCAHistory(id);
-  var avoid='';
-  if(hist.length>0){
-    var sample=hist.slice(-25);
-    avoid='\n\nYE ALREADY POOCHE JA CHUKE HAIN - REPEAT MAT KARO:\n'+sample.map(function(q,i){return (i+1)+'. '+q;}).join('\n');
-  }
-
-  var offset=cont.querySelectorAll('.qcard').length;
-
+  if(!key){cont.innerHTML='<div class="empty">Groq key daalo!</div>';return;}
   var curYr=new Date().getFullYear();
-    var tvKey=getTavilyKey();
-  var key=getGKey();
-  if(!key){cont.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';return;}
-
-  function generateTopicMCQ(newsContext){
-    var sysMsg='Tu SSC GD/Bihar Police CA expert hai. SIRF valid JSON array return kar. Hindi Devanagari, koi markdown nahi.';
-    var userMsg='Topic: "'+name+'" — '+curYr+'.\n';
-    if(newsContext){
-      userMsg+='Ye real news hai is topic ke baare mein:\n'+newsContext+'\n\n';
-      userMsg+='In news se 10 MCQ banao — SSC GD/Bihar Police style.\n';
-    } else {
-      userMsg+='⚡ "'+name+' '+curYr+'" web search karke 10 MCQ banao.\n';
-    }
-    userMsg+=avoid;
-    userMsg+='\nRules: 4 options (1 sahi+3 confusing). ans 0/1/2/3 equally. Hindi Devanagari. Sol: answer+1 related fact.\n';
-    userMsg+='SIRF JSON: [{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":1,"sol":"..."}]';
-
-    var model = newsContext ? 'llama-3.3-70b-versatile' : 'compound-beta';
+  var tvKey=getTavilyKey();
+  cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div></div>';
+  function generateTopicMCQ(newsCtx){
+    var sysMsg='Tu SSC GD/Bihar Police CA expert hai. SIRF valid JSON array return kar. Hindi Devanagari.';
+    var userMsg='Topic: '+name+' '+curYr+'. ';
+    if(newsCtx) userMsg+='Real news: '+newsCtx+' In news se 10 MCQ banao. ';
+    else userMsg+='Web search karo '+name+' '+curYr+' 10 MCQ banao. ';
+    userMsg+=avoid+' 4 options. ans 0-3 vary. ';
+    userMsg+='[{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":1,"sol":"..."}]';
+    var model=newsCtx?'llama-3.3-70b-versatile':'compound-beta';
     fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -4466,92 +4419,36 @@ function loadCAQuestions(id,name,more){
     })
     .then(function(r){return r.json();})
     .then(function(data){
-    if(data.error) throw new Error(data.error.message);
-    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=txt.indexOf('['),e=txt.lastIndexOf(']');
-    if(s===-1) throw new Error('JSON nahi mila');
-    var arr=JSON.parse(txt.substring(s,e+1));
-    if(!arr.length) throw new Error('Empty');
-    arr=arr.filter(function(q){
-      if(!q.opts||q.opts.length<4) return false;
-      var clean=q.opts.map(function(o){return (o||'').replace(/^([A-D])s*/,'').trim().toLowerCase();});
-      var unique=clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;});
-      return unique.length===4;
+      if(data.error) throw new Error(data.error.message);
+      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var s=txt.indexOf('['),e=txt.lastIndexOf(']');
+      if(s===-1) throw new Error('JSON nahi mila');
+      var arr=JSON.parse(txt.substring(s,e+1));
+      arr=arr.filter(function(q){return q.q&&q.opts&&q.opts.length===4&&typeof q.ans==='number';});
+      if(!arr.length) throw new Error('Valid questions nahi mile');
+      pickCA(arr,cont,subj,name);
+    })
+    .catch(function(e){
+      cont.innerHTML='<div class="empty">'+esc(e.message)+'<br><button class="btn" onclick="loadCAQuestions(subj,name,avoid,cont)">Retry</button></div>';
     });
-    if(!arr.length) throw new Error('Valid questions nahi mile, retry karo.');
-
-    var ind=document.getElementById('ca_ind');
-    if(ind) ind.remove();
-    _saveCAHistory(id,arr);
-
-    var out='';
-    arr.forEach(function(q,i){
-      var idx=offset+i;
-      // Shuffle options so correct answer is not always A
-      var correctText=q.opts[q.ans];
-      var shuffled=q.opts.slice().sort(function(){return Math.random()-.5;});
-      // Fix option labels (A/B/C/D)
-      shuffled=shuffled.map(function(o,si){
-        var text=o.replace(/^\([A-D]\)\s*/,'');
-        return '('+'ABCD'[si]+') '+text;
-      });
-      var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText.replace(/^\([A-D]\)\s*/,'');});
-      if(newAns===-1) newAns=q.ans; // fallback
-      out+='<div class="qcard" id="caq'+idx+'">'
-        +'<div class="qtxt">Q'+(idx+1)+'. '+q.q+'</div>';
-      shuffled.forEach(function(o,j){
-        out+='<button class="opt" id="cao'+idx+'_'+j+'" onclick="pickCA('+idx+','+j+','+newAns+')">'+(o||'')+'</button>';
-      });
-      if(q.sol) out+='<div class="sol" id="casol'+idx+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
-      out+='</div>';
-    });
-
-    out+='<button id="caMoreBtn" style="width:100%;background:var(--cd2);border:1.5px dashed rgba(255,255,255,.15);border-radius:14px;color:var(--t3);font-family:inherit;font-size:.78rem;font-weight:700;padding:13px;cursor:pointer;margin-top:8px;">🔄 Aur 15 Questions</button>';
-
-    if(more){
-      var ob=document.getElementById('caMoreBtn');if(ob)ob.remove();
-      cont.insertAdjacentHTML('beforeend',out);
-    } else {
-      cont.innerHTML=out;
-    }
-    var lb=document.getElementById('caMoreBtn');
-    if(lb) lb.onclick=function(){loadCAQuestions(id,name,true);};
-    toast('✅ '+arr.length+' questions!','i');
-  })
-  .catch(function(e){
-    var ind=document.getElementById('ca_ind');if(ind)ind.remove();
-    if(!more){
-      cont.innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))
-        +'<br><button class="btn" style="margin-top:10px;font-size:.78rem" id="caRetryBtn">🔄 Retry</button></div>';
-      var rb=document.getElementById('caRetryBtn');
-      if(rb) rb.onclick=function(){loadCAQuestions(id,name,false);};
-    }
-  });
-}
-
   }
-
   if(tvKey){
     fetch('https://api.tavily.com/search',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({api_key:tvKey,query:name+' India '+curYr,search_depth:'basic',max_results:6,include_answer:false})
+      body:JSON.stringify({api_key:tvKey,query:name+' India '+curYr,search_depth:'basic',max_results:6})
     })
     .then(function(r){return r.json();})
     .then(function(data){
       if(!data.results||!data.results.length) throw new Error('No results');
-      var newsText=data.results.map(function(r,i){
-        return (i+1)+'. '+r.title+(r.content?' — '+r.content.substring(0,200):'');
-      }).join('\n');
+      var newsText=data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. ');
       generateTopicMCQ(newsText);
     })
-    .catch(function(){
-      generateTopicMCQ(null);
-    });
+    .catch(function(){generateTopicMCQ(null);});
   } else {
     generateTopicMCQ(null);
   }
-
+}
 function pickCA(qi,oi,correct){
   var opts=document.querySelectorAll('[id^="cao'+qi+'_"]');
   opts.forEach(function(o){o.disabled=true;});
@@ -4596,142 +4493,67 @@ function renderDailyCAItems(items,dateStr,cacheKey){
 
 function loadDailyCA(force){
   var key=getGKey();
-  if(!key){document.getElementById('daily-ca-content').innerHTML='<div class="empty">🔑 Groq key daalo!</div>';return;}
+  if(!key){document.getElementById('daily-ca-content').innerHTML='<div class="empty">\uD83D\uDD11 Groq key daalo!</div>';return;}
   var d=new Date();
   var cacheKey='dca_'+d.getFullYear()+'_'+d.getMonth()+'_'+d.getDate();
-  // Clear only old dates cache
   try{Object.keys(localStorage).forEach(function(k){if(k.startsWith('dca_')&&k!==cacheKey)localStorage.removeItem(k);});}catch(e){}
   var mn2=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var dateStr=d.getDate()+' '+mn2[d.getMonth()]+' '+d.getFullYear();
-  // Cache hit — show instantly, no loading
+  var curYr=d.getFullYear();
+  var cont=document.getElementById('daily-ca-content');
   if(!force){
     try{
-      var c=localStorage.getItem(cacheKey);
-      if(c){
-        var cp=JSON.parse(c);
-        if(cp&&cp.items&&cp.items.length>0){
-          renderDailyCAItems(cp.items,dateStr,cacheKey);
-          return;
-        }
-        // Cache exists but empty means "no news today" — show blank
-        if(cp&&cp.noNews){
-          document.getElementById('daily-ca-content').innerHTML=
-            '<div style="text-align:center;padding:30px;color:var(--t2)">'
-            +'<div style="font-size:2rem">📭</div>'
-            +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi major current affairs nahi</div>'
-            +'<div style="font-size:.65rem">'+dateStr+'</div>'
-            +'<button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;padding:6px 14px;font-size:.65rem;cursor:pointer">🔄 Dobara Try Karo</button>'
-            +'</div>';
-          return;
-        }
-      }
+      var cached=localStorage.getItem(cacheKey);
+      if(cached){var cp=JSON.parse(cached);if(cp&&cp.items&&cp.items.length>0){renderDailyCAItems(cp.items,dateStr,cacheKey);return;}}
     }catch(e){}
   }
-  // Show loader
-  document.getElementById('daily-ca-content').innerHTML=
-    '<div style="text-align:center;padding:30px">'
-    +'<div style="font-size:2rem">🤖</div>'
-    +'<div style="font-size:.8rem;font-weight:700;color:var(--ac);margin:8px 0">Aaj ki news dhundh raha hai...</div>'
-    +'<div style="font-size:.62rem;color:var(--t2)">'+dateStr+'</div>'
-    +'<div style="display:flex;gap:6px;justify-content:center;margin-top:12px">'
-    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
-    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
-    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
-    +'</div></div>';
-    var curYr=new Date().getFullYear();
+  if(cont) cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div></div>';
   var tvKey=getTavilyKey();
-  var groqKey=getGKey();
-  if(!groqKey){
-    var cont=document.getElementById('daily-ca-content');
-    if(cont) cont.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
-    return;
-  }
-
-  var cont=document.getElementById('daily-ca-content');
-  if(cont) cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div><div style="font-size:.65rem;color:var(--t2);margin-top:8px" id="ca-load-status">'+( tvKey?'📡 Tavily se news fetch ho rahi hai...':'🤖 AI se CA generate ho raha hai...')+'</div></div>';
-
-  function setStatus(msg){var el=document.getElementById('ca-load-status');if(el)el.textContent=msg;}
-
-  function generateWithGroq(newsContext){
-    setStatus('🤖 Groq MCQ bana raha hai...');
-    var sysMsg='Tu SSC GD/Bihar Police/BSSC/RRB CA MCQ expert hai. SIRF valid JSON return karo, Hindi Devanagari, koi markdown nahi.';
-    var userMsg='Date: '+dateStr+'. SIRF '+curYr+' ke events.\n\n';
-    if(newsContext){
-      userMsg+='Ye real news articles hain aaj ke:\n'+newsContext+'\n\n';
-      userMsg+='In news se 10 MCQ banao — exam style.\n';
-    } else {
-      userMsg+='⚡ Web search karo India current affairs '+dateStr+' — aaj ki news se 10 MCQ banao.\n';
-    }
-    userMsg+='Variety: niyukti, puraskar, khel, yojana, vigyan, antarrashtriya, economy.\n';
-    userMsg+='Rules: Min 8 MCQ. Headline: naam+post+saal. 4 options (1 sahi+3 confusing). ans 0/1/2/3 vary. Sol mein 1 extra fact. Hindi Devanagari.\n';
-    userMsg+='{"items":[{"cat":"नियुक्ति","headline":"...","mcq":{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"..."}}]}';
-
-    var model = newsContext ? 'llama-3.3-70b-versatile' : 'compound-beta';
+  function generateWithGroq(newsCtx){
+    var sysMsg='Tu SSC GD/Bihar Police CA MCQ expert hai. SIRF valid JSON return kar. Hindi Devanagari.';
+    var userMsg='Date: '+dateStr+'. SIRF '+curYr+' ke events. ';
+    if(newsCtx) userMsg+='Real news: '+newsCtx+' In news se 10 MCQ banao. ';
+    else userMsg+='Web search karo India current affairs '+dateStr+' 10 MCQ banao. ';
+    userMsg+='Min 8 MCQ. 4 options. ans 0-3 vary. ';
+    userMsg+='{"items":[{"cat":"niyukti","headline":"...","mcq":{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"..."}}]}';
+    var model=newsCtx?'llama-3.3-70b-versatile':'compound-beta';
     fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body:JSON.stringify({model:model,messages:[{role:'system',content:sysMsg},{role:'user',content:userMsg}],max_tokens:3000,temperature:0.4})
     })
     .then(function(r){return r.json();})
     .then(function(data){
-    if(data.error) throw new Error(data.error.message);
-    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
-    var parsed=JSON.parse(txt.substring(s,e));
-    // AI said no news today
-    if(parsed.noNews){
-      try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
-      document.getElementById('daily-ca-content').innerHTML=
-        '<div style="text-align:center;padding:30px;color:var(--t2)">'
-        +'<div style="font-size:2rem">📭</div>'
-        +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi major current affairs nahi</div>'
-        +'<div style="font-size:.65rem">'+dateStr+' — Kal dobara check karo</div>'
-        +'</div>';
-      return;
-    }
-    if(!parsed.items||!parsed.items.length){
-      try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
-      document.getElementById('daily-ca-content').innerHTML=
-        '<div style="text-align:center;padding:30px;color:var(--t2)">'
-        +'<div style="font-size:2rem">📭</div>'
-        +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi news nahi mili</div>'
-        +'<button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;padding:6px 14px;font-size:.65rem;cursor:pointer">🔄 Retry</button>'
-        +'</div>';
-      return;
-    }
-    renderDailyCAItems(parsed.items,dateStr,cacheKey);
-    toast('✅ Aaj ki CA ready!','i');
-  })
-  .catch(function(e){
-    document.getElementById('daily-ca-content').innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,60))+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="loadDailyCA(true)">🔄 Retry</button></div>';
-  });
-}
-
+      if(data.error) throw new Error(data.error.message);
+      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var s=txt.indexOf('{'),e=txt.lastIndexOf('}');
+      if(s===-1) throw new Error('JSON nahi mila');
+      var obj=JSON.parse(txt.substring(s,e+1));
+      if(!obj.items||!obj.items.length) throw new Error('Empty');
+      try{localStorage.setItem(cacheKey,JSON.stringify(obj));}catch(er){}
+      renderDailyCAItems(obj.items,dateStr,cacheKey);
+    })
+    .catch(function(e){
+      if(cont) cont.innerHTML='<div class="empty">'+esc(e.message)+'<br><button class="btn" onclick="loadDailyCA(true)">Retry</button></div>';
+    });
   }
-
-  // Tavily se pehle news fetch karo, phir Groq MCQ banao
   if(tvKey){
     fetch('https://api.tavily.com/search',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({api_key:tvKey,query:'India current affairs '+dateStr,search_depth:'basic',max_results:8,include_answer:false})
+      body:JSON.stringify({api_key:tvKey,query:'India current affairs '+dateStr,search_depth:'basic',max_results:8})
     })
     .then(function(r){return r.json();})
     .then(function(data){
       if(!data.results||!data.results.length) throw new Error('No results');
-      var newsText=data.results.map(function(r,i){
-        return (i+1)+'. '+r.title+(r.content?' — '+r.content.substring(0,200):'');
-      }).join('\n');
+      var newsText=data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. ');
       generateWithGroq(newsText);
     })
-    .catch(function(){
-      setStatus('📡 Tavily fail — AI se try kar raha hai...');
-      generateWithGroq(null);
-    });
+    .catch(function(){generateWithGroq(null);});
   } else {
     generateWithGroq(null);
   }
-
+}
 
 function pickDCA(i,oi,correct){
   var opts=document.querySelectorAll('[id^="dca'+i+'_"]');
@@ -5084,9 +4906,6 @@ function launchMockWithConfig(name){
       if(ldr) ldr.textContent=pct+'%';
       if(fetched>=fetchCount){
         mockState.qs=allQs.slice(0,totalNeeded);
-        if(mockState.qs.length < totalNeeded){
-          toast('⚠️ Sirf '+mockState.qs.length+'/'+totalNeeded+' questions mile','i');
-        }
         renderMockQ();
         startMockTimer();
       } else {
@@ -5242,6 +5061,7 @@ function initFirebase(){
     document.getElementById('fbLoginStatus').textContent='Connection error. Retry karo.';
   }
 }
+
 function setLoginStatus(msg,type){
   var el=document.getElementById('fbLoginStatus');
   if(!el) return;
