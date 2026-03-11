@@ -5348,7 +5348,11 @@ function loginEmail(){
   var email=(document.getElementById('login-email')||{}).value||'';
   var pass=(document.getElementById('login-pass')||{}).value||'';
   if(!email||!pass){setLoginErr('⚠️ Email aur password dono daalo.');return;}
-  if(!auth){setLoginErr('❌ Firebase load nahi hua — page reload karo.');return;}
+  if(!auth){
+    setLoginErr('❌ Firebase load nahi hua — internet check karo ya page reload karo.');
+    console.error('AUTH NULL - Firebase init failed');
+    return;
+  }
   var btn=document.querySelector('#login-page .btn-full');
   if(btn){btn.disabled=true;btn.textContent='⏳ Login ho raha hai...';}
   setLoginErr('');
@@ -5495,6 +5499,12 @@ save=function(){_localSave();saveToFirestore();};
 
 
 // ── START ──
+window.onerror=function(msg,src,line,col,err){
+  var el=document.getElementById('login-err');
+  if(el) el.textContent='JS Error: '+msg+' (line '+line+')';
+  console.error('JS ERROR:',msg,src,line);
+  return false;
+};
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
 
 
