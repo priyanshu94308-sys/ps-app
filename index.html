@@ -842,6 +842,13 @@ body::before{
           </div>
         </div>
       </div>
+      <div class="scard" style="margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="sec" style="margin:0">&#128197; Exam Countdown</div>
+          <div style="font-size:.58rem;color:var(--t2)">Settings mein date set karo</div>
+        </div>
+        <div id="home-countdown"></div>
+      </div>
       <div class="m4">
         <div class="m4b" style="border-top:3px solid var(--ye)"><div class="m4n" style="color:var(--ye)" id="m4s">0</div><div class="m4l">STREAK</div></div>
         <div class="m4b" style="border-top:3px solid var(--pu)"><div class="m4n" style="color:var(--pu)" id="m4a">0%</div><div class="m4l">MONTH %</div></div>
@@ -1086,36 +1093,26 @@ body::before{
       </div>
     </div>
     <div class="tab" id="tab-report">
-
-      <!-- Subject Weakness -->
       <div class="scard" style="margin-bottom:10px">
         <div class="sec">📊 Subject-wise Weakness</div>
         <div id="rpt-weakness"></div>
       </div>
-
-      <!-- Mock Trend -->
       <div class="scard" style="margin-bottom:10px">
         <div class="sec">📈 Mock Score Trend</div>
-        <div id="rpt-trend" style="font-size:.72rem"></div>
+        <div id="rpt-trend"></div>
       </div>
-
-      <!-- Topic Coverage -->
       <div class="scard" style="margin-bottom:10px">
         <div class="sec">📚 Topic Coverage (RWA)</div>
         <div id="rpt-coverage"></div>
       </div>
-
-      <!-- Mock History -->
       <div class="scard">
         <div class="sec">📝 Mock History</div>
         <div id="testHist"></div>
       </div>
-
     </div>
-
     <!-- SETTINGS -->
     <div class="tab" id="tab-settings">
-      <div class="scard" style="margin-bottom:10px"><div class="sec">&#128197; Exam Countdown</div><div id="countdown-section"></div><div style="font-size:.6rem;color:var(--t2);margin-top:6px;text-align:center">Date set karne ke liye tap karo</div></div>
+      <div class="scard" style="margin-bottom:10px"><div class="sec">&#128197; Exam Countdown</div><div id="countdown-section"></div><div style="font-size:.6rem;color:var(--t2);margin-top:6px;text-align:center">Tap karo → date set karo | Khali chodo → hatao</div></div>
       <div class="scard">
         <div class="sec">👤 Profile</div>
         <div style="display:flex;gap:5px"><input type="text" class="fi" id="nameInp" placeholder="Apna naam..."><button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveName()">Save</button></div>
@@ -1129,16 +1126,6 @@ body::before{
         </div>
         <div style="font-size:.63rem;font-weight:700" id="gkStatus">⚪ Key nahi hai</div>
         <a href="https://console.groq.com/keys" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Groq Key Lo</a>
-      </div>
-      <div class="scard">
-        <div class="sec">🔍 Tavily API Key (CA News - FREE)</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Tavily se real 2026 news aayegi CA mein — 1000/month free!</div>
-        <div style="display:flex;gap:5px;margin-bottom:5px">
-          <input type="text" class="fi" id="tavilyKey" placeholder="tvly-...">
-          <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveTavilyKey()">Save</button>
-        </div>
-        <div style="font-size:.63rem;font-weight:700" id="tavilyStatus">Key nahi hai</div>
-        <a href="https://app.tavily.com/home" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Tavily Key Lo</a>
       </div>
       <div class="scard">
         <div class="sec">📢 WhatsApp Channel</div>
@@ -3452,6 +3439,7 @@ var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 // ── STATE ──
 var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[]};
 if(!S.examDates) S.examDates={};
+if(!S.customExams) S.customExams=[];
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
 var pracQs=[],pracAns={},pracC=0,pracT=0;
 var charts={w:null,s:null,m:null};
@@ -3469,7 +3457,6 @@ function save(){
     var exp=new Date();exp.setFullYear(exp.getFullYear()+1);
     if(d.length<3900) document.cookie='ps_v3='+encodeURIComponent(d)+';expires='+exp.toUTCString()+';path=/;SameSite=Lax';
   }catch(e){}
-  if(currentUser) saveToFirestore();
 }
 function load(){
   var best=null,bestSize=0;
@@ -3510,26 +3497,50 @@ function toggleTheme(){
   }
   save();
 }
+
+function toggleTheme(){
+  S.dark=!S.dark;
+  var r=document.documentElement;
+  if(S.dark){
+    r.style.setProperty('--bg','#0b0d14');
+    r.style.setProperty('--bg2','#0f1119');
+    r.style.setProperty('--card','#13161f');
+    r.style.setProperty('--cd2','#181c28');
+    r.style.setProperty('--tx','#f0f3ff');
+    r.style.setProperty('--t2','#5c6580');
+    r.style.setProperty('--t3','#8892b0');
+    r.style.setProperty('--br','rgba(255,255,255,.07)');
+    r.style.setProperty('--br2','rgba(255,255,255,.11)');
+    r.style.setProperty('--glass','rgba(255,255,255,.04)');
+    document.body.style.background='#0b0d14';
+    document.getElementById('themeBtn').textContent='☀️';
+  } else {
+    r.style.setProperty('--bg','#f5f5f0');
+    r.style.setProperty('--bg2','#ebebeb');
+    r.style.setProperty('--card','#ffffff');
+    r.style.setProperty('--cd2','#f0f0ea');
+    r.style.setProperty('--tx','#1a1a2e');
+    r.style.setProperty('--t2','#888899');
+    r.style.setProperty('--t3','#555566');
+    r.style.setProperty('--br','rgba(0,0,0,.08)');
+    r.style.setProperty('--br2','rgba(0,0,0,.13)');
+    r.style.setProperty('--glass','rgba(0,0,0,.03)');
+    document.body.style.background='#f5f5f0';
+    document.getElementById('themeBtn').textContent='🌙';
+  }
+  save();
+}
 function sw(tab){
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
-  var tabEl=document.getElementById('tab-'+tab);
-  var tbEl=document.getElementById('tb-'+tab);
-  if(!tabEl||!tbEl) return;
-  tabEl.classList.add('active');
-  tbEl.classList.add('on');
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('tb-'+tab).classList.add('on');
   document.querySelector('.content').scrollTop=0;
-  if(tab==='home'){renderHome();updateHeader();}
-  
-  
-  if(tab==='rwa'){initRWA();}
-  if(tab==='ask'){window._chatHistory=[];}
-  if(tab==='ca'){initCA();var k=getGKey();if(k) loadDailyCA(false);}
-  if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='report') initReport();
-  if(tab==='settings'){updateGKStatus();updateTavilyStatus();renderCountdown();}
-  if(tab!=='mock'&&typeof mockState!=='undefined'&&mockState&&mockState.timer){clearInterval(mockState.timer);mockState.timer=null;}
-}function clearRWACache(){
+  if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
+  if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
+}
+function clearRWACache(){
   try{
     Object.keys(localStorage).forEach(function(k){
       if(k.indexOf('rwa_')===0) localStorage.removeItem(k);
@@ -3545,6 +3556,20 @@ function getGKey(){
   var k=document.getElementById('geminiKey');
   if(k&&k.value.trim()) return k.value.trim();
   try{return localStorage.getItem('ps_gkey')||'';}catch(e){return '';}
+}
+
+function getTavilyKey(){try{return localStorage.getItem('ps_tvkey')||'';}catch(e){return '';}}
+function saveTavilyKey(){
+  var v=(document.getElementById('tavilyKey')||{}).value||'';
+  if(!v.startsWith('tvly-')){toast('Invalid key — tvly- se shuru hona chahiye','w');return;}
+  try{localStorage.setItem('ps_tvkey',v);}catch(e){}
+  updateTavilyStatus(); toast('Tavily key saved!','i');
+}
+function updateTavilyStatus(){
+  var el=document.getElementById('tavilyStatus'); if(!el) return;
+  var k=getTavilyKey();
+  el.textContent=k?'✅ Tavily Active — Real news milegi':'⚪ Key nahi hai — compound-beta use hoga';
+  el.style.color=k?'var(--gr)':'var(--t2)';
 }
 
 // ── STREAK ──
@@ -3674,45 +3699,38 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   // Auto-reset after 30s to prevent permanent block
   var _rwaTimeout=setTimeout(function(){rwaLoading=false;},30000);
   var subjectPrompts={
-    history:'Tu SSC GD/Bihar Police/BSSC History MCQ expert hai. NCERT Class 6 se 12 tak ka itihas cover karta hai — Prachin Bharat (Class 6), Madhyakalin Bharat (Class 7), Aadhunik Bharat (Class 8, 10, 12). SIRF diye gaye topic ke accurate historical facts use karna. Dates, rulers, battles, treaties sab sahi hona chahiye. SIRF Hindi Devanagari.',
-    geography:'Tu SSC GD/Bihar Police/BSSC Geography MCQ expert hai. NCERT Class 6 se 12 tak ka bhugol cover karta hai — Class 6 (Prithvi), Class 7 (Hamara Paryavaran), Class 8 (Sansadhan), Class 9 (Samakalin Bharat-1), Class 10 (Samakalin Bharat-2), Class 11-12 (Bhautik Bhugol). India + World geography dono. SIRF Hindi Devanagari.',
-    polity:'Tu SSC GD/Bihar Police/BSSC Polity MCQ expert hai. NCERT Class 6 se 12 tak ka Rajniti Vigyan cover karta hai — Class 9 (Loktantrik Rajniti-1), Class 10 (Loktantrik Rajniti-2), Class 11 (Rajniti Siddhant), Class 12 (Swatantra Bharat mein Rajniti). Indian Constitution ke articles, anusuchiyaan, sanshodhan sab sahi. SIRF Hindi Devanagari.',
-    economy:'Tu SSC GD/Bihar Police/BSSC Economy MCQ expert hai. NCERT Class 9 se 12 tak ka Arthashastra cover karta hai — Class 9 (Arthik Vikas), Class 10 (Vikas), Class 11 (Arthashastra), Class 12 (Samashti/Vyashti Arthashastra). Banking, GDP, yojanayein sab accurate. SIRF Hindi Devanagari.',
-    science:'Tu SSC GD/Bihar Police/BSSC Science MCQ expert hai. NCERT Class 6 se 12 tak ka Vigyan cover karta hai. Physics: Class 9-12 (ball ki gati, bijli, prakash, etc.). Chemistry: Class 9-12 (tatva, dhatu, carbon, etc.). Biology: Class 6-12 (jeev jagat, koshika, manav sharir, etc.). SIRF diye gaye topic ka vigyan. SIRF Hindi Devanagari.',
-    computer:'Tu SSC GD/Bihar Police/BSSC Computer MCQ expert hai. Basic computer knowledge — hardware, software, MS Office (Word, Excel, PowerPoint), internet, networking, shortcut keys, operating systems, database basics. Exam level accurate facts. SIRF Hindi Devanagari.',
-    static_gk:'Tu SSC GD/Bihar Police/BSSC Static GK MCQ expert hai. India ki pramukh jaankari — rashtriya pratik, puraskar, khel, prasiddh vyakti, pustak-lekhak, pramukh sthal, aitihaasiik ghatnaayein. NCERT + exam level. SIRF Hindi Devanagari.'
+    history:'Tu SSC GD/Bihar Police History MCQ expert hai. NCERT Class 6-12 — Prachin (Cl.6), Madhyakalin (Cl.7), Aadhunik (Cl.8/10/12). Dates, rulers, battles sab accurate. SIRF Hindi Devanagari.',
+    geography:'Tu SSC GD/Bihar Police Geography MCQ expert hai. NCERT Class 6-12 — India+World geo, rivers, mountains, climate. SIRF Hindi Devanagari.',
+    polity:'Tu SSC GD/Bihar Police Polity MCQ expert hai. NCERT Class 9-12 — Constitution articles, amendments, bodies. Accurate facts. SIRF Hindi Devanagari.',
+    economy:'Tu SSC GD/Bihar Police Economy MCQ expert hai. NCERT Class 9-12 — banking, GDP, yojanayein. SIRF Hindi Devanagari.',
+    science:'Tu SSC GD/Bihar Police Science MCQ expert hai. NCERT Class 6-12 Physics+Chemistry+Biology. SIRF diye gaye topic ka vigyan. SIRF Hindi Devanagari.',
+    computer:'Tu SSC GD/Bihar Police Computer MCQ expert hai. Hardware, software, MS Office, internet, shortcut keys. SIRF Hindi Devanagari.',
+    static_gk:'Tu SSC GD/Bihar Police Static GK MCQ expert hai. Rashtriya pratik, puraskar, khel, pustak, sthal. SIRF Hindi Devanagari.'
   };
-  var systemMsg=subjectPrompts[key]||'Tu MCQ generator hai. SIRF valid JSON array. Hindi Devanagari. No markdown.';
-  systemMsg+=' RULES: (1) OUTPUT SIRF valid JSON array — koi text/markdown nahi. (2) Har question SIRF diye gaye topic ke baare mein ho — topic se bahar BILKUL nahi. (3) Facts 100% accurate hone chahiye. (4) SIRF Hindi Devanagari mein likho.';
+  var systemMsg=(subjectPrompts[key]||'Tu MCQ generator hai. SIRF valid JSON array. Hindi Devanagari.')+' OUTPUT SIRF valid JSON array — no markdown, no text.';
   // Build avoid list from history
   var hist=_getRWAHistory(cacheKey);
   var avoidStr='';
   if(hist.length>0){
     var recent=hist.slice(-40);
-    avoidStr='\n\n🚫 YE QUESTIONS ALREADY POOCHE JA CHUKE HAIN — INSE MILTE-JULTE QUESTIONS BILKUL MAT BANANA:\n'
+    avoidStr='\n\n\uD83D\uDEAB YE QUESTIONS ALREADY POOCHE JA CHUKE HAIN — INSE MILTE-JULTE BILKUL MAT BANANA:\n'
       +recent.map(function(q,i){return (i+1)+'. '+q;}).join('\n')
-      +'\n\n✅ AB NAYI ANGLES CHOOSE KARO — alag events, alag persons, alag dates, alag places use karo.';
-    var angles=['Koi aisa tathya jo kam jaana jaata ho','Koi important date ya saal','Koi important vyakti ya sthan','Koi mahatvapurna ghatna','Koi sankhya ya ankada'];
-    avoidStr+='\n💡 IS BAAR FOCUS: '+angles[Math.floor(Math.random()*angles.length)]+'.';
+      +'\n\n\u2705 AB NAYI ANGLES CHOOSE KARO — alag events, persons, dates, places.';
+    var angles=['Koi aisa tathya jo kam jaana jaata ho','Koi important date ya saal','Koi important vyakti ya sthan','Koi sankhya ya ankada'];
+    avoidStr+='\n\uD83D\uDCA1 IS BAAR FOCUS: '+angles[Math.floor(Math.random()*angles.length)]+'.';
   } else {
-    var angles0=['Pramukh tithiyaan aur saal','Pramukh vyakti aur yogdan','Pramukh sthal aur mahatva','Mahavapurna sankhyaen','Karan aur parinaam'];
-    avoidStr='\n💡 FOCUS: '+angles0[Math.floor(Math.random()*angles0.length)]+'.';
+    var angles0=['Pramukh tithiyaan aur saal','Pramukh vyakti','Pramukh sthal','Karan aur parinaam'];
+    avoidStr='\n\uD83D\uDCA1 FOCUS: '+angles0[Math.floor(Math.random()*angles0.length)]+'.';
   }
   var prompt='TOPIC: "'+topic+'"\n\n'
-    +'Is TOPIC se SIRF 10 MCQ banao. Har question is topic ke kisi ek specific fact ke baare mein hona chahiye.\n'
-    +'\nUDAHARAN: Agar topic \"मौर्य काल\" hai to questions honge:\n'
-    +'  - Chandragupta Maurya ki rajdhani kahan thi?\n'
-    +'  - Ashok ke kitne shilalekh mile hain?\n'
-    +'  - Arthashastra kisne likha?\n'
-    +'Aise SPECIFIC facts wale questions banana — broad ya generic nahi.\n\n'
-    +'⚠️ STRICT RULE: Question mein "'+topic+'" ka koi specific tathya (date/name/place/number) hona chahiye.\n'
-    +'Dusre topics ya dusre kaal ke questions BILKUL nahi.\n\n'
-    +'FORMAT RULES:\n'
-    +'- 4 options: ek bilkul sahi, teen galat par realistic\n'
-    +'- ans: 0/1/2/3 barabar vary karo\n'
-    +'- SSC GD/Bihar Police level — medium difficulty\n'
-    +'- sol: ek line — sahi answer + ek extra fact\n'
-    +'- NCERT Class 6-12 facts use karo, 100% accurate\n'
+    +'Is TOPIC se SIRF 10 SPECIFIC MCQ banao. Har question topic ke ek specific fact ke baare mein ho.\n'
+    +'⚠️ STRICT: Sirf "'+topic+'" ke andar raho — dusre topics bilkul nahi.\n'
+    +'RULES:\n'
+    +'- 4 options: ek sahi, teen galat realistic\n'
+    +'- ans: 0/1/2/3 equally vary karo\n'
+    +'- SSC GD/Bihar Police level — specific dates/names/numbers puchho\n'
+    +'- sol: sahi answer + ek extra fact\n'
+    +'- NCERT Class 6-12 facts use karo\n'
     +avoidStr
     +'\n\nOUTPUT (sirf JSON, kuch nahi):\n'
     +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation"}]';
@@ -3774,18 +3792,14 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
 function getRWAQBQuestions(subjectKey,topic){
   if(typeof QB==='undefined') return [];
   var qbKey=subjectKey==='static_gk'?'gk':subjectKey;
-  if(!QB[qbKey]||!QB[qbKey].length) return [];
-  var words=topic.toLowerCase().replace(/[^ऀ-ॿ\w\s]/g,'').split(/\s+/).filter(function(w){return w.length>2;});
-  if(!words.length) return QB[qbKey].slice(0,5);
-  var strict=QB[qbKey].filter(function(q){
-    var t=((q.q||'')+(q.sol||'')).toLowerCase();
+  if(!QB[qbKey]) return [];
+  var words=topic.toLowerCase().replace(/[^\u0900-\u097f\w\s]/g,'').split(/\s+/).filter(function(w){return w.length>3;});
+  return QB[qbKey].filter(function(q){
+    var t=(q.q||'').toLowerCase();
     return words.some(function(w){return t.indexOf(w)>=0;});
-  });
-  if(strict.length>=3) return strict.slice(0,5);
-  var all=QB[qbKey].slice();
-  for(var i=all.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=all[i];all[i]=all[j];all[j]=tmp;}
-  return all.slice(0,5);
+  }).slice(0,5);
 }
+
 function renderRWAQuestion(){
   var s=rwaQuizState;
   if(s.cur>=s.qs.length){
@@ -3876,48 +3890,108 @@ function rwaBreadcrumbBack(level){
 
 
 
-// ── EXAM COUNTDOWN ──
 var EXAM_LIST=[
-  {key:'ssc_gd',       label:'SSC GD'},
-  {key:'ssc_cgl',      label:'SSC CGL'},
-  {key:'bihar_police', label:'Bihar Police'},
-  {key:'bssc',         label:'BSSC'},
-  {key:'bsf',          label:'BSF'},
-  {key:'hcm',          label:'HCM'}
+  {cat:'SSC',key:'ssc_gd',label:'SSC GD'},
+  {cat:'SSC',key:'ssc_cgl',label:'SSC CGL'},
+  {cat:'SSC',key:'ssc_chsl',label:'SSC CHSL'},
+  {cat:'SSC',key:'ssc_cpo',label:'SSC CPO'},
+  {cat:'SSC',key:'ssc_mts',label:'SSC MTS'},
+  {cat:'SSC',key:'ssc_je',label:'SSC JE'},
+  {cat:'Railway',key:'rrb_ntpc',label:'RRB NTPC'},
+  {cat:'Railway',key:'rrb_groupd',label:'RRB Group D'},
+  {cat:'Railway',key:'rrb_alp',label:'RRB ALP'},
+  {cat:'Railway',key:'rrb_je',label:'RRB JE'},
+  {cat:'Banking',key:'ibps_po',label:'IBPS PO'},
+  {cat:'Banking',key:'ibps_clerk',label:'IBPS Clerk'},
+  {cat:'Banking',key:'sbi_po',label:'SBI PO'},
+  {cat:'Banking',key:'sbi_clerk',label:'SBI Clerk'},
+  {cat:'Banking',key:'rbi_b',label:'RBI Grade B'},
+  {cat:'Defence',key:'nda',label:'NDA'},
+  {cat:'Defence',key:'cds',label:'CDS'},
+  {cat:'Defence',key:'agniveer',label:'Agniveer'},
+  {cat:'Defence',key:'afcat',label:'AFCAT'},
+  {cat:'Police',key:'bihar_police',label:'Bihar Police'},
+  {cat:'Police',key:'up_police',label:'UP Police'},
+  {cat:'Police',key:'delhi_police',label:'Delhi Police'},
+  {cat:'Police',key:'raj_police',label:'Rajasthan Police'}
 ];
-function renderCountdown(){
-  var el=document.getElementById('countdown-section');
-  if(!el) return;
+function _examDays(key){
+  if(!S.examDates||!S.examDates[key]) return {days:'?',color:'var(--t2)',badge:'',sub:'Date set nahi'};
   var today=new Date(); today.setHours(0,0,0,0);
-  var html='';
-  EXAM_LIST.forEach(function(exam){
-    var dateStr=(S.examDates&&S.examDates[exam.key])||'';
-    var days='?'; var color='var(--t2)'; var badge='';
-    if(dateStr){
-      var d=new Date(dateStr); d.setHours(0,0,0,0);
-      var diff=Math.round((d-today)/(86400000));
-      if(diff<0){days='Khatam'; color='var(--t2)';}
-      else if(diff===0){days='AAJ!'; color='#ff4444'; badge='\uD83D\uDD34 ';}
-      else if(diff<=7){days=diff+'d'; color='#ff6b35'; badge='\uD83D\uDD25 ';}
-      else if(diff<=30){days=diff+'d'; color='#ffd700';}
-      else{days=diff+'d'; color='var(--gr)';}
-    }
-    html+='<div onclick="setExamDate(\''+exam.key+'\',\''+exam.label+'\')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--cd2);border-radius:10px;margin-bottom:6px;cursor:pointer">'
-      +'<div style="font-size:.78rem;font-weight:700">'+badge+exam.label+'</div>'
-      +'<div style="font-size:.85rem;font-weight:900;color:'+color+'">'+days+'</div>'
-      +'</div>';
-  });
-  el.innerHTML=html;
+  var d=new Date(S.examDates[key]); d.setHours(0,0,0,0);
+  var diff=Math.round((d-today)/86400000);
+  if(diff<0)  return {days:'Khatam',color:'var(--t2)',badge:'',sub:S.examDates[key]};
+  if(diff===0) return {days:'AAJ!',color:'#ff4444',badge:'\uD83D\uDD34 ',sub:'Exam aaj hai!'};
+  if(diff<=7)  return {days:diff+' din',color:'#ff6b35',badge:'\uD83D\uDD25 ',sub:'Jaldi padho!'};
+  if(diff<=30) return {days:diff+' din',color:'#ffd700',badge:'',sub:S.examDates[key]};
+  return {days:diff+' din',color:'var(--gr)',badge:'',sub:S.examDates[key]};
 }
-function setExamDate(key,label){
+function renderCountdown(){
+  if(!S.examDates) S.examDates={};
+  var catIcons={SSC:'📋',Railway:'🚂',Banking:'🏦',Defence:'🪖',Police:'👮',Custom:'⭐'};
+  var allExams=EXAM_LIST.slice();
+  if(S.customExams&&S.customExams.length) S.customExams.forEach(function(e){allExams.push(e);});
+
+  // Settings — full list grouped
+  var sel=document.getElementById('countdown-section');
+  if(sel){
+    var cats={};
+    allExams.forEach(function(ex){var cat=ex.cat||'Custom'; if(!cats[cat]) cats[cat]=[]; cats[cat].push(ex);});
+    var sHtml='';
+    Object.keys(cats).forEach(function(cat){
+      sHtml+='<div style="font-size:.65rem;font-weight:900;color:var(--ac);margin:10px 0 5px">'+(catIcons[cat]||'📌')+' '+cat+'</div>';
+      cats[cat].forEach(function(ex){
+        var info=_examDays(ex.key);
+        var hasDate=!!(S.examDates[ex.key]);
+        var isCustom=!!(ex.custom);
+        sHtml+='<div onclick="setExamDate(\''+ex.key+'\',\''+ex.label+'\','+(isCustom?'true':'false')+')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--cd2);border-radius:10px;margin-bottom:5px;cursor:pointer;opacity:'+(hasDate?'1':'0.55')+'">'
+          +'<div><div style="font-size:.75rem;font-weight:700">'+info.badge+ex.label+'</div>'
+          +'<div style="font-size:.58rem;color:var(--t2)">'+info.sub+'</div></div>'
+          +'<div style="font-size:.82rem;font-weight:900;color:'+info.color+'">'+info.days+'</div></div>';
+      });
+    });
+    sHtml+='<button onclick="addCustomExam()" style="width:100%;margin-top:8px;background:var(--cd2);border:1.5px dashed var(--ac);border-radius:10px;color:var(--ac);font-family:inherit;font-size:.75rem;font-weight:800;padding:10px;cursor:pointer">+ Custom Exam Add Karo</button>';
+    sel.innerHTML=sHtml;
+  }
+
+  // Home — only set dates, sorted by closest
+  var hel=document.getElementById('home-countdown');
+  if(hel){
+    var setExams=allExams.filter(function(ex){return !!(S.examDates&&S.examDates[ex.key]);});
+    setExams.sort(function(a,b){return new Date(S.examDates[a.key])-new Date(S.examDates[b.key]);});
+    if(!setExams.length){
+      hel.innerHTML='<div style="font-size:.72rem;color:var(--t2);padding:4px 0">&#128197; Settings mein exam dates set karo</div>';
+    } else {
+      hel.innerHTML=setExams.map(function(ex){
+        var info=_examDays(ex.key);
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--br)">'
+          +'<div style="font-size:.74rem;font-weight:700">'+info.badge+ex.label+'</div>'
+          +'<div style="font-size:.8rem;font-weight:900;color:'+info.color+'">'+info.days+'</div></div>';
+      }).join('');
+    }
+  }
+}
+function setExamDate(key,label,isCustom){
   var cur=(S.examDates&&S.examDates[key])||'';
-  var d=window.prompt(label+' ki exam date daalo\n(YYYY-MM-DD format, e.g. 2025-11-15)', cur);
+  var d=window.prompt(label+' ki exam date daalo\n(YYYY-MM-DD, e.g. 2025-11-15)\nHatane ke liye khali chodo:', cur);
   if(d===null) return;
   if(!S.examDates) S.examDates={};
-  if(d===''){delete S.examDates[key];}
-  else{S.examDates[key]=d;}
-  save();
+  if(!d.trim()){
+    delete S.examDates[key];
+    if(isCustom&&S.customExams) S.customExams=S.customExams.filter(function(e){return e.key!==key;});
+  } else {
+    S.examDates[key]=d.trim();
+  }
+  save(); if(currentUser) saveToFirestore();
   renderCountdown();
+}
+function addCustomExam(){
+  var name=window.prompt('Custom exam ka naam:\n(e.g. BPSC 70th, BSSC CGL)','');
+  if(!name||!name.trim()) return;
+  var key='custom_'+Date.now();
+  if(!S.customExams) S.customExams=[];
+  S.customExams.push({key:key,label:name.trim(),cat:'Custom',custom:true});
+  setExamDate(key,name.trim(),true);
 }
 function initApp(){
   load();
@@ -3945,7 +4019,6 @@ function initApp(){
   if(gk){try{var k=localStorage.getItem('ps_gkey');if(k)gk.value=k;}catch(e){}}
   updateHeader();
   renderHome();
-  renderCountdown();;
   renderCountdown();
   renderSubjects();
   initYoga();
@@ -4011,25 +4084,6 @@ function saveGKey(){
   .catch(function(e){
     if(st){st.textContent='❌ Invalid: '+e.message.substring(0,40);st.style.color='var(--a2)';}
   });
-}
-
-function getTavilyKey(){try{return localStorage.getItem('ps_tvkey')||'';}catch(e){return '';}}
-function saveTavilyKey(){
-  var inp=document.getElementById('tavilyKey');
-  if(!inp) return;
-  var k=inp.value.trim();
-  try{localStorage.setItem('ps_tvkey',k);}catch(e){}
-  updateTavilyStatus();
-  toast(k?'Tavily key saved!':'Key hata di','i');
-}
-function updateTavilyStatus(){
-  var k=getTavilyKey();
-  var el=document.getElementById('tavilyStatus');
-  if(!el) return;
-  if(k){el.textContent='Key set hai';el.style.color='var(--gr)';}
-  else{el.textContent='Key nahi hai';el.style.color='var(--t2)';}
-  var inp=document.getElementById('tavilyKey');
-  if(inp&&k) inp.value=k;
 }
 
 // ── HOME ──
@@ -4482,43 +4536,28 @@ function loadCAQuestions(id,name,more){
     +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या"}]';
 
   var tvKey=getTavilyKey();
-  function doGroqFetch(extraContext){
-    var fullPrompt=prompt+(extraContext?'\n\nLatest news context:\n'+extraContext:'');
-    var model=extraContext?'llama-3.3-70b-versatile':'compound-beta';
+  function doGroqCA(ctx){
+    var fp=prompt+(ctx?'\n\nLatest news:\n'+ctx:'');
     return fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body:JSON.stringify({
-        model:model,
+        model:ctx?'llama-3.3-70b-versatile':'compound-beta',
         messages:[
-          {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari mein likho — English bilkul nahi. No markdown.'},
-          {role:'user',content:fullPrompt}
+          {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari. No markdown.'},
+          {role:'user',content:fp}
         ],
-        max_tokens:4500,
-        temperature:0.3
+        max_tokens:4500,temperature:0.3
       })
     });
   }
-  var fetchPromise;
-  if(tvKey){
-    fetchPromise=fetch('https://api.tavily.com/search',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({api_key:tvKey,query:name+' India '+yr,search_depth:'basic',max_results:6})
-    })
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(data.results&&data.results.length){
-        var ctx=data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. ');
-        return doGroqFetch(ctx);
-      }
-      return doGroqFetch(null);
-    })
-    .catch(function(){return doGroqFetch(null);});
-  } else {
-    fetchPromise=doGroqFetch(null);
-  }
-  fetchPromise
+  var caFetch=tvKey
+    ?fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:tvKey,query:name+' India '+yr,search_depth:'basic',max_results:5})})
+      .then(function(r){return r.json();})
+      .then(function(data){return doGroqCA(data.results?data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. '):'');})
+      .catch(function(){return doGroqCA(null);})
+    :doGroqCA(null);
+  caFetch
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.error) throw new Error(data.error.message);
@@ -4583,6 +4622,7 @@ function loadCAQuestions(id,name,more){
     }
   });
 }
+
 function pickCA(qi,oi,correct){
   var opts=document.querySelectorAll('[id^="cao'+qi+'_"]');
   opts.forEach(function(o){o.disabled=true;});
@@ -4627,67 +4667,95 @@ function renderDailyCAItems(items,dateStr,cacheKey){
 
 function loadDailyCA(force){
   var key=getGKey();
-  if(!key){document.getElementById('daily-ca-content').innerHTML='<div class="empty">\uD83D\uDD11 Groq key daalo!</div>';return;}
+  if(!key){document.getElementById('daily-ca-content').innerHTML='<div class="empty">🔑 Groq key daalo!</div>';return;}
   var d=new Date();
   var cacheKey='dca_'+d.getFullYear()+'_'+d.getMonth()+'_'+d.getDate();
+  // Clear only old dates cache
   try{Object.keys(localStorage).forEach(function(k){if(k.startsWith('dca_')&&k!==cacheKey)localStorage.removeItem(k);});}catch(e){}
   var mn2=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var dateStr=d.getDate()+' '+mn2[d.getMonth()]+' '+d.getFullYear();
-  var curYr=d.getFullYear();
-  var cont=document.getElementById('daily-ca-content');
+  // Cache hit — show instantly, no loading
   if(!force){
     try{
-      var cached=localStorage.getItem(cacheKey);
-      if(cached){var cp=JSON.parse(cached);if(cp&&cp.items&&cp.items.length>0){renderDailyCAItems(cp.items,dateStr,cacheKey);return;}}
+      var c=localStorage.getItem(cacheKey);
+      if(c){
+        var cp=JSON.parse(c);
+        if(cp&&cp.items&&cp.items.length>0){
+          renderDailyCAItems(cp.items,dateStr,cacheKey);
+          return;
+        }
+        // Cache exists but empty means "no news today" — show blank
+        if(cp&&cp.noNews){
+          document.getElementById('daily-ca-content').innerHTML=
+            '<div style="text-align:center;padding:30px;color:var(--t2)">'
+            +'<div style="font-size:2rem">📭</div>'
+            +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi major current affairs nahi</div>'
+            +'<div style="font-size:.65rem">'+dateStr+'</div>'
+            +'<button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;padding:6px 14px;font-size:.65rem;cursor:pointer">🔄 Dobara Try Karo</button>'
+            +'</div>';
+          return;
+        }
+      }
     }catch(e){}
   }
-  if(cont) cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div></div>';
-  var tvKey=getTavilyKey();
-  function generateWithGroq(newsCtx){
-    var sysMsg='Tu SSC GD/Bihar Police CA MCQ expert hai. SIRF valid JSON return kar. SABHI questions, options aur solutions SIRF Hindi Devanagari mein likhna — English bilkul mat use karna. Numbers (1,2,3) rakh sakte ho.';
-    var userMsg='Date: '+dateStr+'. SIRF '+curYr+' ke events. ';
-    if(newsCtx) userMsg+='Real news: '+newsCtx+' In news se 10 MCQ banao. ';
-    else userMsg+='Web search karo India current affairs '+dateStr+' 10 MCQ banao. ';
-    userMsg+='Min 8 MCQ. 4 options. ans 0-3 vary. ';
-    userMsg+='{"items":[{"cat":"niyukti","headline":"...","mcq":{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"..."}}]}';
-    var model=newsCtx?'llama-3.3-70b-versatile':'compound-beta';
-    fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:model,messages:[{role:'system',content:sysMsg},{role:'user',content:userMsg}],max_tokens:3000,temperature:0.4})
-    })
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(data.error) throw new Error(data.error.message);
-      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=txt.indexOf('{'),e=txt.lastIndexOf('}');
-      if(s===-1) throw new Error('JSON nahi mila');
-      var obj=JSON.parse(txt.substring(s,e+1));
-      if(!obj.items||!obj.items.length) throw new Error('Empty');
-      try{localStorage.setItem(cacheKey,JSON.stringify(obj));}catch(er){}
-      renderDailyCAItems(obj.items,dateStr,cacheKey);
-    })
-    .catch(function(e){
-      if(cont) cont.innerHTML='<div class="empty">'+esc(e.message)+'<br><button class="btn" onclick="loadDailyCA(true)">Retry</button></div>';
-    });
-  }
-  if(tvKey){
-    fetch('https://api.tavily.com/search',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({api_key:tvKey,query:'India current affairs '+dateStr,search_depth:'basic',max_results:8})
-    })
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(!data.results||!data.results.length) throw new Error('No results');
-      var newsText=data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. ');
-      generateWithGroq(newsText);
-    })
-    .catch(function(){generateWithGroq(null);});
-  } else {
-    generateWithGroq(null);
-  }
+  // Show loader
+  document.getElementById('daily-ca-content').innerHTML=
+    '<div style="text-align:center;padding:30px">'
+    +'<div style="font-size:2rem">🤖</div>'
+    +'<div style="font-size:.8rem;font-weight:700;color:var(--ac);margin:8px 0">Aaj ki news dhundh raha hai...</div>'
+    +'<div style="font-size:.62rem;color:var(--t2)">'+dateStr+'</div>'
+    +'<div style="display:flex;gap:6px;justify-content:center;margin-top:12px">'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
+    +'</div></div>';
+  var prompt='Aaj ki date: '+dateStr+'.'
+    +'\n\nIndia ki aaj ki ('+dateStr+') REAL current affairs ke MCQ banao — Bihar Police/SSC/RRB exam style.'
+    +'\nCategories cover karo: niyukti, puraskar, khel, vigyan, arthvyavastha, antarrashtriya, rashtriya.'
+    +'\n\nAGAR AAJ KOI KHAAS KHABAR NAHI — toh {"noNews":true} return karo.'
+    +'\nWarna SIRF ASAL khabrein likho — kuch bhi mat banao.'
+    +'\n\nRULES:\n1. 4 options BILKUL ALAG, realistic\n2. ans index 0/1/2/3 vary karo\n3. Hindi only\n4. Headline mein poora fact likho'
+    +'\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य","mcq":{"q":"प्रश्न?","opts":["(A) सही","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":1,"sol":"व्याख्या"}}]}'
+    +'\n\nSIRF valid JSON. No markdown.';
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.error) throw new Error(data.error.message);
+    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
+    var parsed=JSON.parse(txt.substring(s,e));
+    // AI said no news today
+    if(parsed.noNews){
+      try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
+      document.getElementById('daily-ca-content').innerHTML=
+        '<div style="text-align:center;padding:30px;color:var(--t2)">'
+        +'<div style="font-size:2rem">📭</div>'
+        +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi major current affairs nahi</div>'
+        +'<div style="font-size:.65rem">'+dateStr+' — Kal dobara check karo</div>'
+        +'</div>';
+      return;
+    }
+    if(!parsed.items||!parsed.items.length){
+      try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
+      document.getElementById('daily-ca-content').innerHTML=
+        '<div style="text-align:center;padding:30px;color:var(--t2)">'
+        +'<div style="font-size:2rem">📭</div>'
+        +'<div style="font-size:.8rem;font-weight:700;margin:8px 0">Aaj koi news nahi mili</div>'
+        +'<button onclick="loadDailyCA(true)" style="margin-top:12px;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;padding:6px 14px;font-size:.65rem;cursor:pointer">🔄 Retry</button>'
+        +'</div>';
+      return;
+    }
+    renderDailyCAItems(parsed.items,dateStr,cacheKey);
+    toast('✅ Aaj ki CA ready!','i');
+  })
+  .catch(function(e){
+    document.getElementById('daily-ca-content').innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,60))+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="loadDailyCA(true)">🔄 Retry</button></div>';
+  });
 }
+
 
 function pickDCA(i,oi,correct){
   var opts=document.querySelectorAll('[id^="dca'+i+'_"]');
@@ -4845,97 +4913,72 @@ function buildHeatmap(){
 }
 
 function initReport(){
-
-  // ── 1. Subject Weakness ──
+  var subjects={history:'📜 इतिहास',geography:'🌍 भूगोल',polity:'⚖️ राजनीति',economy:'💰 अर्थव्यवस्था',science:'🔬 विज्ञान',computer:'💻 Computer',static_gk:'🏛️ Static GK'};
+  // Subject Weakness
   var el=document.getElementById('rpt-weakness');
   if(el){
-    var subjects={
-      history:'📜 इतिहास', geography:'🌍 भूगोल', polity:'⚖️ राजनीति',
-      economy:'💰 अर्थव्यवस्था', science:'🔬 विज्ञान', computer:'💻 Computer', static_gk:'🏛️ Static GK'
-    };
-    var html='';
-    var hasData=false;
+    var html=''; var hasData=false;
     Object.keys(subjects).forEach(function(key){
-      var st=S.sStats&&S.sStats[key]?S.sStats[key]:{d:0,t:0};
-      if(!st.t) return;
-      hasData=true;
+      var st=(S.sStats&&S.sStats[key])||{d:0,t:0};
+      if(!st.t) return; hasData=true;
       var pct=Math.round(st.d/st.t*100);
       var color=pct>=70?'var(--gr)':pct>=50?'#ffd700':'#ff6b35';
       html+='<div style="margin-bottom:8px">'
         +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px">'
-        +'<span style="font-weight:700">'+subjects[key]+'</span>'
-        +'<span style="color:'+color+';font-weight:900">'+pct+'%</span></div>'
+        +'<span style="font-weight:700">'+subjects[key]+'</span><span style="color:'+color+';font-weight:900">'+pct+'%</span></div>'
         +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
-        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px;transition:width .5s"></div></div>'
-        +'<div style="font-size:.58rem;color:var(--t2);margin-top:2px">'+st.d+'/'+st.t+' sahi</div>'
-        +'</div>';
+        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px"></div></div>'
+        +'<div style="font-size:.58rem;color:var(--t2);margin-top:2px">'+st.d+'/'+st.t+' sahi</div></div>';
     });
     el.innerHTML=hasData?html:'<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Practice karo — data aayega 📖</div>';
   }
-
-  // ── 2. Mock Trend ──
+  // Mock Trend
   var tel=document.getElementById('rpt-trend');
   if(tel){
     var mocks=S.mocks&&S.mocks.length?S.mocks.slice(-10):[];
-    if(!mocks.length){
-      tel.innerHTML='<div style="color:var(--t2);padding:8px 0">Abhi koi mock nahi diya 📝</div>';
-    } else {
-      var max=100; var h=80;
-      var bars=mocks.map(function(m,i){
-        var pct=m.pct||0;
-        var barH=Math.round((pct/max)*h);
-        var color=pct>=60?'var(--gr)':pct>=40?'#ffd700':'#ff6b35';
-        return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">'
-          +'<div style="font-size:.55rem;font-weight:900;color:'+color+'">'+pct+'%</div>'
-          +'<div style="width:100%;display:flex;align-items:flex-end;height:'+h+'px">'
-          +'<div style="width:100%;height:'+barH+'px;background:'+color+';border-radius:4px 4px 0 0"></div></div>'
-          +'<div style="font-size:.48rem;color:var(--t2);text-align:center">'+(m.name||'Mock').substring(0,6)+'</div>'
-          +'</div>';
-      }).join('');
-      tel.innerHTML='<div style="display:flex;gap:4px;align-items:flex-end;padding:4px 0">'+bars+'</div>'
-        +'<div style="font-size:.6rem;color:var(--t2);margin-top:4px;text-align:center">Pichle '+mocks.length+' mocks</div>';
+    if(!mocks.length){tel.innerHTML='<div style="color:var(--t2);padding:8px 0;font-size:.72rem">Koi mock nahi diya 📝</div>';}
+    else{
+      var h=80;
+      tel.innerHTML='<div style="display:flex;gap:4px;align-items:flex-end;padding:4px 0">'
+        +mocks.map(function(m){
+          var p=m.pct||0; var bh=Math.round(p/100*h);
+          var col=p>=60?'var(--gr)':p>=40?'#ffd700':'#ff6b35';
+          return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">'
+            +'<div style="font-size:.55rem;font-weight:900;color:'+col+'">'+p+'%</div>'
+            +'<div style="width:100%;display:flex;align-items:flex-end;height:'+h+'px">'
+            +'<div style="width:100%;height:'+bh+'px;background:'+col+';border-radius:4px 4px 0 0"></div></div>'
+            +'<div style="font-size:.48rem;color:var(--t2)">'+(m.name||'Mock').substring(0,6)+'</div></div>';
+        }).join('')
+        +'</div><div style="font-size:.6rem;color:var(--t2);margin-top:4px;text-align:center">Pichle '+mocks.length+' mocks</div>';
     }
   }
-
-  // ── 3. Topic Coverage (RWA) ──
+  // Topic Coverage
   var cel=document.getElementById('rpt-coverage');
-  if(cel && typeof RWA_TOPICS !== 'undefined'){
-    var subjects2={history:'📜 इतिहास',geography:'🌍 भूगोल',polity:'⚖️ राजनीति',economy:'💰 अर्थव्यवस्था',science:'🔬 विज्ञान',computer:'💻 Computer',static_gk:'🏛️ Static GK'};
+  if(cel&&typeof RWA_TOPICS!=='undefined'){
     var chtml='';
     Object.keys(RWA_TOPICS).forEach(function(key){
-      var subj=RWA_TOPICS[key];
-      var total=subj.subtopics.length;
-      var opened=0;
-      subj.subtopics.forEach(function(_,idx){
-        var ck='rwa_'+key+'_'+idx;
-        try{if(localStorage.getItem('rwa_h_'+ck)) opened++;}catch(e){}
-      });
+      var subj=RWA_TOPICS[key]; var total=subj.subtopics.length; var opened=0;
+      subj.subtopics.forEach(function(_,idx){try{if(localStorage.getItem('rwa_h_rwa_'+key+'_'+idx)) opened++;}catch(e){}});
       var pct=total?Math.round(opened/total*100):0;
       var color=pct>=70?'var(--gr)':pct>=30?'#ffd700':'var(--t2)';
       chtml+='<div style="margin-bottom:8px">'
         +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px">'
-        +'<span style="font-weight:700">'+(subjects2[key]||key)+'</span>'
-        +'<span style="color:'+color+';font-weight:900">'+opened+'/'+total+'</span></div>'
+        +'<span style="font-weight:700">'+(subjects[key]||key)+'</span><span style="color:'+color+';font-weight:900">'+opened+'/'+total+'</span></div>'
         +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
-        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px;transition:width .5s"></div></div>'
-        +'</div>';
+        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px"></div></div></div>';
     });
     cel.innerHTML=chtml;
   }
-
-  // ── 4. Mock History ──
+  // Mock History
   var th=document.getElementById('testHist');
   if(th){
-    if(!S.mocks||!S.mocks.length){
-      th.innerHTML='<div class="empty" style="padding:16px">Abhi koi mock test nahi diya</div>';
-    } else {
-      th.innerHTML=S.mocks.slice().reverse().map(function(m){
-        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--br)">'
-          +'<div><div style="font-size:.78rem;font-weight:700">'+esc(m.name||'Mock Test')+'</div>'
-          +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+'</div></div>'
-          +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+( m.pct||0)+'%</div></div>';
-      }).join('');
-    }
+    if(!S.mocks||!S.mocks.length){th.innerHTML='<div class="empty" style="padding:16px">Abhi koi mock nahi diya</div>';}
+    else{th.innerHTML=S.mocks.slice().reverse().map(function(m){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--br)">'
+        +'<div><div style="font-size:.78rem;font-weight:700">'+esc(m.name||'Mock Test')+'</div>'
+        +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+'</div></div>'
+        +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+( m.pct||0)+'%</div></div>';
+    }).join('');}
   }
 }
 
@@ -5309,6 +5352,7 @@ function loadFromFirestore(cb){
         try{
           var p=JSON.parse(doc.data().appData);
           S=Object.assign({},S,p);
+          if(doc.data().examDates) S.examDates=Object.assign({},S.examDates||{},doc.data().examDates);
         }catch(e){}
       } else {load();}
       if(cb)cb();
@@ -5325,7 +5369,7 @@ function saveToFirestore(){
     db.collection('users').doc(uid).set({
       appData:JSON.stringify(S),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
-      name:S.name,streak:calcStreak()
+      name:S.name,streak:calcStreak(),examDates:S.examDates||{}
     },{merge:true}).catch(function(e){console.error('Save error:',e);});
   },1500);
 }
