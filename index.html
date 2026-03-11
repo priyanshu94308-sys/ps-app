@@ -1014,10 +1014,7 @@ body::before{
     <div class="tab" id="tab-rwa">
       <!-- Level 1: Subjects -->
       <div id="rwa-subjects-view">
-        <div style="background:linear-gradient(135deg,rgba(255,165,0,.15),rgba(255,107,138,.1));border:1px solid rgba(255,165,0,.3);border-radius:13px;padding:12px;margin-bottom:12px">
-          <div style="font-size:.95rem;font-weight:900">📖 RWA Yellow Book</div>
-          <div style="font-size:.63rem;color:var(--t2);margin-top:3px">Ankit Bhati Sir · AI + QB Questions</div>
-        </div>
+        
         <div style="font-size:.75rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📚 Subject Choose Karo</div>
         <div id="rwa-subjects"></div>
       </div>
@@ -4658,22 +4655,39 @@ function loadDailyCA(force){
     +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
     +'<div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
     +'</div></div>';
-  var prompt='Tu ek Current Affairs MCQ generator hai. Aaj ki date: '+dateStr+'.'
-    +'\n\nTera kaam hai India ki recent (2024-2026) important current affairs ke MCQ banana — Bihar Police/SSC GD/RRB exam style.'
-    +'\nIn categories se cover karo (jitna ho sake): niyukti, puraskar, khel, vigyan-takniki, arthvyavastha, antarrashtriya, rashtriya-ghatnayen.'
-    +'\n\nRULES:\n'
-    +'1. MINIMUM 8 items — kam mat banana.\n'
-    +'2. 4 options BILKUL ALAG aur realistic (ek sahi, teen galat jo confuse kare)\n'
-    +'3. ans index 0/1/2/3 equally vary karo — sab ek hi index pe mat rakho\n'
-    +'4. Hindi only (Devanagari)\n'
-    +'5. Headline mein POORA fact likho (sirf naam nahi — position/jagah/sal bhi)\n'
-    +'6. Sol mein 1-2 line explanation aur extra fact likho\n'
-    +'7. Sirf REAL events — kuch bhi mat banao\n'
-    +'\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा सटीक तथ्य यहाँ","mcq":{"q":"प्रश्न?","opts":["(A) सही उत्तर","(B) गलत","(C) गलत","(D) गलत"],"ans":0,"sol":"विस्तृत व्याख्या"}}]}'
-    +'\nSIRF valid JSON. No markdown. No preamble.';
+  var prompt='Aaj ki date: '+dateStr+'.'
+    +'\n\n## TERA KAAM\n'
+    +'India ki CONFIRMED current affairs ke MCQ banao — Bihar Police/SSC GD/RRB/BSSC exam style.'
+    +'\nSaal range: 2023-2026. In categories se cover karo: niyukti, puraskar, khel, yojana, vigyan, antarrashtriya, rashtriya.'
+    +'\n\n## SABSE IMPORTANT — SELF-VERIFY RULE\n'
+    +'Har fact likhne se PEHLE apne aap se poochho:\n'
+    +'  - "Kya mujhe is fact ki 100% certainty hai?"\n'
+    +'  - "Kya maine is specific naam + post + saal combination clearly training mein dekha hai?"\n'
+    +'  - Agar KISI BHI PART mein doubt ho → us item ko SKIP karo, aage badho\n'
+    +'GALAT FACT DENA = STUDENT KA EXAM KHARAB KARNA. Better to give 6 correct than 10 wrong.\n'
+    +'\n## SAFE CATEGORIES (inpe focus karo — ye change nahi hote):\n'
+    +'- Khel: Cricket/Hockey/Olympics results, records, cups (score aur naam dono confirm karo)\n'
+    +'- Puraskar: Padma, Nobel, Bharat Ratna, Oscar (year + recipient confirm karo)\n'
+    +'- Yojana/Scheme: Government schemes naam, launch year, lakshya (ye stable hote hain)\n'
+    +'- Vigyan/Space: ISRO missions, scientific discoveries (naam + year confirm karo)\n'
+    +'- Arthvyavastha: GDP rank, budget figures, RBI rates (specific confirmed numbers)\n'
+    +'\n## RISKY CATEGORIES (sirf tab likho jab 100% sure ho):\n'
+    +'- Niyukti/Appointments: SIRF tab likho jab naam + post + department TEENO confirm ho\n'
+    +'  Example GALAT: "Amit Shah = Raksha Mantri" (wo Griha Mantri hain — Rajnath Singh Raksha Mantri)\n'
+    +'  Agar current Cabinet post ke baare mein 1% bhi doubt ho → SKIP karo\n'
+    +'\n## RULES:\n'
+    +'1. MINIMUM 8 items (skip karo to minimum na karo — quality > quantity)\n'
+    +'2. 4 options: ek bilkul sahi, teen galat jo confuse kare (realistic alternatives)\n'
+    +'3. ans index 0/1/2/3 distribute karo equally\n'
+    +'4. Sirf Hindi/Devanagari\n'
+    +'5. Headline mein POORA fact: naam + post/jagah/record + saal SATH mein likho\n'
+    +'6. Sol mein: sahi answer confirm karo + 1 extra related fact likho\n'
+    +'7. Koi bhi item copy-paste na karo pichle response se — fresh facts only\n'
+    +'\nJSON format (SIRF ye return karo, koi markdown nahi):\n'
+    +'{"items":[{"cat":"नियुक्ति","headline":"पूरा सटीक तथ्य + साल","mcq":{"q":"प्रश्न?","opts":["(A) उत्तर1","(B) उत्तर2","(C) उत्तर3","(D) उत्तर4"],"ans":0,"sol":"सही उत्तर X है क्योंकि... + extra fact"}}]}';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'llama-3.1-8b-instant',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu ek strict fact-checker aur Current Affairs MCQ generator hai. RULE #1: Koi bhi uncertain fact mat likho — agar 100% sure nahi ho toh skip karo. RULE #2: Sirf valid JSON return karo, Hindi only, no markdown.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.2})
   })
   .then(function(r){return r.json();})
   .then(function(data){
@@ -4682,7 +4696,7 @@ function loadDailyCA(force){
       if(emsg.toLowerCase().includes('rate limit')){
         // Retry with fallback model after 1s
         setTimeout(function(){
-          fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})})
+          fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',messages:[{role:'system',content:'Tu strict fact-checker aur CA MCQ generator hai. Uncertain fact = skip karo. Sirf valid JSON, Hindi only, no markdown.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.2})})
           .then(function(r2){return r2.json();})
           .then(function(d2){
             if(d2.error) throw new Error(d2.error.message);
