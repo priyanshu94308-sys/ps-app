@@ -890,58 +890,10 @@ body::before{
       <div id="taskList"></div>
     </div>
     <!-- PRACTICE -->
-    <div class="tab" id="tab-practice">
-      <div id="pv1">
-        <div style="font-size:1rem;font-weight:900;margin-bottom:12px;letter-spacing:-.2px">📚 Practice <span style="font-size:.65rem;font-weight:700;color:var(--t2);letter-spacing:0">Subject choose karo</span></div>
-        <div class="chips" id="examC">
-          <button class="chip on" onclick="setExam('ssc',this)">SSC</button>
-          <button class="chip" onclick="setExam('rrb',this)">RRB</button>
-          <button class="chip" onclick="setExam('police',this)">Police</button>
-          <button class="chip" onclick="setExam('upsc',this)">UPSC</button>
-        </div>
-        <div class="sg" id="subjGrid"></div>
-      </div>
-      <div id="pv2" style="display:none">
-        <button class="back" onclick="showV('pv1','pv2')">← Back</button>
-        <div id="chTitle" style="font-size:.87rem;font-weight:800;margin-bottom:8px"></div>
-        <div class="chips" id="lvlC">
-          <button class="chip on" onclick="setLvl('all',this)">Sab</button>
-          <button class="chip" onclick="setLvl('easy',this)">🟢 Easy</button>
-          <button class="chip" onclick="setLvl('moderate',this)">🟡 Moderate</button>
-          <button class="chip" onclick="setLvl('hard',this)">🟠 Hard</button>
-        </div>
-        <div id="chList"></div>
-      </div>
-      <div id="pv3" style="display:none">
-        <button class="back" onclick="showV('pv2','pv3')">← Back</button>
-        <div id="pTitle" style="font-size:.85rem;font-weight:800;margin-bottom:5px"></div>
-        <div id="pScore" style="display:none;background:var(--card);border-radius:8px;padding:7px 11px;border:1px solid var(--br);margin-bottom:7px;justify-content:space-between;align-items:center">
-          <span style="font-size:.7rem;color:var(--t2)">Score</span><span style="font-size:1rem;font-weight:800;color:var(--gr)" id="pScoreN">0/0</span>
-        </div>
-        <div id="qList"></div>
-      </div>
-    </div>
+    
     <!-- MOCK -->
         <!-- YOGA -->
-    <div class="tab" id="tab-yoga">
-      <div class="yscene">
-        <div style="width:100%;height:130px;position:relative;margin-bottom:8px">
-          <svg id="yogaSVG" viewBox="0 0 300 130" style="width:100%;height:100%"></svg>
-        </div>
-        <div class="yring">
-          <svg width="74" height="74"><circle class="yrb" cx="37" cy="37" r="31"/><circle class="yrf" id="yogaRing" cx="37" cy="37" r="31" stroke-dasharray="194.8" stroke-dashoffset="0"/></svg>
-          <div class="ynum" id="yogaNum">1:00</div>
-        </div>
-        <div style="font-size:.86rem;font-weight:800;margin-bottom:2px" id="yStepName">🙏 Taiyar Ho!</div>
-        <div style="font-size:.68rem;color:var(--t2);line-height:1.5;margin-bottom:9px" id="yStepDesc">Start dabao — yoga session shuru hoga!</div>
-        <div style="display:flex;gap:7px;justify-content:center">
-          <button class="ybtn go" id="yBtn" onclick="yogaToggle()">▶ Start</button>
-          <button class="ybtn" onclick="yogaReset()">↺ Reset</button>
-        </div>
-      </div>
-      <div class="sec">📋 Steps</div>
-      <div id="yStepList"></div>
-    </div>
+    
     <!-- RWA BOOK -->
     <div class="tab" id="tab-rwa">
       <!-- Level 1: Subjects -->
@@ -1148,6 +1100,7 @@ body::before{
     </div>
     <!-- SETTINGS -->
     <div class="tab" id="tab-settings">
+      <div class="scard" style="margin-bottom:10px"><div class="sec">&#128197; Exam Countdown</div><div id="countdown-section"></div><div style="font-size:.6rem;color:var(--t2);margin-top:6px;text-align:center">Date set karne ke liye tap karo</div></div>
       <div class="scard">
         <div class="sec">👤 Profile</div>
         <div style="display:flex;gap:5px"><input type="text" class="fi" id="nameInp" placeholder="Apna naam..."><button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveName()">Save</button></div>
@@ -1191,8 +1144,8 @@ body::before{
   </div>
   <div class="tabbar">
     <button class="tb on" onclick="sw('home')" id="tb-home"><span>🏠</span>Home</button>
-    <button class="tb" onclick="sw('practice')" id="tb-practice"><span>📚</span>Practice</button>
-    <button class="tb" onclick="sw('yoga')" id="tb-yoga"><span>🧘</span>Yoga</button>
+    
+    
     <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>Topic</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
@@ -3483,6 +3436,7 @@ var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 
 // ── STATE ──
 var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[]};
+if(!S.examDates) S.examDates={};
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
 var pracQs=[],pracAns={},pracC=0,pracT=0;
 var charts={w:null,s:null,m:null};
@@ -3550,9 +3504,9 @@ function sw(tab){
   tabEl.classList.add('active');
   tbEl.classList.add('on');
   document.querySelector('.content').scrollTop=0;
-  if(tab==='home'){renderHome();updateHeader();}
-  if(tab==='practice'){renderSubjects();}
-  if(tab==='yoga'){initYoga();}
+  if(tab==='home'){renderHome();updateHeader();renderCountdown();}
+  
+  
   if(tab==='rwa'){initRWA();}
   if(tab==='ask'){window._chatHistory=[];}
   if(tab==='ca'){initCA();var k=getGKey();if(k) loadDailyCA(false);}
@@ -3906,6 +3860,50 @@ function rwaBreadcrumbBack(level){
 }
 
 
+
+// ── EXAM COUNTDOWN ──
+var EXAM_LIST=[
+  {key:'ssc_gd',       label:'SSC GD'},
+  {key:'ssc_cgl',      label:'SSC CGL'},
+  {key:'bihar_police', label:'Bihar Police'},
+  {key:'bssc',         label:'BSSC'},
+  {key:'bsf',          label:'BSF'},
+  {key:'hcm',          label:'HCM'}
+];
+function renderCountdown(){
+  var el=document.getElementById('countdown-section');
+  if(!el) return;
+  var today=new Date(); today.setHours(0,0,0,0);
+  var html='';
+  EXAM_LIST.forEach(function(exam){
+    var dateStr=(S.examDates&&S.examDates[exam.key])||'';
+    var days='?'; var color='var(--t2)'; var badge='';
+    if(dateStr){
+      var d=new Date(dateStr); d.setHours(0,0,0,0);
+      var diff=Math.round((d-today)/(86400000));
+      if(diff<0){days='Khatam'; color='var(--t2)';}
+      else if(diff===0){days='AAJ!'; color='#ff4444'; badge='\uD83D\uDD34 ';}
+      else if(diff<=7){days=diff+'d'; color='#ff6b35'; badge='\uD83D\uDD25 ';}
+      else if(diff<=30){days=diff+'d'; color='#ffd700';}
+      else{days=diff+'d'; color='var(--gr)';}
+    }
+    html+='<div onclick="setExamDate(\''+exam.key+'\',\''+exam.label+'\')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--cd2);border-radius:10px;margin-bottom:6px;cursor:pointer">'
+      +'<div style="font-size:.78rem;font-weight:700">'+badge+exam.label+'</div>'
+      +'<div style="font-size:.85rem;font-weight:900;color:'+color+'">'+days+'</div>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+function setExamDate(key,label){
+  var cur=(S.examDates&&S.examDates[key])||'';
+  var d=window.prompt(label+' ki exam date daalo\n(YYYY-MM-DD format, e.g. 2025-11-15)', cur);
+  if(d===null) return;
+  if(!S.examDates) S.examDates={};
+  if(d===''){delete S.examDates[key];}
+  else{S.examDates[key]=d;}
+  save();
+  renderCountdown();
+}
 function initApp(){
   load();
   // Apply saved dark/light mode
@@ -3932,6 +3930,8 @@ function initApp(){
   if(gk){try{var k=localStorage.getItem('ps_gkey');if(k)gk.value=k;}catch(e){}}
   updateHeader();
   renderHome();
+  renderCountdown();;
+  renderCountdown();
   renderSubjects();
   initYoga();
   initCA();
