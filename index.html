@@ -13,9 +13,9 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" onload="window._fbLoad=(window._fbLoad||0)+1" onerror="window._fbErr=true"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" onload="window._fbLoad=(window._fbLoad||0)+1" onerror="window._fbErr=true"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" onload="window._fbLoad=(window._fbLoad||0)+1;if(window._fbLoad>=3&&window._fbReady)window._fbReady()" onerror="window._fbErr=true"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
 
@@ -5331,23 +5331,50 @@ save=function(){_localSave();saveToFirestore();};
 
 // ── START ──
 window.addEventListener('DOMContentLoaded',function(){
-  // Firebase SDKs load hone ka wait karo
-  if(typeof firebase!=='undefined'){
+  var statusEl=document.getElementById('fbLoginStatus');
+  var gateEl=document.getElementById('fbGate');
+  if(gateEl) gateEl.style.display='flex';
+
+  function startApp(){
+    if(statusEl) statusEl.textContent='';
     initFirebase();
-  } else {
-    var tries=0;
-    var waitFB=setInterval(function(){
-      tries++;
-      if(typeof firebase!=='undefined'){
-        clearInterval(waitFB);
-        initFirebase();
-      } else if(tries>10){
-        clearInterval(waitFB);
-        document.getElementById('fbGate').style.display='flex';
-        document.getElementById('fbLoginStatus').innerHTML='❌ Firebase SDK load nahi hua — Internet check karo ya reload karo';
-      }
-    },300);
   }
+
+  // Already loaded (fast connection)
+  if(typeof firebase!=='undefined'&&window._fbLoad>=3){
+    startApp();
+    return;
+  }
+
+  // Slow connection — wait for onload callback (up to 60 sec)
+  window._fbReady=function(){
+    clearInterval(waitFB);
+    startApp();
+  };
+
+  var tries=0;
+  if(statusEl) statusEl.innerHTML='⏳ App load ho rahi hai...';
+  var waitFB=setInterval(function(){
+    tries++;
+    if(typeof firebase!=='undefined'){
+      clearInterval(waitFB);
+      startApp();
+      return;
+    }
+    if(window._fbErr){
+      clearInterval(waitFB);
+      if(statusEl) statusEl.innerHTML='❌ Firebase load fail — Net check karo, reload karo';
+      return;
+    }
+    // Update loading message every 5 sec
+    if(tries%17===0&&statusEl){
+      statusEl.innerHTML='⏳ Load ho rahi hai... ('+Math.round(tries*0.3)+'s)';
+    }
+    if(tries>200){// 60 seconds
+      clearInterval(waitFB);
+      if(statusEl) statusEl.innerHTML='❌ Timeout — Net bahut slow hai। Reload karo ya WiFi use karo।';
+    }
+  },300);
 });
 
 </script>
