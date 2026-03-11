@@ -611,7 +611,8 @@ select.fi { -webkit-appearance: none; cursor: pointer; }
       <input class="fi" type="password" id="login-pass" placeholder="Password..." onkeydown="if(event.key==='Enter')loginEmail()">
     </div>
     <button class="btn btn-full" onclick="loginEmail()">Login / Register →</button>
-    <div id="login-err"></div>
+    <div id="login-err" style="margin-top:8px;font-size:.7rem;min-height:16px"></div>
+    <div id="login-dbg" style="display:none;margin-top:10px;background:rgba(255,0,0,.1);border:1px solid red;border-radius:8px;padding:8px;font-size:.6rem;color:red;word-break:break-all;white-space:pre-wrap"></div>
     <div class="login-or">ya</div>
     <button onclick="loginGoogle()" style="width:100%;background:var(--glass);border:1.5px solid var(--br);border-radius:11px;color:var(--tx);font-size:.78rem;font-weight:700;padding:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
       <span>🔍</span> Google se Login
@@ -5345,14 +5346,19 @@ function setLoginErr(msg){
 }
 
 function loginEmail(){
+  var dbg=document.getElementById('login-dbg');
+  function _d(m){if(dbg){dbg.style.display='block';dbg.textContent+='\n'+m;}console.log(m);}
+  _d('Login button clicked');
   var email=(document.getElementById('login-email')||{}).value||'';
   var pass=(document.getElementById('login-pass')||{}).value||'';
+  _d('Email: '+(email?'entered':'EMPTY')+', Pass: '+(pass?'entered':'EMPTY'));
   if(!email||!pass){setLoginErr('⚠️ Email aur password dono daalo.');return;}
   if(!auth){
     setLoginErr('❌ Firebase load nahi hua — internet check karo ya page reload karo.');
-    console.error('AUTH NULL - Firebase init failed');
+    _d('ERROR: auth is null/undefined');
     return;
   }
+  _d('Calling signInWithEmailAndPassword...');
   var btn=document.querySelector('#login-page .btn-full');
   if(btn){btn.disabled=true;btn.textContent='⏳ Login ho raha hai...';}
   setLoginErr('');
@@ -5394,6 +5400,15 @@ function loginGoogle(){
     });
 }
 function initFirebase(){
+  var dbg=document.getElementById('login-dbg');
+  function _dbg(msg){if(dbg){dbg.style.display='block';dbg.textContent+='\n'+msg;}console.log(msg);}
+  _dbg('initFirebase start...');
+  if(typeof firebase==='undefined'){
+    _dbg('ERROR: Firebase SDK load nahi hua!');
+    setLoginErr('❌ Firebase load nahi hua. Internet check karo.');
+    return;
+  }
+  _dbg('Firebase SDK OK');
   var firebaseConfig={
     apiKey:"AIzaSyBTkrEU8TJXtxqCrZlaWC6W7KBcpM8YG8Y",
     authDomain:"ps-study-app.firebaseapp.com",
@@ -5404,8 +5419,10 @@ function initFirebase(){
   };
   try{
     firebase.initializeApp(firebaseConfig);
+    _dbg('App initialized OK');
     db=firebase.firestore();
     auth=firebase.auth();
+    _dbg('Auth ready: '+(auth?'YES':'NO'));
     // Handle redirect result (mobile Google login ke baad)
     auth.getRedirectResult().catch(function(e){
       if(e.code&&e.code!=='auth/null-user') setLoginErr('Login error: '+e.message);
@@ -5500,9 +5517,9 @@ save=function(){_localSave();saveToFirestore();};
 
 // ── START ──
 window.onerror=function(msg,src,line,col,err){
-  var el=document.getElementById('login-err');
-  if(el) el.textContent='JS Error: '+msg+' (line '+line+')';
-  console.error('JS ERROR:',msg,src,line);
+  var dbg=document.getElementById('login-dbg');
+  if(dbg){dbg.style.display='block';dbg.textContent='JS ERROR line '+line+':\n'+msg;}
+  console.error('JS ERROR:',msg,line,err);
   return false;
 };
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
