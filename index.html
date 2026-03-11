@@ -5259,7 +5259,20 @@ function setLoginStatus(msg,type){
 }
 
 function signInWithGoogle(){
-  if(!auth){setLoginStatus('❌ Firebase load nahi hua','e');return;}
+  // Agar auth abhi ready nahi — thoda wait karke retry karo
+  if(!auth){
+    setLoginStatus('⏳ Firebase load ho raha hai... ek second ruko','i');
+    setTimeout(function(){
+      if(!auth){
+        setLoginStatus('❌ Firebase load nahi hua — page reload karo','e');
+        var st=document.getElementById('fbLoginStatus');
+        if(st) st.innerHTML='❌ Firebase load nahi hua — <a href="javascript:location.reload()" style="color:var(--ac)">Reload karo</a>';
+      } else {
+        signInWithGoogle();
+      }
+    },2500);
+    return;
+  }
   var btn=document.getElementById('googleLoginBtn');
   if(btn){btn.disabled=true;btn.style.opacity='.7';btn.textContent='⏳ Google pe ja rahe hain...';}
   setLoginStatus('Ek second ruko...','i');
