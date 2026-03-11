@@ -3500,6 +3500,8 @@ function save(){
     var exp=new Date();exp.setFullYear(exp.getFullYear()+1);
     if(d.length<3900) document.cookie='ps_v3='+encodeURIComponent(d)+';expires='+exp.toUTCString()+';path=/;SameSite=Lax';
   }catch(e){}
+  // Firestore sync — logged in ho toh
+  if(currentUser) saveToFirestore();
 }
 function load(){
   var best=null,bestSize=0;
@@ -3554,6 +3556,7 @@ function sw(tab){
   if(tab==='practice'){renderSubjects();}
   if(tab==='yoga'){initYoga();}
   if(tab==='rwa'){initRWA();}
+  if(tab==='ask'){window._chatHistory=[];}
   if(tab==='ca'){initCA();var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='report') initReport();
@@ -3785,12 +3788,20 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
 function getRWAQBQuestions(subjectKey,topic){
   if(typeof QB==='undefined') return [];
   var qbKey=subjectKey==='static_gk'?'gk':subjectKey;
-  if(!QB[qbKey]) return [];
-  var words=topic.toLowerCase().replace(/[^\u0900-\u097f\w\s]/g,'').split(/\s+/).filter(function(w){return w.length>3;});
-  return QB[qbKey].filter(function(q){
-    var t=(q.q||'').toLowerCase();
+  if(!QB[qbKey]||!QB[qbKey].length) return [];
+  var words=topic.toLowerCase().replace(/[^ऀ-ॿ\w\s]/g,'').split(/\s+/).filter(function(w){return w.length>2;});
+  if(!words.length) return QB[qbKey].slice(0,5);
+  // First: strict match (any word in question)
+  var strict=QB[qbKey].filter(function(q){
+    var t=((q.q||'')+(q.sol||'')).toLowerCase();
     return words.some(function(w){return t.indexOf(w)>=0;});
-  }).slice(0,5);
+  });
+  // If strict gives enough → use it
+  if(strict.length>=3) return strict.slice(0,5);
+  // Fallback: return random from subject
+  var all=QB[qbKey].slice();
+  for(var i=all.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=all[i];all[i]=all[j];all[j]=tmp;}
+  return all.slice(0,5);
 }
 
 function renderRWAQuestion(){
@@ -5073,6 +5084,9 @@ function launchMockWithConfig(name){
       if(ldr) ldr.textContent=pct+'%';
       if(fetched>=fetchCount){
         mockState.qs=allQs.slice(0,totalNeeded);
+        if(mockState.qs.length < totalNeeded){
+          toast('⚠️ Sirf '+mockState.qs.length+'/'+totalNeeded+' questions mile','i');
+        }
         renderMockQ();
         startMockTimer();
       } else {
