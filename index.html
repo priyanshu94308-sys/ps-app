@@ -3684,7 +3684,7 @@ function _getRWAHistory(cacheKey){
 function _saveRWAHistory(cacheKey,qs){
   var h=_getRWAHistory(cacheKey);
   qs.forEach(function(q){
-    var txt=(q.q||'').substring(0,60);
+    var txt=(q.q||'').substring(0,100);
     if(txt&&h.indexOf(txt)===-1) h.push(txt);
   });
   // Keep last 60 questions max
@@ -3720,27 +3720,37 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   var avoidStr='';
   if(hist.length>0){
     var recent=hist.slice(-40);
-    avoidStr='\n\nYE QUESTIONS PEHLE POOCHE JA CHUKE HAIN — BILKUL SAME YA SIMILAR MAT POOCHHO:\n'
+    avoidStr='\n\n🚫 YE QUESTIONS ALREADY POOCHE JA CHUKE HAIN — INSE MILTE-JULTE QUESTIONS BILKUL MAT BANANA:\n'
       +recent.map(function(q,i){return (i+1)+'. '+q;}).join('\n')
-      +'\n\nUpar wale se ALAG topic ke angles choose karo.';
+      +'\n\n✅ AB NAYI ANGLES CHOOSE KARO — alag events, alag persons, alag dates, alag places use karo.';
+    var angles=['Koi aisa tathya jo kam jaana jaata ho','Koi important date ya saal','Koi important vyakti ya sthan','Koi mahatvapurna ghatna','Koi sankhya ya ankada'];
+    avoidStr+='\n💡 IS BAAR FOCUS: '+angles[Math.floor(Math.random()*angles.length)]+'.';
+  } else {
+    var angles0=['Pramukh tithiyaan aur saal','Pramukh vyakti aur yogdan','Pramukh sthal aur mahatva','Mahavapurna sankhyaen','Karan aur parinaam'];
+    avoidStr='\n💡 FOCUS: '+angles0[Math.floor(Math.random()*angles0.length)]+'.';
   }
   var prompt='TOPIC: "'+topic+'"\n\n'
-    +'Is TOPIC par SIRF 10 NAYE aur UNIQUE MCQ banao.\n'
-    +'⚠️ SABSE IMPORTANT: Har ek question SIRF "'+topic+'" ke baare mein ho.\n'
-    +'Dusre topics ke questions BILKUL mat banana — sirf is ek topic ke andar raho.\n\n'
-    +'RULES:\n'
-    +'- 4 options: ek sahi, teen galat (realistic, confusing)\n'
-    +'- ans: 0/1/2/3 equally vary karo — sirf 0 mat dena\n'
-    +'- SSC GD/Bihar Police exam style — medium difficulty\n'
-    +'- sol: ek line mein sahi answer ki explanation\n'
-    +'- NCERT Class 6-12 ke facts use karo\n'
+    +'Is TOPIC se SIRF 10 MCQ banao. Har question is topic ke kisi ek specific fact ke baare mein hona chahiye.\n'
+    +'\nUDAHARAN: Agar topic \"मौर्य काल\" hai to questions honge:\n'
+    +'  - Chandragupta Maurya ki rajdhani kahan thi?\n'
+    +'  - Ashok ke kitne shilalekh mile hain?\n'
+    +'  - Arthashastra kisne likha?\n'
+    +'Aise SPECIFIC facts wale questions banana — broad ya generic nahi.\n\n'
+    +'⚠️ STRICT RULE: Question mein "'+topic+'" ka koi specific tathya (date/name/place/number) hona chahiye.\n'
+    +'Dusre topics ya dusre kaal ke questions BILKUL nahi.\n\n'
+    +'FORMAT RULES:\n'
+    +'- 4 options: ek bilkul sahi, teen galat par realistic\n'
+    +'- ans: 0/1/2/3 barabar vary karo\n'
+    +'- SSC GD/Bihar Police level — medium difficulty\n'
+    +'- sol: ek line — sahi answer + ek extra fact\n'
+    +'- NCERT Class 6-12 facts use karo, 100% accurate\n'
     +avoidStr
     +'\n\nOUTPUT (sirf JSON, kuch nahi):\n'
     +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation"}]';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7})
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.85})
   }).then(function(r){return r.json();}).then(function(data){
     clearTimeout(_rwaTimeout);rwaLoading=false;
     if(data.error){
