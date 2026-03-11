@@ -3704,7 +3704,17 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   rwaLoading=true;
   // Auto-reset after 30s to prevent permanent block
   var _rwaTimeout=setTimeout(function(){rwaLoading=false;},30000);
-  var systemMsg='Tu ek MCQ generator hai. OUTPUT SIRF valid JSON array hoga. Koi text, explanation, markdown allowed nahi. Har question SIRF given topic ke baare mein hoga.';
+  var subjectPrompts={
+    history:'Tu SSC GD/Bihar Police/BSSC History MCQ expert hai. NCERT Class 6 se 12 tak ka itihas cover karta hai — Prachin Bharat (Class 6), Madhyakalin Bharat (Class 7), Aadhunik Bharat (Class 8, 10, 12). SIRF diye gaye topic ke accurate historical facts use karna. Dates, rulers, battles, treaties sab sahi hona chahiye. SIRF Hindi Devanagari.',
+    geography:'Tu SSC GD/Bihar Police/BSSC Geography MCQ expert hai. NCERT Class 6 se 12 tak ka bhugol cover karta hai — Class 6 (Prithvi), Class 7 (Hamara Paryavaran), Class 8 (Sansadhan), Class 9 (Samakalin Bharat-1), Class 10 (Samakalin Bharat-2), Class 11-12 (Bhautik Bhugol). India + World geography dono. SIRF Hindi Devanagari.',
+    polity:'Tu SSC GD/Bihar Police/BSSC Polity MCQ expert hai. NCERT Class 6 se 12 tak ka Rajniti Vigyan cover karta hai — Class 9 (Loktantrik Rajniti-1), Class 10 (Loktantrik Rajniti-2), Class 11 (Rajniti Siddhant), Class 12 (Swatantra Bharat mein Rajniti). Indian Constitution ke articles, anusuchiyaan, sanshodhan sab sahi. SIRF Hindi Devanagari.',
+    economy:'Tu SSC GD/Bihar Police/BSSC Economy MCQ expert hai. NCERT Class 9 se 12 tak ka Arthashastra cover karta hai — Class 9 (Arthik Vikas), Class 10 (Vikas), Class 11 (Arthashastra), Class 12 (Samashti/Vyashti Arthashastra). Banking, GDP, yojanayein sab accurate. SIRF Hindi Devanagari.',
+    science:'Tu SSC GD/Bihar Police/BSSC Science MCQ expert hai. NCERT Class 6 se 12 tak ka Vigyan cover karta hai. Physics: Class 9-12 (ball ki gati, bijli, prakash, etc.). Chemistry: Class 9-12 (tatva, dhatu, carbon, etc.). Biology: Class 6-12 (jeev jagat, koshika, manav sharir, etc.). SIRF diye gaye topic ka vigyan. SIRF Hindi Devanagari.',
+    computer:'Tu SSC GD/Bihar Police/BSSC Computer MCQ expert hai. Basic computer knowledge — hardware, software, MS Office (Word, Excel, PowerPoint), internet, networking, shortcut keys, operating systems, database basics. Exam level accurate facts. SIRF Hindi Devanagari.',
+    static_gk:'Tu SSC GD/Bihar Police/BSSC Static GK MCQ expert hai. India ki pramukh jaankari — rashtriya pratik, puraskar, khel, prasiddh vyakti, pustak-lekhak, pramukh sthal, aitihaasiik ghatnaayein. NCERT + exam level. SIRF Hindi Devanagari.'
+  };
+  var systemMsg=subjectPrompts[key]||'Tu MCQ generator hai. SIRF valid JSON array. Hindi Devanagari. No markdown.';
+  systemMsg+=' RULES: (1) OUTPUT SIRF valid JSON array — koi text/markdown nahi. (2) Har question SIRF diye gaye topic ke baare mein ho — topic se bahar BILKUL nahi. (3) Facts 100% accurate hone chahiye. (4) SIRF Hindi Devanagari mein likho.';
   // Build avoid list from history
   var hist=_getRWAHistory(cacheKey);
   var avoidStr='';
@@ -3716,13 +3726,14 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   }
   var prompt='TOPIC: "'+topic+'"\n\n'
     +'Is TOPIC par SIRF 10 NAYE aur UNIQUE MCQ banao.\n'
-    +'IMPORTANT: Har question "'+topic+'" ke baare mein ho.\n'
-    +'Topic se bahar ka koi question nahi.\n\n'
+    +'⚠️ SABSE IMPORTANT: Har ek question SIRF "'+topic+'" ke baare mein ho.\n'
+    +'Dusre topics ke questions BILKUL mat banana — sirf is ek topic ke andar raho.\n\n'
     +'RULES:\n'
     +'- 4 options: ek sahi, teen galat (realistic, confusing)\n'
-    +'- ans: 0/1/2/3 equally vary karo\n'
-    +'- Hindi mein, SSC/Bihar Police exam style\n'
-    +'- sol: ek line Hindi explanation\n'
+    +'- ans: 0/1/2/3 equally vary karo — sirf 0 mat dena\n'
+    +'- SSC GD/Bihar Police exam style — medium difficulty\n'
+    +'- sol: ek line mein sahi answer ki explanation\n'
+    +'- NCERT Class 6-12 ke facts use karo\n'
     +avoidStr
     +'\n\nOUTPUT (sirf JSON, kuch nahi):\n'
     +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation"}]';
