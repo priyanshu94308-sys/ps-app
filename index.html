@@ -1031,7 +1031,7 @@ body::before{
       <div id="rwa-quiz-view" style="display:none">
         <button onclick="rwaBreadcrumbBack(1)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Topics</button>
         <div style="font-size:.82rem;font-weight:900;margin-bottom:10px" id="rwa-quiz-title"></div>
-        <div id="rwa-ai-ready" style="display:none;font-size:.6rem;color:#0c6;margin-bottom:8px;background:rgba(0,200,100,.1);border-radius:6px;padding:4px 8px">✅ AI questions ready — quiz khatam hone ke baad milenge!</div>
+        
         <div id="rwa-quiz-content"></div>
       </div>
     </div>
@@ -3553,7 +3553,8 @@ var charts={w:null,s:null,m:null};
 var yIdx=0,yLeft=0,yRun=false,yInt=null;
 var _caTopics=[];
 var _caHistory={};
-var _rwaHistory={};  // topic-wise asked questions history
+var _rwaHistory={};
+var _commUnsub=null;  // topic-wise asked questions history
 
 // ── UTILS ──
 // Rate-limit aware Groq caller
@@ -3647,15 +3648,17 @@ function sw(tab){
   var te=document.getElementById('tab-'+tab);if(te) te.classList.add('active');
   var be=document.getElementById('tb-'+tab);if(be) be.classList.add('on');
   var cont=document.querySelector('.content');if(cont) cont.scrollTop=0;
-  if(tab==='report') initReport();
+  if(tab==='home'){renderHome();updateHeader();}
   if(tab==='ca') loadDailyCA(false);
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
+  if(tab==='rwa'){initRWA();document.getElementById('rwa-subjects-view').style.display='block';document.getElementById('rwa-topics-view').style.display='none';document.getElementById('rwa-quiz-view').style.display='none';}
   if(tab==='community') initCommChat();
   if(tab==='settings'){
     var ki=document.getElementById('geminiKey');
     if(ki&&!ki.value.trim()){var sk=getGKey();if(sk)ki.value=sk;}
     updateGKStatus();
   }
+  if(tab!=='mock'&&mockState&&mockState.timer){clearInterval(mockState.timer);mockState.timer=null;toast('⚠️ Mock paused!','i');}
   if(tab==='practice'){
     var b=document.getElementById('bmCountLbl');if(b)b.textContent=(S.bookmarks||[]).length+' saved';
     var s=document.getElementById('srDueLbl');if(s)s.textContent=getDueSR().length+' due today';
@@ -4685,7 +4688,8 @@ function loadDailyCA(force){
             if(d2.error) throw new Error(d2.error.message);
             var txt2=d2.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
             var s2=txt2.indexOf('{'),e2=txt2.lastIndexOf('}')+1;
-            var parsed2=JSON.parse(txt2.substring(s2,e2));
+            var parsed2;
+            try{parsed2=JSON.parse(txt2.substring(s2,e2));}catch(pe2){return;}
             try{localStorage.setItem(cacheKey,JSON.stringify(parsed2));}catch(ex){}
             // Re-trigger loadDailyCA with cached result
             loadDailyCA(false);
@@ -4698,7 +4702,11 @@ function loadDailyCA(force){
     }
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
-    var parsed=JSON.parse(txt.substring(s,e));
+    var parsed;
+    try{parsed=JSON.parse(txt.substring(s,e));}catch(pe){
+      document.getElementById('daily-ca-content').innerHTML='<div style="padding:20px;text-align:center"><div style="font-size:1.5rem">⚠️</div><div style="font-size:.75rem;color:var(--ye);margin:8px 0;font-weight:700">Response invalid — Retry karo</div><button onclick="loadDailyCA(true)" style="background:var(--ac);border:none;border-radius:10px;color:#000;font-size:.72rem;font-weight:800;padding:8px 16px;cursor:pointer;font-family:inherit">🔄 Retry</button></div>';
+      return;
+    }
     // AI said no news today
     if(parsed.noNews){
       try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
@@ -4972,7 +4980,13 @@ function launchMockWithConfig(name){
       if(data.error) throw new Error(data.error.message);
       var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
       var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
-      var batch=JSON.parse(txt.substring(s,e));
+      var batch;
+      try{batch=JSON.parse(txt.substring(s,e));}catch(pe){
+        document.getElementById('mock-setup').style.display='none';
+        document.getElementById('mock-home').style.display='block';
+        toast('❌ AI response galat — dobara try karo','e');
+        return;
+      }
       // Shuffle options
       batch=batch.map(function(q){
         if(!q.opts||q.opts.length<4) return q;
@@ -5490,21 +5504,37 @@ function rfAns(chosen){
 }
 function rfStop(){if(_rfTimer){clearInterval(_rfTimer);_rfTimer=null;}}
 
-// ════════════════════════════════════════════
-// FORMULA SHEET
-// ════════════════════════════════════════════
 function initCommChat(){
   var el=document.getElementById('commMsgs');if(!el) return;
   if(!db||!currentUser){el.innerHTML='<div style="text-align:center;padding:20px;font-size:.65rem;color:var(--t2)">Login karo community join karne ke liye 👋</div>';return;}
   el.innerHTML='<div style="text-align:center;padding:20px;font-size:.65rem;color:var(--t2)">⏳ Loading...</div>';
   if(_commUnsub){try{_commUnsub();}catch(e){}}
+  // Timeout fallback — if Firestore hangs >6s
+  var _commTimeout=setTimeout(function(){
+    if(el.innerHTML.indexOf('Loading')!==-1){
+      el.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:1.2rem">📡</div>'
+        +'<div style="font-size:.7rem;color:var(--ye);font-weight:700;margin:6px 0">Chat load nahi hua</div>'
+        +'<div style="font-size:.6rem;color:var(--t2);margin-bottom:10px">Network slow ya Firestore issue</div>'
+        +'<button onclick="initCommChat()" style="background:var(--ac);border:none;border-radius:8px;color:#000;font-size:.68rem;font-weight:800;padding:7px 14px;cursor:pointer;font-family:inherit">🔄 Retry</button></div>';
+    }
+  },6000);
   try{
-    _commUnsub=db.collection('community').orderBy('ts','asc').limitToLast(60)
+    _commUnsub=db.collection('community').orderBy('ts').limitToLast(60)
       .onSnapshot(function(snap){
+        clearTimeout(_commTimeout);
         var msgs=[];snap.forEach(function(d){msgs.push(Object.assign({id:d.id},d.data()));});
         renderCommMsgs(msgs);
-      },function(){el.innerHTML='<div style="text-align:center;padding:20px;font-size:.65rem;color:var(--a2)">❌ Load nahi hua</div>';});
-  }catch(e){el.innerHTML='<div style="text-align:center;padding:20px;font-size:.65rem;color:var(--a2)">Firebase error</div>';}
+      },function(err){
+        clearTimeout(_commTimeout);
+        var hint=err&&err.code==='permission-denied'?'Firestore rules — login check karo':'Network ya Firestore error';
+        el.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:1rem">❌</div>'
+          +'<div style="font-size:.68rem;color:var(--a2);font-weight:700;margin:6px 0">'+hint+'</div>'
+          +'<button onclick="initCommChat()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.65rem;font-weight:700;padding:6px 12px;cursor:pointer;font-family:inherit">🔄 Retry</button></div>';
+      });
+  }catch(e){
+    clearTimeout(_commTimeout);
+    el.innerHTML='<div style="text-align:center;padding:20px;font-size:.65rem;color:var(--a2)">Firebase error: '+e.message+'</div>';
+  }
 }
 function renderCommMsgs(msgs){
   var el=document.getElementById('commMsgs');if(!el) return;
