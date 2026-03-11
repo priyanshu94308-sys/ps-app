@@ -1086,18 +1086,33 @@ body::before{
       </div>
     </div>
     <div class="tab" id="tab-report">
-      <div class="sgrid">
-        <div class="sbox"><div class="snum" id="rStreak">0</div><div class="slbl">🔥 STREAK</div></div>
-        <div class="sbox"><div class="snum" id="rBest">0%</div><div class="slbl">🏆 BEST SCORE</div></div>
-        <div class="sbox"><div class="snum" id="rAvg">0%</div><div class="slbl">📅 MONTHLY AVG</div></div>
-        <div class="sbox"><div class="snum" id="rMocks">0</div><div class="slbl">📝 TOTAL MOCKS</div></div>
+
+      <!-- Subject Weakness -->
+      <div class="scard" style="margin-bottom:10px">
+        <div class="sec">📊 Subject-wise Weakness</div>
+        <div id="rpt-weakness"></div>
       </div>
-      <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📊 Daily Progress</div><div class="ch"><canvas id="weekChart"></canvas></div></div>
-      <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📚 Subject Accuracy</div><div class="ch"><canvas id="subjChart"></canvas></div></div>
-      <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:5px;color:var(--t2)">📝 Mock Scores</div><div class="ch"><canvas id="mockChart"></canvas></div></div>
-      <div class="cc"><div style="font-size:.66rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📅 Activity Heatmap (90 days)</div><div class="hm-w" id="hmWrap"><div class="hm" id="hmGrid"></div></div></div>
-      <div class="card"><div class="sec">📜 Test History</div><div id="testHist"></div></div>
+
+      <!-- Mock Trend -->
+      <div class="scard" style="margin-bottom:10px">
+        <div class="sec">📈 Mock Score Trend</div>
+        <div id="rpt-trend" style="font-size:.72rem"></div>
+      </div>
+
+      <!-- Topic Coverage -->
+      <div class="scard" style="margin-bottom:10px">
+        <div class="sec">📚 Topic Coverage (RWA)</div>
+        <div id="rpt-coverage"></div>
+      </div>
+
+      <!-- Mock History -->
+      <div class="scard">
+        <div class="sec">📝 Mock History</div>
+        <div id="testHist"></div>
+      </div>
+
     </div>
+
     <!-- SETTINGS -->
     <div class="tab" id="tab-settings">
       <div class="scard" style="margin-bottom:10px"><div class="sec">&#128197; Exam Countdown</div><div id="countdown-section"></div><div style="font-size:.6rem;color:var(--t2);margin-top:6px;text-align:center">Date set karne ke liye tap karo</div></div>
@@ -3504,7 +3519,7 @@ function sw(tab){
   tabEl.classList.add('active');
   tbEl.classList.add('on');
   document.querySelector('.content').scrollTop=0;
-  if(tab==='home'){renderHome();updateHeader();renderCountdown();}
+  if(tab==='home'){renderHome();updateHeader();}
   
   
   if(tab==='rwa'){initRWA();}
@@ -3512,7 +3527,7 @@ function sw(tab){
   if(tab==='ca'){initCA();var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='report') initReport();
-  if(tab==='settings'){updateGKStatus();updateTavilyStatus();}
+  if(tab==='settings'){updateGKStatus();updateTavilyStatus();renderCountdown();}
   if(tab!=='mock'&&typeof mockState!=='undefined'&&mockState&&mockState.timer){clearInterval(mockState.timer);mockState.timer=null;}
 }function clearRWACache(){
   try{
@@ -4830,20 +4845,85 @@ function buildHeatmap(){
 }
 
 function initReport(){
-  var rs=document.getElementById('rStreak');if(rs)rs.textContent=calcStreak();
-  var ra=document.getElementById('rAvg');if(ra)ra.textContent=calcMonthAvg()+'%';
-  var rm=document.getElementById('rMocks');if(rm)rm.textContent=S.mocks?S.mocks.length:0;
-  // Best accuracy
-  var bestAcc=0;
-  Object.values(S.sStats||{}).forEach(function(st){if(st.t)bestAcc=Math.max(bestAcc,Math.round(st.d/st.t*100));});
-  var rb=document.getElementById('rBest');if(rb)rb.textContent=bestAcc+'%';
-  // Data info
-  var di=document.getElementById('dataInfo');
-  if(di){
-    var days=Object.keys(S.log).length;
-    di.textContent='Total days: '+days+' · Tasks: '+S.tasks.length+' · Streak: '+calcStreak()+' days';
+
+  // ── 1. Subject Weakness ──
+  var el=document.getElementById('rpt-weakness');
+  if(el){
+    var subjects={
+      history:'📜 इतिहास', geography:'🌍 भूगोल', polity:'⚖️ राजनीति',
+      economy:'💰 अर्थव्यवस्था', science:'🔬 विज्ञान', computer:'💻 Computer', static_gk:'🏛️ Static GK'
+    };
+    var html='';
+    var hasData=false;
+    Object.keys(subjects).forEach(function(key){
+      var st=S.sStats&&S.sStats[key]?S.sStats[key]:{d:0,t:0};
+      if(!st.t) return;
+      hasData=true;
+      var pct=Math.round(st.d/st.t*100);
+      var color=pct>=70?'var(--gr)':pct>=50?'#ffd700':'#ff6b35';
+      html+='<div style="margin-bottom:8px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px">'
+        +'<span style="font-weight:700">'+subjects[key]+'</span>'
+        +'<span style="color:'+color+';font-weight:900">'+pct+'%</span></div>'
+        +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
+        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px;transition:width .5s"></div></div>'
+        +'<div style="font-size:.58rem;color:var(--t2);margin-top:2px">'+st.d+'/'+st.t+' sahi</div>'
+        +'</div>';
+    });
+    el.innerHTML=hasData?html:'<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Practice karo — data aayega 📖</div>';
   }
-  // Test History
+
+  // ── 2. Mock Trend ──
+  var tel=document.getElementById('rpt-trend');
+  if(tel){
+    var mocks=S.mocks&&S.mocks.length?S.mocks.slice(-10):[];
+    if(!mocks.length){
+      tel.innerHTML='<div style="color:var(--t2);padding:8px 0">Abhi koi mock nahi diya 📝</div>';
+    } else {
+      var max=100; var h=80;
+      var bars=mocks.map(function(m,i){
+        var pct=m.pct||0;
+        var barH=Math.round((pct/max)*h);
+        var color=pct>=60?'var(--gr)':pct>=40?'#ffd700':'#ff6b35';
+        return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">'
+          +'<div style="font-size:.55rem;font-weight:900;color:'+color+'">'+pct+'%</div>'
+          +'<div style="width:100%;display:flex;align-items:flex-end;height:'+h+'px">'
+          +'<div style="width:100%;height:'+barH+'px;background:'+color+';border-radius:4px 4px 0 0"></div></div>'
+          +'<div style="font-size:.48rem;color:var(--t2);text-align:center">'+(m.name||'Mock').substring(0,6)+'</div>'
+          +'</div>';
+      }).join('');
+      tel.innerHTML='<div style="display:flex;gap:4px;align-items:flex-end;padding:4px 0">'+bars+'</div>'
+        +'<div style="font-size:.6rem;color:var(--t2);margin-top:4px;text-align:center">Pichle '+mocks.length+' mocks</div>';
+    }
+  }
+
+  // ── 3. Topic Coverage (RWA) ──
+  var cel=document.getElementById('rpt-coverage');
+  if(cel && typeof RWA_TOPICS !== 'undefined'){
+    var subjects2={history:'📜 इतिहास',geography:'🌍 भूगोल',polity:'⚖️ राजनीति',economy:'💰 अर्थव्यवस्था',science:'🔬 विज्ञान',computer:'💻 Computer',static_gk:'🏛️ Static GK'};
+    var chtml='';
+    Object.keys(RWA_TOPICS).forEach(function(key){
+      var subj=RWA_TOPICS[key];
+      var total=subj.subtopics.length;
+      var opened=0;
+      subj.subtopics.forEach(function(_,idx){
+        var ck='rwa_'+key+'_'+idx;
+        try{if(localStorage.getItem('rwa_h_'+ck)) opened++;}catch(e){}
+      });
+      var pct=total?Math.round(opened/total*100):0;
+      var color=pct>=70?'var(--gr)':pct>=30?'#ffd700':'var(--t2)';
+      chtml+='<div style="margin-bottom:8px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px">'
+        +'<span style="font-weight:700">'+(subjects2[key]||key)+'</span>'
+        +'<span style="color:'+color+';font-weight:900">'+opened+'/'+total+'</span></div>'
+        +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
+        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px;transition:width .5s"></div></div>'
+        +'</div>';
+    });
+    cel.innerHTML=chtml;
+  }
+
+  // ── 4. Mock History ──
   var th=document.getElementById('testHist');
   if(th){
     if(!S.mocks||!S.mocks.length){
@@ -4853,15 +4933,10 @@ function initReport(){
         return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--br)">'
           +'<div><div style="font-size:.78rem;font-weight:700">'+esc(m.name||'Mock Test')+'</div>'
           +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+'</div></div>'
-          +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+(m.pct||0)+'%</div></div>';
+          +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+( m.pct||0)+'%</div></div>';
       }).join('');
     }
   }
-  // Heatmap
-  var hmw=document.getElementById('hmWrap');
-  if(hmw) buildHeatmap();
-  // Charts
-  try{drawCharts();}catch(e){}
 }
 
 function drawCharts(){
