@@ -4405,7 +4405,7 @@ function loadCAQuestions(subj,name,avoid,cont){
   var tvKey=getTavilyKey();
   cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div></div>';
   function generateTopicMCQ(newsCtx){
-    var sysMsg='Tu SSC GD/Bihar Police CA expert hai. SIRF valid JSON array return kar. Hindi Devanagari.';
+    var sysMsg='Tu SSC GD/Bihar Police CA expert hai. SIRF valid JSON array return kar. SABHI questions, options aur solutions SIRF Hindi Devanagari mein likhna — English bilkul mat use karna. Numbers (1,2,3) rakh sakte ho.';
     var userMsg='Topic: '+name+' '+curYr+'. ';
     if(newsCtx) userMsg+='Real news: '+newsCtx+' In news se 10 MCQ banao. ';
     else userMsg+='Web search karo '+name+' '+curYr+' 10 MCQ banao. ';
@@ -4510,7 +4510,7 @@ function loadDailyCA(force){
   if(cont) cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div></div>';
   var tvKey=getTavilyKey();
   function generateWithGroq(newsCtx){
-    var sysMsg='Tu SSC GD/Bihar Police CA MCQ expert hai. SIRF valid JSON return kar. Hindi Devanagari.';
+    var sysMsg='Tu SSC GD/Bihar Police CA MCQ expert hai. SIRF valid JSON return kar. SABHI questions, options aur solutions SIRF Hindi Devanagari mein likhna — English bilkul mat use karna. Numbers (1,2,3) rakh sakte ho.';
     var userMsg='Date: '+dateStr+'. SIRF '+curYr+' ke events. ';
     if(newsCtx) userMsg+='Real news: '+newsCtx+' In news se 10 MCQ banao. ';
     else userMsg+='Web search karo India current affairs '+dateStr+' 10 MCQ banao. ';
