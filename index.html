@@ -4398,56 +4398,154 @@ function openCATopic(id,name){
   loadCAQuestions(id,name,false);
 }
 
-function loadCAQuestions(subj,name,avoid,cont){
+function loadCAQuestions(id,name,more){
+  var cont=document.getElementById('ca-detail-content');
+  if(!more){
+    cont.innerHTML='<div style="text-align:center;padding:30px">'
+      +'<div style="font-size:2.5rem">🤖</div>'
+      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Questions Ban Rahi Hain...</div>'
+      +'<div style="font-size:.68rem;color:var(--t2)">'+name+'</div>'
+      +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
+  } else {
+    var ind=document.createElement('div');
+    ind.id='ca_ind';
+    ind.innerHTML='<div style="text-align:center;padding:10px;color:var(--t2);font-size:.72rem">⏳ Aur questions aa rahe hain...</div>';
+    cont.appendChild(ind);
+  }
+
   var key=getGKey();
-  if(!key){cont.innerHTML='<div class="empty">Groq key daalo!</div>';return;}
-  var curYr=new Date().getFullYear();
+  if(!key){
+    cont.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
+    return;
+  }
+
+  var yr=new Date().getFullYear();
+  var mn3=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var now=new Date();
+  var currentDate=now.getDate()+' '+mn3[now.getMonth()]+' '+yr;
+  var hist=_getCAHistory(id);
+  var avoid='';
+  if(hist.length>0){
+    var sample=hist.slice(-25);
+    avoid='\n\nYE ALREADY POOCHE JA CHUKE HAIN - REPEAT MAT KARO:\n'+sample.map(function(q,i){return (i+1)+'. '+q;}).join('\n');
+  }
+
+  var offset=cont.querySelectorAll('.qcard').length;
+
+  var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
+    +'\n\nTopic: "'+name+'" par 15 UNIQUE MCQ banao.'
+    +'\n\n⚠️ SABSE IMPORTANT: Sirf LATEST aur CURRENT data use karo ('+yr+' tak ka).'
+    +'\nJaise: CMs, Governors, appointments, awards — ABHI JO HAI wo likho, purana nahi.'
+    +'\nExample: MP CM = Mohan Yadav (NOT Shivraj), Bihar CM = Nitish Kumar, etc.'
+    +'\n\nSTRICT RULES:'
+    +'\n1. 4 options BILKUL ALAG — plausible wrong options'
+    +'\n2. ans index 0/1/2/3 equally vary karo — sirf 0 mat dena'
+    +'\n3. Factual, exam-style Hindi'
+    +'\n4. Sol mein latest fact explain karo'
+    +avoid
+    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या"}]';
+
   var tvKey=getTavilyKey();
-  cont.innerHTML='<div style="text-align:center;padding:20px"><div class="load-bar"><div class="load-fill"></div></div></div>';
-  function generateTopicMCQ(newsCtx){
-    var sysMsg='Tu SSC GD/Bihar Police CA expert hai. SIRF valid JSON array return kar. SABHI questions, options aur solutions SIRF Hindi Devanagari mein likhna — English bilkul mat use karna. Numbers (1,2,3) rakh sakte ho.';
-    var userMsg='Topic: '+name+' '+curYr+'. ';
-    if(newsCtx) userMsg+='Real news: '+newsCtx+' In news se 10 MCQ banao. ';
-    else userMsg+='Web search karo '+name+' '+curYr+' 10 MCQ banao. ';
-    userMsg+=avoid+' 4 options. ans 0-3 vary. ';
-    userMsg+='[{"q":"?","opts":["(A)","(B)","(C)","(D)"],"ans":1,"sol":"..."}]';
-    var model=newsCtx?'llama-3.3-70b-versatile':'compound-beta';
-    fetch('https://api.groq.com/openai/v1/chat/completions',{
+  function doGroqFetch(extraContext){
+    var fullPrompt=prompt+(extraContext?'\n\nLatest news context:\n'+extraContext:'');
+    var model=extraContext?'llama-3.3-70b-versatile':'compound-beta';
+    return fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:model,messages:[{role:'system',content:sysMsg},{role:'user',content:userMsg}],max_tokens:2000,temperature:0.5})
-    })
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(data.error) throw new Error(data.error.message);
-      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=txt.indexOf('['),e=txt.lastIndexOf(']');
-      if(s===-1) throw new Error('JSON nahi mila');
-      var arr=JSON.parse(txt.substring(s,e+1));
-      arr=arr.filter(function(q){return q.q&&q.opts&&q.opts.length===4&&typeof q.ans==='number';});
-      if(!arr.length) throw new Error('Valid questions nahi mile');
-      pickCA(arr,cont,subj,name);
-    })
-    .catch(function(e){
-      cont.innerHTML='<div class="empty">'+esc(e.message)+'<br><button class="btn" onclick="loadCAQuestions(subj,name,avoid,cont)">Retry</button></div>';
+      body:JSON.stringify({
+        model:model,
+        messages:[
+          {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari mein likho — English bilkul nahi. No markdown.'},
+          {role:'user',content:fullPrompt}
+        ],
+        max_tokens:4500,
+        temperature:0.3
+      })
     });
   }
+  var fetchPromise;
   if(tvKey){
-    fetch('https://api.tavily.com/search',{
+    fetchPromise=fetch('https://api.tavily.com/search',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({api_key:tvKey,query:name+' India '+curYr,search_depth:'basic',max_results:6})
+      body:JSON.stringify({api_key:tvKey,query:name+' India '+yr,search_depth:'basic',max_results:6})
     })
     .then(function(r){return r.json();})
     .then(function(data){
-      if(!data.results||!data.results.length) throw new Error('No results');
-      var newsText=data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. ');
-      generateTopicMCQ(newsText);
+      if(data.results&&data.results.length){
+        var ctx=data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. ');
+        return doGroqFetch(ctx);
+      }
+      return doGroqFetch(null);
     })
-    .catch(function(){generateTopicMCQ(null);});
+    .catch(function(){return doGroqFetch(null);});
   } else {
-    generateTopicMCQ(null);
+    fetchPromise=doGroqFetch(null);
   }
+  fetchPromise
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.error) throw new Error(data.error.message);
+    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+    var s=txt.indexOf('['),e=txt.lastIndexOf(']');
+    if(s===-1) throw new Error('JSON nahi mila');
+    var arr=JSON.parse(txt.substring(s,e+1));
+    if(!arr.length) throw new Error('Empty');
+    arr=arr.filter(function(q){
+      if(!q.opts||q.opts.length<4) return false;
+      var clean=q.opts.map(function(o){return (o||'').replace(/^([A-D])s*/,'').trim().toLowerCase();});
+      var unique=clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+      return unique.length===4;
+    });
+    if(!arr.length) throw new Error('Valid questions nahi mile, retry karo.');
+
+    var ind=document.getElementById('ca_ind');
+    if(ind) ind.remove();
+    _saveCAHistory(id,arr);
+
+    var out='';
+    arr.forEach(function(q,i){
+      var idx=offset+i;
+      // Shuffle options so correct answer is not always A
+      var correctText=q.opts[q.ans];
+      var shuffled=q.opts.slice().sort(function(){return Math.random()-.5;});
+      // Fix option labels (A/B/C/D)
+      shuffled=shuffled.map(function(o,si){
+        var text=o.replace(/^\([A-D]\)\s*/,'');
+        return '('+'ABCD'[si]+') '+text;
+      });
+      var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText.replace(/^\([A-D]\)\s*/,'');});
+      if(newAns===-1) newAns=q.ans; // fallback
+      out+='<div class="qcard" id="caq'+idx+'">'
+        +'<div class="qtxt">Q'+(idx+1)+'. '+q.q+'</div>';
+      shuffled.forEach(function(o,j){
+        out+='<button class="opt" id="cao'+idx+'_'+j+'" onclick="pickCA('+idx+','+j+','+newAns+')">'+(o||'')+'</button>';
+      });
+      if(q.sol) out+='<div class="sol" id="casol'+idx+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
+      out+='</div>';
+    });
+
+    out+='<button id="caMoreBtn" style="width:100%;background:var(--cd2);border:1.5px dashed rgba(255,255,255,.15);border-radius:14px;color:var(--t3);font-family:inherit;font-size:.78rem;font-weight:700;padding:13px;cursor:pointer;margin-top:8px;">🔄 Aur 15 Questions</button>';
+
+    if(more){
+      var ob=document.getElementById('caMoreBtn');if(ob)ob.remove();
+      cont.insertAdjacentHTML('beforeend',out);
+    } else {
+      cont.innerHTML=out;
+    }
+    var lb=document.getElementById('caMoreBtn');
+    if(lb) lb.onclick=function(){loadCAQuestions(id,name,true);};
+    toast('✅ '+arr.length+' questions!','i');
+  })
+  .catch(function(e){
+    var ind=document.getElementById('ca_ind');if(ind)ind.remove();
+    if(!more){
+      cont.innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))
+        +'<br><button class="btn" style="margin-top:10px;font-size:.78rem" id="caRetryBtn">🔄 Retry</button></div>';
+      var rb=document.getElementById('caRetryBtn');
+      if(rb) rb.onclick=function(){loadCAQuestions(id,name,false);};
+    }
+  });
 }
 function pickCA(qi,oi,correct){
   var opts=document.querySelectorAll('[id^="cao'+qi+'_"]');
