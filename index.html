@@ -5347,36 +5347,47 @@ function setLoginErr(msg){
 function loginEmail(){
   var email=(document.getElementById('login-email')||{}).value||'';
   var pass=(document.getElementById('login-pass')||{}).value||'';
-  if(!email||!pass){setLoginErr('Email aur password dono daalo.');return;}
-  if(!auth){setLoginErr('Auth load nahi hua, reload karo.');return;}
+  if(!email||!pass){setLoginErr('⚠️ Email aur password dono daalo.');return;}
+  if(!auth){setLoginErr('❌ Firebase load nahi hua — page reload karo.');return;}
+  var btn=document.querySelector('#login-page .btn-full');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Login ho raha hai...';}
   setLoginErr('');
-  // Try sign in first, then create if not exists
   auth.signInWithEmailAndPassword(email,pass)
     .catch(function(e){
       if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'){
-        // Try creating account
         return auth.createUserWithEmailAndPassword(email,pass);
       }
       throw e;
     })
+    .then(function(){
+      if(btn){btn.disabled=false;btn.textContent='Login / Register →';}
+    })
     .catch(function(e){
+      if(btn){btn.disabled=false;btn.textContent='Login / Register →';}
       var msg='Login error';
-      if(e.code==='auth/invalid-email') msg='Invalid email format';
-      else if(e.code==='auth/weak-password') msg='Password kam se kam 6 characters ka hona chahiye';
-      else if(e.code==='auth/wrong-password') msg='Password galat hai';
-      else if(e.code==='auth/too-many-requests') msg='Bahut zyada tries — thodi der baad try karo';
-      else msg=e.message||'Login error';
+      if(e.code==='auth/invalid-email') msg='❌ Invalid email format';
+      else if(e.code==='auth/weak-password') msg='❌ Password 6+ characters ka hona chahiye';
+      else if(e.code==='auth/wrong-password') msg='❌ Password galat hai';
+      else if(e.code==='auth/too-many-requests') msg='❌ Bahut zyada tries — thodi der baad try karo';
+      else if(e.code==='auth/network-request-failed') msg='❌ Internet check karo';
+      else msg='❌ '+(e.message||'Login error')+' ['+e.code+']';
       setLoginErr(msg);
     });
 }
 
 function loginGoogle(){
   if(!auth){setLoginErr('Auth load nahi hua.');return;}
-  setLoginErr('');
+  setLoginErr('⏳ Google pe ja rahe hain...');
   var provider=new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(function(e){
-    setLoginErr(e.message||'Google login failed');
-  });
+  auth.signInWithPopup(provider)
+    .catch(function(e){
+      // Popup blocked on mobile — fallback to redirect
+      if(e.code==='auth/popup-blocked'||e.code==='auth/popup-cancelled'){
+        setLoginErr('⏳ Redirect ho raha hai...');
+        return auth.signInWithRedirect(provider);
+      }
+      setLoginErr(e.message||'Google login failed');
+    });
 }
 function initFirebase(){
   var firebaseConfig={
@@ -5391,6 +5402,10 @@ function initFirebase(){
     firebase.initializeApp(firebaseConfig);
     db=firebase.firestore();
     auth=firebase.auth();
+    // Handle redirect result (mobile Google login ke baad)
+    auth.getRedirectResult().catch(function(e){
+      if(e.code&&e.code!=='auth/null-user') setLoginErr('Login error: '+e.message);
+    });
     auth.onAuthStateChanged(function(user){
       if(user){
         currentUser=user;
@@ -5419,20 +5434,17 @@ function setLoginStatus(msg,type){
 }
 
 function signInWithGoogle(){
-  if(!auth){setLoginStatus('❌ Firebase load nahi hua','e');return;}
-  var btn=document.getElementById('login-err');
-  if(btn){btn.disabled=true;btn.style.opacity='.7';btn.textContent='⏳ Google pe ja rahe hain...';}
-  setLoginStatus('Ek second ruko...','i');
-  try{
-    var provider=new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(function(e){
-      if(btn){btn.disabled=false;btn.style.opacity='1';btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google se Login Karo';}
-      setLoginStatus('❌ '+e.message,'e');
+  if(!auth){setLoginErr('❌ Firebase load nahi hua');return;}
+  setLoginErr('⏳ Google pe ja rahe hain...');
+  var provider=new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .catch(function(e){
+      if(e.code==='auth/popup-blocked'||e.code==='auth/popup-cancelled'){
+        setLoginErr('⏳ Redirect ho raha hai...');
+        return auth.signInWithRedirect(provider);
+      }
+      setLoginErr('❌ '+( e.message||'Login failed'));
     });
-  }catch(e){
-    if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent='Google se Login Karo';}
-    setLoginStatus('❌ '+e.message,'e');
-  }
 }
 
 function signOutUser(){
@@ -6745,7 +6757,6 @@ function studySubTab(tab, el){
   if(tab==='ca'){ initCA(); if(getGKey()) loadDailyCA(false); }
   if(tab==='digest'){ initDigestMonths(); }
   if(tab==='formula'){ showFormulas(_curFormulaSubj||'maths',null); filterFormulas(); }
-  if(tab==='formula'){ showFormulas(_curFormulaSubj||'maths',null); filterFormulas(); }
 }
 
 function initStudyTab(){
@@ -6777,11 +6788,6 @@ function toggleWater(idx){
   if(idx<w) log.water=idx; else log.water=idx+1;
   if(log.water>8) log.water=8;
   save();renderWater();
-}
-function setMood(mood){
-  var log=getLog(today());
-  log.mood=(log.mood===mood)?null:mood;
-  save();renderMood();toast(mood==='great'?'🔥 Fire mode!':mood==='good'?'😊 Good!':mood==='ok'?'🙂 Theek hai!':'😴 Rest karo bhi!');
 }
 
 </script>
