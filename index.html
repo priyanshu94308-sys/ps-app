@@ -4775,34 +4775,63 @@ function loadCAQuestions(id,name,more){
     });
     if(!arr.length) throw new Error('Valid questions nahi mile, retry karo.');
 
-    // ── FACT CHECK LAYER ──
-    var factCheckPrompt='Niche diye gaye MCQ questions ke facts verify karo. '
-      +'Agar koi question galat hai toh correct karo. '
-      +'IMPORTANT: Sirf JSON array return karo, same format mein. '
-      +'Hindi Devanagari mein likhna hai. '
-      +'Current year '+new Date().getFullYear()+' ke facts use karo.\n\n'
-      +'Questions:\n'+JSON.stringify(arr);
-    groqFetch(key,{
-      _models:['compound-beta','llama-3.3-70b-versatile'],
-      messages:[
-        {role:'system',content:'Tu fact-checker hai. Diye gaye MCQ JSON array ke facts verify aur correct kar. Sirf corrected JSON array return kar, koi extra text nahi. Hindi Devanagari mein.'},
-        {role:'user',content:factCheckPrompt}
-      ],
-      max_tokens:4500,temperature:0.1
-    },function(fcData,_m){
-      try{
-        var fctxt=fcData.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-        var fcs=fctxt.indexOf('['),fce=fctxt.lastIndexOf(']');
-        if(fcs>-1){
-          var fcArr=JSON.parse(fctxt.substring(fcs,fce+1));
-          if(fcArr.length>0) arr=fcArr;
-        }
-      }catch(e){}
-      renderCAQuestions(arr,cont,more,id,offset);
-    },function(){
-      // Fact check fail — show original
-      renderCAQuestions(arr,cont,more,id,offset);
-    });
+    // ── FACT CHECK LAYER (Tavily + Groq) ──
+    var tvKey=getTavilyKey();
+    if(tvKey){
+      // Step 1: Tavily se har question ka key fact search karo
+      var searchPromises=arr.map(function(q){
+        var searchQuery=q.q.replace(/[?।]/g,'').trim().substring(0,80);
+        return fetch('https://api.tavily.com/search',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({api_key:tvKey,query:searchQuery,search_depth:'basic',max_results:2})
+        }).then(function(r){return r.json();}).then(function(d){
+          return (d.results||[]).map(function(r){return r.content||'';}).join(' ').substring(0,300);
+        }).catch(function(){return '';});
+      });
+      Promise.all(searchPromises).then(function(contexts){
+        // Step 2: Groq se verify + correct karo with Tavily context
+        var verifyPrompt='Niche diye gaye MCQ questions ko Tavily search results ke basis pe verify aur correct karo.\n'
+          +'Agar answer galat hai toh sahi karo. SIRF Hindi Devanagari mein. Sirf JSON array return karo.\n\n'
+          +'Questions with context:\n'
+          +arr.map(function(q,i){
+            return JSON.stringify(q)+'\nContext: '+contexts[i];
+          }).join('\n---\n');
+        groqFetch(key,{
+          _models:['llama-3.3-70b-versatile','llama3-70b-8192'],
+          messages:[
+            {role:'system',content:'Tu expert fact-checker hai. Tavily search context dekh ke MCQ verify kar. Galat answers correct kar. SIRF Hindi Devanagari. Sirf JSON array return kar.'},
+            {role:'user',content:verifyPrompt}
+          ],
+          max_tokens:4500,temperature:0.1
+        },function(fcData,_m){
+          try{
+            var fctxt=fcData.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+            var fcs=fctxt.indexOf('['),fce=fctxt.lastIndexOf(']');
+            if(fcs>-1){var fcArr=JSON.parse(fctxt.substring(fcs,fce+1));if(fcArr.length>0)arr=fcArr;}
+          }catch(e){}
+          renderCAQuestions(arr,cont,more,id,offset);
+        },function(){renderCAQuestions(arr,cont,more,id,offset);});
+      });
+    } else {
+      // No Tavily key — sirf Groq se verify
+      var factCheckPrompt='Niche diye gaye MCQ questions ke facts verify karo. Galat hai toh correct karo. SIRF Hindi Devanagari. Sirf JSON array return karo.\n\nQuestions:\n'+JSON.stringify(arr);
+      groqFetch(key,{
+        _models:['compound-beta','llama-3.3-70b-versatile'],
+        messages:[
+          {role:'system',content:'Tu fact-checker hai. MCQ JSON array ke facts verify aur correct kar. Sirf corrected JSON array return kar. Hindi Devanagari mein.'},
+          {role:'user',content:factCheckPrompt}
+        ],
+        max_tokens:4500,temperature:0.1
+      },function(fcData,_m){
+        try{
+          var fctxt=fcData.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+          var fcs=fctxt.indexOf('['),fce=fctxt.lastIndexOf(']');
+          if(fcs>-1){var fcArr=JSON.parse(fctxt.substring(fcs,fce+1));if(fcArr.length>0)arr=fcArr;}
+        }catch(e){}
+        renderCAQuestions(arr,cont,more,id,offset);
+      },function(){renderCAQuestions(arr,cont,more,id,offset);});
+    }
   },function(e){
     var ind=document.getElementById('ca_ind');if(ind)ind.remove();
     if(!more){
