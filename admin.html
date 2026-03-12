@@ -8,140 +8,91 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;}
-  :root{
-    --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;
-    --ac:#f5a623;--ac2:#ff6b35;--gr:#22c55e;--rd:#ef4444;
-    --t1:#ffffff;--t2:#8b8ba0;--t3:#4a4a6a;
-    --border:rgba(255,255,255,.08);
-  }
-  body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',sans-serif;min-height:100vh;}
-
-  /* LOGIN PAGE */
-  #loginPage{
-    position:fixed;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,166,35,.12),transparent 60%),var(--bg);
-    z-index:999;
-  }
-  .login-card{
-    background:var(--bg2);border:1px solid var(--border);
-    border-radius:24px;padding:32px 28px;width:90%;max-width:360px;text-align:center;
-  }
-  .admin-badge{
-    display:inline-block;background:linear-gradient(135deg,#f5a623,#ff6b35);
-    color:#000;font-size:.6rem;font-weight:900;padding:3px 10px;border-radius:20px;
-    letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
-  }
-  .login-title{font-size:1.5rem;font-weight:900;margin-bottom:6px;}
-  .login-sub{font-size:.72rem;color:var(--t2);margin-bottom:24px;}
-  #loginBtn{
-    width:100%;background:#fff;border:none;border-radius:12px;
-    color:#1f1f1f;font-size:.85rem;font-weight:700;padding:13px;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
-    box-shadow:0 4px 20px rgba(0,0,0,.3);
-  }
-  #loginBtn:hover{opacity:.9;}
-  #loginStatus{font-size:.65rem;color:var(--rd);margin-top:10px;min-height:16px;}
-
-  /* MAIN APP */
-  #app{display:none;}
-  .topbar{
-    background:var(--bg2);border-bottom:1px solid var(--border);
-    padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
-    position:sticky;top:0;z-index:100;
-  }
-  .topbar-left{display:flex;align-items:center;gap:10px;}
-  .topbar-logo{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#f5a623,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  .topbar-badge{font-size:.55rem;background:var(--rd);color:#fff;padding:2px 7px;border-radius:20px;font-weight:800;}
-  .admin-user{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--t2);}
-  .admin-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--ac);}
-  #logoutBtn{background:none;border:1px solid var(--border);color:var(--t2);font-size:.65rem;padding:5px 10px;border-radius:8px;cursor:pointer;}
-
-  .container{padding:20px;max-width:800px;margin:0 auto;}
-
-  /* STATS GRID */
-  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
-  .stat-card{
-    background:var(--bg2);border:1px solid var(--border);border-radius:16px;
-    padding:18px 16px;
-  }
-  .stat-val{font-size:1.8rem;font-weight:900;color:var(--ac);}
-  .stat-label{font-size:.65rem;color:var(--t2);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
-  .stat-sub{font-size:.6rem;color:var(--t3);margin-top:2px;}
-
-  /* ACTION CARDS */
-  .section-title{font-size:.7rem;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:2px;margin:20px 0 10px;}
-  .action-card{
-    background:var(--bg2);border:1px solid var(--border);border-radius:16px;
-    padding:16px;margin-bottom:10px;
-  }
-  .action-title{font-size:.85rem;font-weight:800;margin-bottom:4px;}
-  .action-desc{font-size:.65rem;color:var(--t2);margin-bottom:12px;line-height:1.6;}
-  .btn{
-    border:none;border-radius:10px;font-family:inherit;font-size:.78rem;
-    font-weight:700;padding:10px 16px;cursor:pointer;transition:.2s;
-  }
-  .btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;}
-  .btn-warning{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;}
-  .btn-success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;}
-  .btn-primary{background:linear-gradient(135deg,#5c6af0,#7c3aed);color:#fff;}
-  .btn:hover{opacity:.85;transform:translateY(-1px);}
-  .btn:active{transform:translateY(0);}
-  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-
-  /* USERS TABLE */
-  .users-table{width:100%;border-collapse:collapse;font-size:.72rem;}
-  .users-table th{color:var(--t2);font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
-  .users-table td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.04);}
-  .users-table tr:hover td{background:rgba(255,255,255,.02);}
-  .user-name{font-weight:700;}
-  .user-email{color:var(--t2);font-size:.62rem;}
-  .ban-btn{background:var(--rd);border:none;color:#fff;font-size:.6rem;padding:3px 8px;border-radius:6px;cursor:pointer;font-weight:700;}
-  .banned-badge{background:rgba(239,68,68,.2);color:var(--rd);font-size:.6rem;padding:2px 7px;border-radius:6px;font-weight:700;}
-
-  /* NOTIFICATION */
-  .notif-textarea{
-    width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;
-    color:var(--t1);font-family:inherit;font-size:.78rem;padding:12px;
-    resize:vertical;min-height:80px;margin-bottom:10px;
-  }
-  .notif-textarea:focus{outline:none;border-color:var(--ac);}
-
-  /* LOG */
-  .log-box{
-    background:var(--bg3);border:1px solid var(--border);border-radius:10px;
-    padding:12px;font-size:.65rem;color:var(--t2);max-height:150px;overflow-y:auto;
-    font-family:monospace;line-height:1.8;
-  }
-  .log-ok{color:var(--gr);}
-  .log-err{color:var(--rd);}
-  .log-info{color:var(--ac);}
-
-  /* TOAST */
-  #toast{
-    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-    background:#1e1e2e;border:1px solid var(--border);color:var(--t1);
-    font-size:.78rem;font-weight:700;padding:10px 20px;border-radius:12px;
-    opacity:0;transition:.3s;pointer-events:none;z-index:9999;white-space:nowrap;
-  }
-  #toast.show{opacity:1;}
-
-  /* CONFIRM MODAL */
-  #modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9998;}
-  #modal.show{display:flex;}
-  .modal-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:320px;width:90%;text-align:center;}
-  .modal-title{font-size:1rem;font-weight:900;margin-bottom:8px;}
-  .modal-desc{font-size:.72rem;color:var(--t2);margin-bottom:20px;line-height:1.6;}
-  .modal-btns{display:flex;gap:10px;}
-  .modal-btns .btn{flex:1;}
-
-  @media(min-width:500px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--ac:#f5a623;--gr:#22c55e;--rd:#ef4444;--bl:#5c6af0;--t1:#fff;--t2:#8b8ba0;--t3:#4a4a6a;--bdr:rgba(255,255,255,.08);}
+body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+#loginPage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,166,35,.12),transparent 60%),var(--bg);z-index:999;}
+.login-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:24px;padding:32px 28px;width:90%;max-width:360px;text-align:center;}
+.admin-badge{display:inline-block;background:linear-gradient(135deg,#f5a623,#ff6b35);color:#000;font-size:.6rem;font-weight:900;padding:3px 10px;border-radius:20px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+.login-title{font-size:1.5rem;font-weight:900;margin-bottom:6px;}
+.login-sub{font-size:.72rem;color:var(--t2);margin-bottom:24px;}
+#loginBtn{width:100%;background:#fff;border:none;border-radius:12px;color:#1f1f1f;font-size:.85rem;font-weight:700;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+#loginStatus{font-size:.65rem;color:var(--rd);margin-top:10px;min-height:16px;}
+#app{display:none;}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bdr);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:8px;}
+.topbar-logo{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#f5a623,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.topbar-badge{font-size:.55rem;background:var(--rd);color:#fff;padding:2px 7px;border-radius:20px;font-weight:800;}
+.admin-user{display:flex;align-items:center;gap:8px;}
+.admin-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--ac);}
+.admin-name{font-size:.72rem;color:var(--t2);}
+#logoutBtn{background:none;border:1px solid var(--bdr);color:var(--t2);font-size:.65rem;padding:5px 10px;border-radius:8px;cursor:pointer;}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--bdr);overflow-x:auto;padding:0 12px;}
+.tab{flex-shrink:0;padding:11px 14px;font-size:.7rem;font-weight:700;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab.active{color:var(--ac);border-bottom-color:var(--ac);}
+.page{display:none;padding:16px;max-width:900px;margin:0 auto;}
+.page.active{display:block;}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+@media(min-width:500px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+.stat-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:16px 14px;}
+.stat-val{font-size:1.6rem;font-weight:900;color:var(--ac);}
+.stat-label{font-size:.6rem;color:var(--t2);margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:10px;}
+.card-title{font-size:.85rem;font-weight:800;margin-bottom:4px;}
+.card-desc{font-size:.65rem;color:var(--t2);margin-bottom:12px;line-height:1.6;}
+.sec-title{font-size:.65rem;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:2px;margin:16px 0 8px;}
+.btn{border:none;border-radius:10px;font-family:inherit;font-size:.78rem;font-weight:700;padding:10px 16px;cursor:pointer;transition:.2s;}
+.btn:hover{opacity:.85;}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;}
+.btn-success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;}
+.btn-primary{background:linear-gradient(135deg,#5c6af0,#7c3aed);color:#fff;}
+.btn-orange{background:linear-gradient(135deg,#f5a623,#ff6b35);color:#000;}
+.btn-sm{padding:6px 12px;font-size:.65rem;}
+.tbl{width:100%;border-collapse:collapse;font-size:.72rem;}
+.tbl th{color:var(--t2);font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--bdr);}
+.tbl td{padding:10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.tbl tr:hover td{background:rgba(255,255,255,.02);}
+.u-name{font-weight:700;font-size:.78rem;}
+.u-sub{color:var(--t2);font-size:.6rem;margin-top:2px;}
+.badge{display:inline-block;font-size:.58rem;padding:2px 7px;border-radius:6px;font-weight:700;margin-top:3px;}
+.badge-red{background:rgba(239,68,68,.2);color:var(--rd);}
+.badge-green{background:rgba(34,197,94,.15);color:var(--gr);}
+.action-col{display:flex;flex-direction:column;gap:4px;}
+#detailModal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:flex-start;justify-content:center;z-index:9998;padding:20px;overflow-y:auto;}
+#detailModal.show{display:flex;}
+.detail-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:24px;width:100%;max-width:420px;margin:auto;}
+.detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.detail-title{font-size:1rem;font-weight:900;}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--bdr);font-size:.72rem;}
+.detail-row:last-child{border-bottom:none;}
+.dk{color:var(--t2);font-weight:600;flex-shrink:0;margin-right:12px;}
+.dv{color:var(--t1);font-weight:700;text-align:right;word-break:break-all;}
+.close-btn{background:none;border:1px solid var(--bdr);color:var(--t2);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:.65rem;}
+.notif-ta{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;color:var(--t1);font-family:inherit;font-size:.78rem;padding:12px;resize:vertical;min-height:80px;margin-bottom:10px;}
+.notif-ta:focus{outline:none;border-color:var(--ac);}
+.log-box{background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:12px;font-size:.65rem;color:var(--t2);max-height:400px;overflow-y:auto;font-family:monospace;line-height:1.8;}
+.lok{color:var(--gr);}
+.lerr{color:var(--rd);}
+.linf{color:var(--ac);}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e1e2e;border:1px solid var(--bdr);color:var(--t1);font-size:.78rem;font-weight:700;padding:10px 20px;border-radius:12px;opacity:0;transition:.3s;pointer-events:none;z-index:9999;white-space:nowrap;}
+#toast.show{opacity:1;}
+#confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:9997;padding:20px;}
+#confirmModal.show{display:flex;}
+.confirm-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:28px;max-width:320px;width:100%;text-align:center;}
+.confirm-title{font-size:1rem;font-weight:900;margin-bottom:8px;}
+.confirm-desc{font-size:.72rem;color:var(--t2);margin-bottom:20px;line-height:1.6;}
+.confirm-btns{display:flex;gap:10px;}
+.confirm-btns .btn{flex:1;}
+.search-box{width:100%;background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;color:var(--t1);font-family:inherit;font-size:.78rem;padding:10px 14px;margin-bottom:12px;}
+.search-box:focus{outline:none;border-color:var(--ac);}
+.act-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.act-icon{font-size:1.2rem;flex-shrink:0;}
+.act-text{font-size:.72rem;}
+.act-time{font-size:.6rem;color:var(--t2);margin-top:2px;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginPage">
   <div class="login-card">
     <div class="admin-badge">🔐 Admin Only</div>
@@ -155,345 +106,371 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-logo">PS Study</div>
-      <div class="topbar-badge">ADMIN</div>
+      <span class="topbar-logo">PS Study</span>
+      <span class="topbar-badge">ADMIN</span>
     </div>
     <div class="admin-user">
       <img id="adminAvatar" class="admin-avatar" src="" alt="">
-      <span id="adminName"></span>
+      <span class="admin-name" id="adminName"></span>
       <button id="logoutBtn" onclick="adminLogout()">Logout</button>
     </div>
   </div>
 
-  <div class="container">
+  <div class="tabs">
+    <div class="tab active" onclick="showPage('dashboard',this)">📊 Dashboard</div>
+    <div class="tab" onclick="showPage('users',this)">👥 Users</div>
+    <div class="tab" onclick="showPage('chat',this)">💬 Chat</div>
+    <div class="tab" onclick="showPage('actions',this)">⚡ Actions</div>
+    <div class="tab" onclick="showPage('logs',this)">📋 Logs</div>
+  </div>
 
-    <!-- STATS -->
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="sec-title">📊 Overview</div>
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-val" id="totalUsers">—</div>
-        <div class="stat-label">Total Users</div>
-        <div class="stat-sub">Registered</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="activeToday">—</div>
-        <div class="stat-label">Active Today</div>
-        <div class="stat-sub">Last 24 hours</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="chatMsgs">—</div>
-        <div class="stat-label">Chat Messages</div>
-        <div class="stat-sub">Community</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val" id="bannedUsers">—</div>
-        <div class="stat-label">Banned</div>
-        <div class="stat-sub">Users</div>
+      <div class="stat-card"><div class="stat-val" id="s-total">—</div><div class="stat-label">Total Users</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-active">—</div><div class="stat-label">Aaj Active</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-chat">—</div><div class="stat-label">Chat Msgs</div></div>
+      <div class="stat-card"><div class="stat-val" id="s-banned">—</div><div class="stat-label">Banned</div></div>
+    </div>
+    <div class="sec-title">🕐 Recent Activity</div>
+    <div class="card" id="recentActivity"><div style="color:var(--t2);text-align:center;padding:16px;font-size:.72rem">Loading...</div></div>
+    <div class="sec-title">🏆 Top Users (Streak)</div>
+    <div class="card" id="topUsers"><div style="color:var(--t2);text-align:center;padding:16px;font-size:.72rem">Loading...</div></div>
+  </div>
+
+  <!-- USERS -->
+  <div id="page-users" class="page">
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input class="search-box" style="flex:1;margin:0" id="userSearch" placeholder="🔍 Naam se dhundo..." oninput="filterUsers()">
+      <button class="btn btn-success btn-sm" onclick="loadUsers()">🔄</button>
+    </div>
+    <div id="usersContainer"><div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Loading...</div></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="page-chat" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:.82rem;font-weight:800">Community Chat</span>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-success btn-sm" onclick="loadChat()">🔄</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmAction('Chat clear karna hai?','Saare messages delete ho jaayenge!',clearChat)">🗑️ Clear All</button>
       </div>
     </div>
+    <div id="chatContainer"><div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Loading...</div></div>
+  </div>
 
-    <!-- DANGER ZONE -->
-    <div class="section-title">⚡ Quick Actions</div>
-
-    <div class="action-card">
-      <div class="action-title">🗑️ Chat Clear Karo</div>
-      <div class="action-desc">Community chat ke saare messages ek click mein delete karo। Firestore reads/writes bachenge।</div>
-      <button class="btn btn-danger" onclick="confirmAction('chat','Sach mein community chat clear karna hai?','Saare messages delete ho jaayenge!',clearChat)">Chat Clear Karo</button>
-    </div>
-
-    <div class="action-card">
-      <div class="action-title">🔥 Firestore Data Clear</div>
-      <div class="action-desc">Saare users ka app data (progress, bookmarks, mocks) delete karo। Ye action UNDO nahi ho sakta!</div>
-      <button class="btn btn-danger" onclick="confirmAction('data','SURE HO? Saara user data delete hoga!','Ye action permanent hai — wapas nahi aa sakta!',clearAllData)">Saara Data Clear Karo</button>
-    </div>
-
-    <div class="action-card">
-      <div class="action-title">📢 Sab Users ko Notification</div>
-      <div class="action-desc">Ek message likho — agla baar jab koi login kare tab dikhega।</div>
-      <textarea class="notif-textarea" id="notifMsg" placeholder="Message likho... (e.g. App update ho gaya! Naye features dekho 🎉)"></textarea>
+  <!-- ACTIONS -->
+  <div id="page-actions" class="page">
+    <div class="sec-title">📢 Notification</div>
+    <div class="card">
+      <div class="card-title">Sab Users ko Message Bhejo</div>
+      <div class="card-desc">Next login pe popup dikhega — ek baar</div>
+      <textarea class="notif-ta" id="notifMsg" placeholder="Message likho... (e.g. App update ho gaya! 🎉)"></textarea>
       <button class="btn btn-primary" onclick="sendNotification()">📢 Send Notification</button>
     </div>
-
-    <!-- USERS LIST -->
-    <div class="section-title">👥 Users</div>
-    <div class="action-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <span style="font-size:.78rem;font-weight:700">Registered Users</span>
-        <button class="btn btn-success" style="padding:6px 12px;font-size:.65rem" onclick="loadUsers()">🔄 Refresh</button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="users-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Last Active</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="usersBody">
-            <tr><td colspan="3" style="text-align:center;color:var(--t2);padding:20px;">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="sec-title">⚠️ Danger Zone</div>
+    <div class="card">
+      <div class="card-title">🗑️ Chat Clear</div>
+      <div class="card-desc">Community chat ke saare messages ek click mein delete karo</div>
+      <button class="btn btn-danger" onclick="confirmAction('Chat clear karna hai?','Saare messages delete honge!',clearChat)">Chat Clear Karo</button>
     </div>
-
-    <!-- LOG -->
-    <div class="section-title">📋 Activity Log</div>
-    <div class="log-box" id="logBox">
-      <div class="log-info">Admin panel ready...</div>
+    <div class="card">
+      <div class="card-title">🔥 Saara User Data Clear</div>
+      <div class="card-desc">Saare users ka progress, bookmarks, mocks — PERMANENT delete. UNDO nahi hoga!</div>
+      <button class="btn btn-danger" onclick="confirmAction('SURE HO?','Ye permanent hai — wapas nahi aayega!',clearAllData)">Saara Data Clear Karo</button>
     </div>
+  </div>
 
-    <div style="height:40px;"></div>
+  <!-- LOGS -->
+  <div id="page-logs" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:.82rem;font-weight:800">Activity Log</span>
+      <button class="btn btn-danger btn-sm" onclick="document.getElementById('logBox').innerHTML='<div class=linf>Cleared.</div>'">🗑️ Clear</button>
+    </div>
+    <div class="log-box" id="logBox"><div class="linf">Admin panel ready...</div></div>
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- USER DETAIL -->
+<div id="detailModal">
+  <div class="detail-card">
+    <div class="detail-head">
+      <div class="detail-title" id="detailName">User Detail</div>
+      <button class="close-btn" onclick="closeDetail()">✕ Band Karo</button>
+    </div>
+    <div id="detailContent"></div>
+    <div style="display:flex;gap:8px;margin-top:16px" id="detailActions"></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirmModal">
+  <div class="confirm-card">
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-desc" id="confirmDesc"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-orange" onclick="closeConfirm()">Ruk Ja</button>
+      <button class="btn btn-danger" id="confirmBtn">Haan, Karo!</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
-<!-- CONFIRM MODAL -->
-<div id="modal">
-  <div class="modal-card">
-    <div class="modal-title" id="modalTitle"></div>
-    <div class="modal-desc" id="modalDesc"></div>
-    <div class="modal-btns">
-      <button class="btn btn-warning" onclick="closeModal()">Ruk Ja</button>
-      <button class="btn btn-danger" id="modalConfirm">Haan, Karo!</button>
-    </div>
-  </div>
-</div>
-
 <script>
-// ── CONFIG ──
-var ADMIN_EMAIL = 'priyanshu94308@gmail.com'; // Sirf ye email admin hai
-var firebaseConfig = {
-  apiKey: "AIzaSyBTkrEU8TJXtxqCrZlaWC6W7KBcpM8YG8Y",
-  authDomain: "ps-study-app.firebaseapp.com",
-  projectId: "ps-study-app",
-  storageBucket: "ps-study-app.firebasestorage.app",
-  messagingSenderId: "806312075451",
-  appId: "1:806312075451:web:47e663c89f96edfe74099e"
-};
-
-var db, auth;
+var ADMIN_EMAIL='priyanshu94308@gmail.com';
+var firebaseConfig={apiKey:"AIzaSyBTkrEU8TJXtxqCrZlaWC6W7KBcpM8YG8Y",authDomain:"ps-study-app.firebaseapp.com",projectId:"ps-study-app",storageBucket:"ps-study-app.firebasestorage.app",messagingSenderId:"806312075451",appId:"1:806312075451:web:47e663c89f96edfe74099e"};
+var db,auth,allUsers=[];
 firebase.initializeApp(firebaseConfig);
-db = firebase.firestore();
-auth = firebase.auth();
+db=firebase.firestore();
+auth=firebase.auth();
 
 auth.onAuthStateChanged(function(user){
-  if(user && user.email === ADMIN_EMAIL){
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('adminName').textContent = user.displayName.split(' ')[0];
-    document.getElementById('adminAvatar').src = user.photoURL || '';
-    log('✅ Admin login: ' + user.email, 'ok');
-    loadStats();
-    loadUsers();
-  } else if(user){
+  if(user&&user.email===ADMIN_EMAIL){
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('adminName').textContent=(user.displayName||'Admin').split(' ')[0];
+    document.getElementById('adminAvatar').src=user.photoURL||'';
+    log('✅ Login: '+user.email,'ok');
+    loadDashboard();loadUsers();loadChat();
+  }else if(user){
     auth.signOut();
-    document.getElementById('loginStatus').textContent = '❌ Ye account admin nahi hai!';
-    log('❌ Unauthorized login attempt: ' + user.email, 'err');
+    document.getElementById('loginStatus').textContent='❌ Ye account admin nahi hai!';
   }
 });
 
 function adminLogin(){
-  var provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(function(e){
-    document.getElementById('loginStatus').textContent = '❌ ' + e.message;
+  document.getElementById('loginBtn').disabled=true;
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(function(e){
+    document.getElementById('loginStatus').textContent='❌ '+e.message;
+    document.getElementById('loginBtn').disabled=false;
   });
 }
+function adminLogout(){auth.signOut();location.reload();}
 
-function adminLogout(){
-  auth.signOut();
-  document.getElementById('loginPage').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
 }
 
-// ── STATS ──
-function loadStats(){
-  // Total users
+function loadDashboard(){
   db.collection('users').get().then(function(snap){
-    document.getElementById('totalUsers').textContent = snap.size;
-    
-    // Active today
-    var yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    var active = snap.docs.filter(function(d){
-      var data = d.data();
-      if(!data.updatedAt) return false;
-      return data.updatedAt.toDate() > yesterday;
-    }).length;
-    document.getElementById('activeToday').textContent = active;
-
-    // Banned
-    var banned = snap.docs.filter(function(d){ return d.data().banned; }).length;
-    document.getElementById('bannedUsers').textContent = banned;
-    
-    log('📊 Stats loaded: ' + snap.size + ' users', 'info');
-  }).catch(function(e){ log('❌ Stats error: ' + e.message, 'err'); });
-
-  // Chat messages
-  db.collection('community_chat').get().then(function(snap){
-    document.getElementById('chatMsgs').textContent = snap.size;
-  });
+    document.getElementById('s-total').textContent=snap.size;
+    var yesterday=Date.now()-86400000,active=0,banned=0,recent=[];
+    snap.docs.forEach(function(d){
+      var data=d.data(),appData={};
+      try{appData=data.appData?JSON.parse(data.appData):{};}catch(e){}
+      if(data.banned)banned++;
+      if(data.updatedAt&&data.updatedAt.toMillis()>yesterday)active++;
+      recent.push({name:data.name||appData.name||'Unknown',uid:d.id,updatedAt:data.updatedAt,streak:data.streak||appData.streak||0});
+    });
+    document.getElementById('s-active').textContent=active;
+    document.getElementById('s-banned').textContent=banned;
+    recent.sort(function(a,b){return(b.updatedAt?b.updatedAt.toMillis():0)-(a.updatedAt?a.updatedAt.toMillis():0);});
+    var ra='';
+    recent.slice(0,8).forEach(function(u){
+      ra+='<div class="act-item"><div class="act-icon">👤</div><div><div class="act-text">'+esc(u.name)+'</div><div class="act-time">'+(u.updatedAt?timeAgo(u.updatedAt.toDate()):'N/A')+'</div></div></div>';
+    });
+    document.getElementById('recentActivity').innerHTML=ra||'<div style="color:var(--t2);text-align:center;padding:10px;font-size:.72rem">Koi activity nahi</div>';
+    var top=recent.slice().sort(function(a,b){return b.streak-a.streak;}).slice(0,5);
+    var tu='';
+    top.forEach(function(u,i){
+      tu+='<div class="act-item"><div class="act-icon">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':'🏅')+'</div><div><div class="act-text">'+esc(u.name)+'</div><div class="act-time">🔥 '+u.streak+' din streak</div></div></div>';
+    });
+    document.getElementById('topUsers').innerHTML=tu||'<div style="color:var(--t2);text-align:center;padding:10px;font-size:.72rem">Data nahi</div>';
+    log('📊 Dashboard: '+snap.size+' users, '+active+' active today','info');
+  }).catch(function(e){log('❌ Dashboard error: '+e.message,'err');});
+  db.collection('community_chat').get().then(function(snap){document.getElementById('s-chat').textContent=snap.size;});
 }
 
-// ── USERS ──
 function loadUsers(){
-  var tbody = document.getElementById('usersBody');
-  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--t2);padding:20px;">Loading...</td></tr>';
-  
-  db.collection('users').orderBy('updatedAt','desc').limit(50).get().then(function(snap){
-    if(snap.empty){
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--t2);padding:20px;">Koi user nahi</td></tr>';
-      return;
-    }
-    var html = '';
+  var cont=document.getElementById('usersContainer');
+  cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Loading...</div>';
+  db.collection('users').orderBy('updatedAt','desc').limit(100).get().then(function(snap){
+    allUsers=[];
     snap.docs.forEach(function(d){
-      var data = d.data();
-      var name = data.name || 'Unknown';
-      var uid = d.id;
-      var lastActive = data.updatedAt ? timeAgo(data.updatedAt.toDate()) : 'N/A';
-      var banned = data.banned;
-      html += '<tr>';
-      html += '<td><div class="user-name">' + esc(name) + '</div><div class="user-email">' + uid.substring(0,16) + '...</div></td>';
-      html += '<td>' + lastActive + '</td>';
-      html += '<td>';
-      if(banned){
-        html += '<span class="banned-badge">Banned</span> ';
-        html += '<button onclick="unbanUser(\'' + uid + '\')" style="background:var(--gr);border:none;color:#fff;font-size:.6rem;padding:3px 8px;border-radius:6px;cursor:pointer;font-weight:700;">Unban</button>';
-      } else {
-        html += '<button class="ban-btn" onclick="banUser(\'' + uid + '\',\'' + esc(name) + '\')">Ban</button>';
-      }
-      html += '</td></tr>';
+      var data=d.data(),appData={};
+      try{appData=data.appData?JSON.parse(data.appData):{};}catch(e){}
+      allUsers.push({
+        uid:d.id,name:data.name||appData.name||'Unknown',
+        updatedAt:data.updatedAt,streak:data.streak||appData.streak||0,
+        banned:data.banned||false,
+        mocks:(appData.mocks||[]).length,
+        bookmarks:(appData.bookmarks||[]).length,
+        tasks:(appData.tasks||[]).length,
+        log:appData.log||{},
+        examDates:data.examDates||{},
+        raw:data
+      });
     });
-    tbody.innerHTML = html;
-    log('👥 ' + snap.size + ' users loaded', 'info');
-  }).catch(function(e){ 
-    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--rd)">❌ ' + e.message + '</td></tr>';
-    log('❌ Users error: ' + e.message, 'err');
+    renderUsers(allUsers);
+    log('👥 '+allUsers.length+' users loaded','info');
+  }).catch(function(e){
+    cont.innerHTML='<div style="color:var(--rd);text-align:center;padding:20px">❌ '+esc(e.message)+'</div>';
+    log('❌ Users error: '+e.message,'err');
   });
 }
 
-// ── BAN / UNBAN ──
-function banUser(uid, name){
-  confirmAction('ban', name + ' ko ban karna hai?', 'Ye user app use nahi kar paayega!', function(){
-    db.collection('users').doc(uid).update({banned: true}).then(function(){
-      toast('🚫 ' + name + ' banned!');
-      log('🚫 Banned: ' + name + ' (' + uid + ')', 'err');
-      loadUsers(); loadStats();
+function renderUsers(users){
+  var cont=document.getElementById('usersContainer');
+  if(!users.length){cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Koi user nahi</div>';return;}
+  var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>User</th><th>Stats</th><th>Last Active</th><th>Action</th></tr></thead><tbody>';
+  users.forEach(function(u){
+    html+='<tr>';
+    html+='<td><div class="u-name">'+esc(u.name)+'</div><div class="u-sub">'+u.uid.substring(0,16)+'...</div>'+(u.banned?'<span class="badge badge-red">Banned</span>':'<span class="badge badge-green">Active</span>')+'</td>';
+    html+='<td><div class="u-sub">🔥 '+u.streak+' streak</div><div class="u-sub">📝 '+u.mocks+' mocks</div><div class="u-sub">🔖 '+u.bookmarks+' saved</div></td>';
+    html+='<td style="font-size:.65rem;color:var(--t2)">'+(u.updatedAt?timeAgo(u.updatedAt.toDate()):'N/A')+'</td>';
+    html+='<td><div class="action-col">';
+    html+='<button class="btn btn-primary btn-sm" onclick="showUserDetail(\''+u.uid+'\')">👁 Detail</button>';
+    if(u.banned){html+='<button class="btn btn-success btn-sm" onclick="unbanUser(\''+u.uid+'\',\''+esc(u.name)+'\')">✅ Unban</button>';}
+    else{html+='<button class="btn btn-danger btn-sm" onclick="banUser(\''+u.uid+'\',\''+esc(u.name)+'\')">🚫 Ban</button>';}
+    html+='</div></td></tr>';
+  });
+  html+='</tbody></table></div>';
+  cont.innerHTML=html;
+}
+
+function filterUsers(){
+  var q=(document.getElementById('userSearch').value||'').toLowerCase();
+  renderUsers(allUsers.filter(function(u){return u.name.toLowerCase().includes(q)||u.uid.includes(q);}));
+}
+
+function showUserDetail(uid){
+  var u=allUsers.find(function(x){return x.uid===uid;});
+  if(!u)return;
+  document.getElementById('detailName').textContent='👤 '+u.name;
+  var logDays=Object.keys(u.log||{}).length;
+  var exams=Object.keys(u.examDates||{}).join(', ')||'None set';
+  var rows=[
+    ['UID',u.uid],['Naam',u.name],
+    ['Status',u.banned?'🚫 Banned':'✅ Active'],
+    ['Streak','🔥 '+u.streak+' din'],
+    ['Study Days','📅 '+logDays+' din'],
+    ['Mock Tests','📝 '+u.mocks+' diye'],
+    ['Bookmarks','🔖 '+u.bookmarks+' saved'],
+    ['Tasks','✅ '+u.tasks+' added'],
+    ['Exams',exams],
+    ['Last Active',u.updatedAt?u.updatedAt.toDate().toLocaleString('hi-IN'):'N/A'],
+  ];
+  document.getElementById('detailContent').innerHTML=rows.map(function(r){
+    return '<div class="detail-row"><span class="dk">'+r[0]+'</span><span class="dv">'+esc(String(r[1]))+'</span></div>';
+  }).join('');
+  var act=u.banned
+    ?'<button class="btn btn-success" style="flex:1" onclick="unbanUser(\''+u.uid+'\',\''+esc(u.name)+'\');closeDetail()">✅ Unban</button>'
+    :'<button class="btn btn-danger" style="flex:1" onclick="banUser(\''+u.uid+'\',\''+esc(u.name)+'\');closeDetail()">🚫 Ban</button>';
+  document.getElementById('detailActions').innerHTML=act;
+  document.getElementById('detailModal').classList.add('show');
+}
+function closeDetail(){document.getElementById('detailModal').classList.remove('show');}
+
+function loadChat(){
+  var cont=document.getElementById('chatContainer');
+  cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Loading...</div>';
+  db.collection('community_chat').orderBy('ts','desc').limit(100).get().then(function(snap){
+    if(snap.empty){cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Koi message nahi</div>';return;}
+    var html='<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>User</th><th>Message</th><th>Time</th><th>Del</th></tr></thead><tbody>';
+    snap.docs.forEach(function(d){
+      var data=d.data();
+      html+='<tr><td class="u-name">'+esc(data.name||'?')+'</td>';
+      html+='<td style="font-size:.72rem;max-width:200px;word-break:break-word">'+esc(data.text||'')+'</td>';
+      html+='<td style="font-size:.62rem;color:var(--t2)">'+(data.ts?timeAgo(data.ts.toDate()):'?')+'</td>';
+      html+='<td><button class="btn btn-danger btn-sm" onclick="deleteMsg(\''+d.id+'\')">🗑</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    cont.innerHTML=html;
+    log('💬 '+snap.size+' messages loaded','info');
+  }).catch(function(e){cont.innerHTML='<div style="color:var(--rd);text-align:center;padding:20px">❌ '+esc(e.message)+'</div>';log('❌ Chat: '+e.message,'err');});
+}
+
+function deleteMsg(id){
+  db.collection('community_chat').doc(id).delete().then(function(){toast('🗑️ Message deleted!');loadChat();});
+}
+
+function banUser(uid,name){
+  confirmAction(name+' ko ban karna hai?','Ye user app use nahi kar paayega!',function(){
+    db.collection('users').doc(uid).update({banned:true}).then(function(){
+      toast('🚫 '+name+' banned!');log('🚫 Banned: '+name,'err');loadUsers();loadDashboard();
     });
   });
 }
-
-function unbanUser(uid){
-  db.collection('users').doc(uid).update({banned: false}).then(function(){
-    toast('✅ User unbanned!');
-    log('✅ Unbanned: ' + uid, 'ok');
-    loadUsers(); loadStats();
+function unbanUser(uid,name){
+  db.collection('users').doc(uid).update({banned:false}).then(function(){
+    toast('✅ '+name+' unbanned!');log('✅ Unbanned: '+name,'ok');loadUsers();loadDashboard();
   });
 }
 
-// ── CLEAR CHAT ──
 function clearChat(){
-  log('🗑️ Clearing chat...', 'info');
+  log('🗑️ Clearing chat...','info');
   db.collection('community_chat').get().then(function(snap){
-    var batch = db.batch();
-    snap.docs.forEach(function(d){ batch.delete(d.ref); });
+    var batch=db.batch();
+    snap.docs.forEach(function(d){batch.delete(d.ref);});
     return batch.commit();
-  }).then(function(){
-    toast('✅ Chat clear ho gaya!');
-    log('✅ Chat cleared!', 'ok');
-    loadStats();
-  }).catch(function(e){ 
-    toast('❌ Error: ' + e.message);
-    log('❌ Chat clear error: ' + e.message, 'err');
-  });
+  }).then(function(){toast('✅ Chat clear!');log('✅ Chat cleared','ok');loadChat();loadDashboard();})
+  .catch(function(e){log('❌ '+e.message,'err');});
 }
 
-// ── CLEAR ALL DATA ──
 function clearAllData(){
-  log('⚠️ Clearing ALL user data...', 'err');
+  log('⚠️ Clearing ALL data...','err');
   db.collection('users').get().then(function(snap){
-    var batch = db.batch();
-    snap.docs.forEach(function(d){
-      batch.update(d.ref, {appData: null, examDates: {}, streak: 0});
-    });
+    var batch=db.batch();
+    snap.docs.forEach(function(d){batch.update(d.ref,{appData:null,examDates:{},streak:0});});
     return batch.commit();
-  }).then(function(){
-    toast('✅ Saara data clear ho gaya!');
-    log('✅ All user data cleared', 'ok');
-    loadStats();
-  }).catch(function(e){
-    toast('❌ Error: ' + e.message);
-    log('❌ Clear data error: ' + e.message, 'err');
-  });
+  }).then(function(){toast('✅ Saara data clear!');log('✅ All data cleared','ok');loadDashboard();})
+  .catch(function(e){log('❌ '+e.message,'err');});
 }
 
-// ── NOTIFICATION ──
 function sendNotification(){
-  var msg = (document.getElementById('notifMsg').value || '').trim();
-  if(!msg){ toast('❌ Message likho pehle!'); return; }
+  var msg=(document.getElementById('notifMsg').value||'').trim();
+  if(!msg){toast('❌ Message likho!');return;}
   db.collection('admin').doc('notification').set({
-    message: msg,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    active: true
+    message:msg,timestamp:firebase.firestore.FieldValue.serverTimestamp(),active:true
   }).then(function(){
-    toast('📢 Notification send ho gaya!');
-    log('📢 Notification: ' + msg.substring(0,50), 'ok');
-    document.getElementById('notifMsg').value = '';
-  }).catch(function(e){
-    toast('❌ Error: ' + e.message);
-    log('❌ Notif error: ' + e.message, 'err');
-  });
+    toast('📢 Notification sent!');
+    log('📢 Notification: '+msg.substring(0,50),'ok');
+    document.getElementById('notifMsg').value='';
+  }).catch(function(e){log('❌ '+e.message,'err');});
 }
 
-// ── HELPERS ──
-function confirmAction(type, title, desc, fn){
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalDesc').textContent = desc;
-  document.getElementById('modal').classList.add('show');
-  document.getElementById('modalConfirm').onclick = function(){
-    closeModal();
-    fn();
-  };
+function confirmAction(title,desc,fn){
+  document.getElementById('confirmTitle').textContent=title;
+  document.getElementById('confirmDesc').textContent=desc;
+  document.getElementById('confirmModal').classList.add('show');
+  document.getElementById('confirmBtn').onclick=function(){closeConfirm();fn();};
 }
-function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function closeConfirm(){document.getElementById('confirmModal').classList.remove('show');}
 
 function toast(msg){
-  var el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},2500);
 }
 
-function log(msg, type){
-  var box = document.getElementById('logBox');
-  var d = document.createElement('div');
-  d.className = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
-  var time = new Date().toLocaleTimeString('hi-IN');
-  d.textContent = '[' + time + '] ' + msg;
-  box.appendChild(d);
-  box.scrollTop = box.scrollHeight;
+function log(msg,type){
+  var box=document.getElementById('logBox');
+  var d=document.createElement('div');
+  d.className=type==='ok'?'lok':type==='err'?'lerr':'linf';
+  d.textContent='['+new Date().toLocaleTimeString('hi-IN')+'] '+msg;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
 }
 
 function timeAgo(date){
-  var diff = Math.floor((Date.now() - date) / 1000);
-  if(diff < 60) return diff + 's ago';
-  if(diff < 3600) return Math.floor(diff/60) + 'm ago';
-  if(diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  return Math.floor(diff/86400) + 'd ago';
+  var diff=Math.floor((Date.now()-date)/1000);
+  if(diff<60)return diff+'s ago';
+  if(diff<3600)return Math.floor(diff/60)+'m ago';
+  if(diff<86400)return Math.floor(diff/3600)+'h ago';
+  return Math.floor(diff/86400)+'d ago';
 }
 
-function esc(s){ 
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// Close modal on outside click
-document.getElementById('modal').addEventListener('click', function(e){
-  if(e.target === this) closeModal();
-});
+document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this)closeDetail();});
+document.getElementById('confirmModal').addEventListener('click',function(e){if(e.target===this)closeConfirm();});
 </script>
 </body>
 </html>
