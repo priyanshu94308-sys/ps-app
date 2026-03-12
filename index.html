@@ -1112,7 +1112,16 @@ body::before{
     </div>
     <!-- SETTINGS -->
     <div class="tab" id="tab-settings">
-      <div class="scard" style="margin-bottom:10px"><div class="sec">&#128197; Exam Countdown</div><div id="countdown-section"></div><div style="font-size:.6rem;color:var(--t2);margin-top:6px;text-align:center">Tap karo → date set karo | Khali chodo → hatao</div></div>
+      <div class="scard" style="margin-bottom:10px">
+        <div onclick="toggleCDFolder()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0">
+          <div class="sec" style="margin:0">&#128197; Exam Countdown</div>
+          <div id="cd-folder-arrow" style="font-size:.8rem;color:var(--ac);transition:transform .3s">&#9660;</div>
+        </div>
+        <div id="cd-folder" style="display:none;margin-top:10px">
+          <div style="font-size:.6rem;color:var(--t2);margin-bottom:8px">Folder tap karo &#9660; | Exam tap karo &#8594; date set karo</div>
+          <div id="countdown-section"></div>
+        </div>
+      </div>
       <div class="scard">
         <div class="sec">👤 Profile</div>
         <div style="display:flex;gap:5px"><input type="text" class="fi" id="nameInp" placeholder="Apna naam..."><button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveName()">Save</button></div>
@@ -1126,6 +1135,16 @@ body::before{
         </div>
         <div style="font-size:.63rem;font-weight:700" id="gkStatus">⚪ Key nahi hai</div>
         <a href="https://console.groq.com/keys" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Groq Key Lo</a>
+      <div class="scard">
+        <div class="sec">&#128269; Tavily Key (CA News)</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Real 2026 news context CA mein — 1000/month free!</div>
+        <div style="display:flex;gap:5px;margin-bottom:5px">
+          <input type="text" class="fi" id="tavilyKey" placeholder="tvly-...">
+          <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveTavilyKey()">Save</button>
+        </div>
+        <div style="font-size:.63rem;font-weight:700" id="tavilyStatus">&#9898; Key nahi hai</div>
+        <a href="https://app.tavily.com/home" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">&#128273; FREE Tavily Key Lo</a>
+      </div>
       </div>
       <div class="scard">
         <div class="sec">📢 WhatsApp Channel</div>
@@ -1184,6 +1203,7 @@ body::before{
 
 <div class="toast" id="toast"></div>
 <script>
+
 var QB = {
 
 // ══════════════════════════════════════════════
@@ -3993,6 +4013,22 @@ function addCustomExam(){
   S.customExams.push({key:key,label:name.trim(),cat:'Custom',custom:true});
   setExamDate(key,name.trim(),true);
 }
+function toggleCDFolder(){
+  var el=document.getElementById('cd-folder');
+  var arr=document.getElementById('cd-folder-arrow');
+  if(!el) return;
+  var open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  if(arr) arr.style.transform=open?'':'rotate(180deg)';
+}
+function toggleCatFolder(id){
+  var el=document.getElementById(id);
+  var arr=document.getElementById('arr-'+id);
+  if(!el) return;
+  var open=el.style.display==='block';
+  el.style.display=open?'none':'block';
+  if(arr) arr.style.transform=open?'':'rotate(90deg)';
+}
 function initApp(){
   load();
   // Apply saved dark/light mode
@@ -4542,7 +4578,7 @@ function loadCAQuestions(id,name,more){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
       body:JSON.stringify({
-        model:ctx?'llama-3.3-70b-versatile':'compound-beta',
+        model:'compound-beta',
         messages:[
           {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari. No markdown.'},
           {role:'user',content:fp}
@@ -4551,13 +4587,7 @@ function loadCAQuestions(id,name,more){
       })
     });
   }
-  var caFetch=tvKey
-    ?fetch('https://api.tavily.com/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:tvKey,query:name+' India '+yr,search_depth:'basic',max_results:5})})
-      .then(function(r){return r.json();})
-      .then(function(data){return doGroqCA(data.results?data.results.map(function(r,i){return (i+1)+'. '+r.title;}).join('. '):'');})
-      .catch(function(){return doGroqCA(null);})
-    :doGroqCA(null);
-  caFetch
+  doGroqCA(null)
   .then(function(r){return r.json();})
   .then(function(data){
     if(data.error) throw new Error(data.error.message);
@@ -4719,7 +4749,7 @@ function loadDailyCA(force){
     +'\n\nSIRF valid JSON. No markdown.';
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
+    body:JSON.stringify({model:'compound-beta',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
   })
   .then(function(r){return r.json();})
   .then(function(data){
