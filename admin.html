@@ -275,7 +275,7 @@ function loadDashboard(){
     recent.sort(function(a,b){return(b.updatedAt?b.updatedAt.toMillis():0)-(a.updatedAt?a.updatedAt.toMillis():0);});
     var ra='';
     recent.slice(0,8).forEach(function(u){
-      ra+='<div class="act-item"><div class="act-icon">👤</div><div><div class="act-text">'+esc(u.name)+'</div><div class="act-time">'+(u.updatedAt?timeAgo(u.updatedAt.toDate()):'N/A')+'</div></div></div>';
+      ra+='<div class="act-item"><div class="act-icon">👤</div><div><div class="act-text">'+esc(u.name)+'</div><div class="act-time">'+(u.updatedAt?timeAgo(u.updatedAt.toDate?u.updatedAt.toDate():new Date(u.updatedAt)):'N/A')+'</div></div></div>';
     });
     document.getElementById('recentActivity').innerHTML=ra||'<div style="color:var(--t2);text-align:center;padding:10px;font-size:.72rem">Koi activity nahi</div>';
     var top=recent.slice().sort(function(a,b){return b.streak-a.streak;}).slice(0,5);
@@ -325,7 +325,7 @@ function renderUsers(users){
     html+='<tr>';
     html+='<td><div class="u-name">'+esc(u.name)+'</div><div class="u-sub">'+u.uid.substring(0,16)+'...</div>'+(u.banned?'<span class="badge badge-red">Banned</span>':'<span class="badge badge-green">Active</span>')+'</td>';
     html+='<td><div class="u-sub">🔥 '+u.streak+' streak</div><div class="u-sub">📝 '+u.mocks+' mocks</div><div class="u-sub">🔖 '+u.bookmarks+' saved</div></td>';
-    html+='<td style="font-size:.65rem;color:var(--t2)">'+(u.updatedAt?timeAgo(u.updatedAt.toDate()):'N/A')+'</td>';
+    html+='<td style="font-size:.65rem;color:var(--t2)">'+(u.updatedAt?timeAgo(u.updatedAt.toDate?u.updatedAt.toDate():new Date(u.updatedAt)):'N/A')+'</td>';
     html+='<td><div class="action-col">';
     html+='<button class="btn btn-primary btn-sm" onclick="showUserDetail(\''+u.uid+'\')">👁 Detail</button>';
     if(u.banned){html+='<button class="btn btn-success btn-sm" onclick="unbanUser(\''+u.uid+'\',\''+esc(u.name)+'\')">✅ Unban</button>';}
@@ -356,7 +356,7 @@ function showUserDetail(uid){
     ['Bookmarks','🔖 '+u.bookmarks+' saved'],
     ['Tasks','✅ '+u.tasks+' added'],
     ['Exams',exams],
-    ['Last Active',u.updatedAt?u.updatedAt.toDate().toLocaleString('hi-IN'):'N/A'],
+    ['Last Active',u.updatedAt?(u.updatedAt.toDate?u.updatedAt.toDate():new Date(u.updatedAt)).toLocaleString('hi-IN'):'N/A'],
   ];
   document.getElementById('detailContent').innerHTML=rows.map(function(r){
     return '<div class="detail-row"><span class="dk">'+r[0]+'</span><span class="dv">'+esc(String(r[1]))+'</span></div>';
@@ -379,7 +379,7 @@ function loadChat(){
       var data=d.data();
       html+='<tr><td class="u-name">'+esc(data.name||'?')+'</td>';
       html+='<td style="font-size:.72rem;max-width:200px;word-break:break-word">'+esc(data.text||'')+'</td>';
-      html+='<td style="font-size:.62rem;color:var(--t2)">'+(data.ts?timeAgo(data.ts.toDate()):'?')+'</td>';
+      html+='<td style="font-size:.62rem;color:var(--t2)">'+(data.ts?timeAgo(data.ts.toDate?data.ts.toDate():new Date(data.ts)):'?')+'</td>';
       html+='<td><button class="btn btn-danger btn-sm" onclick="deleteMsg(\''+d.id+'\')">🗑</button></td></tr>';
     });
     html+='</tbody></table></div>';
