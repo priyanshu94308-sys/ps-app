@@ -1235,6 +1235,47 @@ body::before{
 
 <div class="toast" id="toast"></div>
 <script>
+// ── GROQ FALLBACK CHAIN ──
+var GROQ_MODELS=[
+  'llama-3.3-70b-versatile',
+  'llama3-70b-8192',
+  'deepseek-r1-distill-llama-70b',
+  'gemma2-9b-it',
+  'llama3-8b-8192',
+  'llama-3.1-8b-instant'
+];
+var HINDI_SYSTEM='IMPORTANT: Saare questions, options aur explanation SIRF Hindi Devanagari lipi mein likhna hai. Koi bhi English word allowed nahi hai — sirf English Grammar subject ke options English mein ho sakte hain. Ye rule tod na bilkul mana hai.';
+
+function groqFetch(gkey, payload, cb, errcb){
+  var models = payload._models || GROQ_MODELS;
+  var idx = 0;
+  function tryNext(){
+    if(idx>=models.length){errcb('Sabhi models fail ho gaye. Thodi der baad try karo.');return;}
+    var model = models[idx++];
+    var body = Object.assign({}, payload, {model: model});
+    delete body._models;
+    // Inject Hindi system instruction
+    if(body.messages && body.messages[0] && body.messages[0].role==='system'){
+      if(body.messages[0].content.indexOf('Devanagari')===-1){
+        body.messages[0].content = HINDI_SYSTEM + '\n\n' + body.messages[0].content;
+      }
+    }
+    fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
+      body:JSON.stringify(body)
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.error){
+        console.warn('Model '+model+' failed:',d.error.message);
+        tryNext();
+      } else {
+        cb(d, model);
+      }
+    }).catch(function(){tryNext();});
+  }
+  tryNext();
+}
+
 var QB = {
 
 // ══════════════════════════════════════════════
@@ -3786,11 +3827,7 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     +avoidStr
     +'\n\nOUTPUT (sirf JSON, kuch nahi):\n'
     +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation"}]';
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.85})
-  }).then(function(r){return r.json();}).then(function(data){
+  groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.85},function(data,_m){
     clearTimeout(_rwaTimeout);rwaLoading=false;
     if(data.error){
       var errMsg=data.error.message||'Unknown error';
@@ -3838,7 +3875,7 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
       rwaQuizState={qs:aiQs,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
       renderRWAQuestion();
     }
-  }).catch(function(e){clearTimeout(_rwaTimeout);rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
+  }, function(e){clearTimeout(_rwaTimeout);rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
 }
 
 function getRWAQBQuestions(subjectKey,topic){
@@ -4148,7 +4185,7 @@ function sendChatMsg(){
   }).then(function(){
     inp.disabled=false;
     inp.focus();
-  }).catch(function(e){
+  }, function(e){
     inp.disabled=false;
     toast('Send nahi hua: '+e.message,'w');
   });
@@ -4447,11 +4484,7 @@ function openAIPractice(){
   var subName=subjectNames[curSubj.id]||curSubj.name;
   var systemMsg='Tu MCQ generator hai. SIRF valid JSON array output kar. Koi bhi explanation ya markdown mat likho.';
   var prompt='Subject: "'+subName+'" ke 10 SSC/Bihar Police exam style MCQ banao.\n\nRULES:\n- Varied topics cover karo is subject ke andar\n- 4 options: ek sahi, teen galat (realistic)\n- ans: 0/1/2/3 equally vary karo\n- Hindi mein (English grammar ke liye English)\n- sol: ek line explanation\n\nFORMAT:\n[{"q":"question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation","ch":"chapter name"}]';
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7})
-  }).then(function(r){return r.json();}).then(function(data){
+  groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7},function(data,_m){
     if(data.error){if(ql)ql.innerHTML='<div class="empty">❌ '+data.error.message.substring(0,60)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
@@ -4468,7 +4501,7 @@ function openAIPractice(){
     });
     pracQs=aiQs;
     renderPracQs();
-  }).catch(function(e){if(ql)ql.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';});
+  }, function(e){if(ql)ql.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';});
 }
 
 function openChapter(ch,lvl){
@@ -4714,24 +4747,17 @@ function loadCAQuestions(id,name,more){
     +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या"}]';
 
   var tvKey=getTavilyKey();
-  function doGroqCA(ctx){
+  function doGroqCA(ctx, cb, errcb){
     var fp=prompt+(ctx?'\n\nLatest news:\n'+ctx:'');
-    return fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({
-        model:'compound-beta',
-        messages:[
-          {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari. No markdown.'},
-          {role:'user',content:fp}
-        ],
-        max_tokens:4500,temperature:0.3
-      })
-    });
+    groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
+      messages:[
+        {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari. No markdown.'},
+        {role:'user',content:fp}
+      ],
+      max_tokens:4500,temperature:0.3
+    },cb,errcb);
   }
-  doGroqCA(null)
-  .then(function(r){return r.json();})
-  .then(function(data){
+  doGroqCA(null,function(data){
     if(data.error) throw new Error(data.error.message);
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('['),e=txt.lastIndexOf(']');
@@ -4783,11 +4809,10 @@ function loadCAQuestions(id,name,more){
     var lb=document.getElementById('caMoreBtn');
     if(lb) lb.onclick=function(){loadCAQuestions(id,name,true);};
     toast('✅ '+arr.length+' questions!','i');
-  })
-  .catch(function(e){
+  },function(e){
     var ind=document.getElementById('ca_ind');if(ind)ind.remove();
     if(!more){
-      cont.innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))
+      cont.innerHTML='<div class="empty">❌ '+esc(e.substring(0,80))
         +'<br><button class="btn" style="margin-top:10px;font-size:.78rem" id="caRetryBtn">🔄 Retry</button></div>';
       var rb=document.getElementById('caRetryBtn');
       if(rb) rb.onclick=function(){loadCAQuestions(id,name,false);};
@@ -4889,13 +4914,7 @@ function loadDailyCA(force){
     +'\n\nRULES:\n1. 4 options BILKUL ALAG, realistic\n2. ans index 0/1/2/3 vary karo\n3. Hindi only\n4. Headline mein poora fact likho'
     +'\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य","mcq":{"q":"प्रश्न?","opts":["(A) सही","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":1,"sol":"व्याख्या"}}]}'
     +'\n\nSIRF valid JSON. No markdown.';
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({model:'compound-beta',messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3})
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.error) throw new Error(data.error.message);
+  groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3},function(data,_m){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     var parsed=JSON.parse(txt.substring(s,e));
@@ -5010,19 +5029,11 @@ function askQ(msg){
     +' RULES: (1) Hamesha Hindi mein jawab de. (2) Short aur precise reh — ek concept ek baar explain kar.'
     +' (3) Agar MCQ poochha ho to pehle answer bata, phir explanation. (4) Formulas/facts bullet points mein de.'
     +' (5) Exam tips relevant ho to zaroor bata.';
-  fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({
-      model:'llama-3.3-70b-versatile',
+  groqFetch(key,{
       messages:[{role:'system',content:sysPrompt}].concat(window._chatHistory),
       max_tokens:1200,temperature:0.5
-    })
-  })
-  .then(function(r){return r.json();})
-  .then(function(data){
+    },function(data,_m){
     if(typing) typing.remove();
-    if(data.error) throw new Error(data.error.message);
     var reply=data.choices[0].message.content;
     window._chatHistory.push({role:'assistant',content:reply});
     addChatMsg(reply,'a');
@@ -5042,7 +5053,7 @@ function askQWithImg(msg,imgDataUrl){
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
-      model:'meta-llama/llama-4-scout-17b-16e-instruct',
+      model:'llama-3.3-70b-versatile',
       messages:[{role:'user',content:[
         {type:'image_url',image_url:{url:'data:'+mimeType+';base64,'+base64}},
         {type:'text',text:msg||'Is image mein jo bhi question, text, ya problem hai use dhyan se dekho aur Hindi mein solve karo. Agar MCQ hai to sahi answer bata aur explain karo. Agar math/reasoning problem hai to step-by-step solve karo. Agar koi map/diagram/chart hai to explain karo. Exam point of view se jawab do.'}
@@ -5290,11 +5301,7 @@ function launchMockWithConfig(name){
       +'- Exam level: '+name+'\n\n'
       +'FORMAT (SIRF JSON, kuch nahi):\n'
       +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या","subj":"subject"}]';
-    fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+gkey},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4500,temperature:0.6})
-    }).then(function(r){return r.json();}).then(function(data){
+    groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4500,temperature:0.6},function(data,_m){
       if(data.error) throw new Error(data.error.message);
       var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
       var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
@@ -5338,7 +5345,7 @@ function launchMockWithConfig(name){
       } else {
         fetchBatch(batchIdx+1);
       }
-    }).catch(function(e){
+    }, function(e){
       document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))+'<br><button class="btn" onclick="sw(\'mock\')" >← Back</button> <button class="btn" onclick="launchMockWithConfig(mockState.name)">🔄 Retry</button></div>';
     });
   }
@@ -5505,7 +5512,7 @@ function signInWithGoogle(){
     var provider=new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider).then(function(){
       if(btn){btn.disabled=false;btn.style.opacity='1';}
-    }).catch(function(e){
+    }, function(e){
       if(btn){btn.disabled=false;btn.style.opacity='1';btn.textContent='Google se Login Karo';}
       setLoginStatus('❌ '+e.message,'e');
     });
@@ -5562,7 +5569,7 @@ function saveToFirestore(){
       appData:JSON.stringify(S),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       name:S.name,streak:calcStreak(),examDates:S.examDates||{}
-    },{merge:true}).catch(function(e){console.error('Save error:',e);});
+    },{merge:true}, function(e){console.error('Save error:',e);});
   },1500);
 }
 
