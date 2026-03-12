@@ -1,0 +1,40 @@
+{
+  "name": "PS Study App",
+  "short_name": "PS Study",
+  "description": "SSC GD, Bihar Police, BSSC exam preparation app with AI-powered questions, mock tests, and current affairs",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#f5a623",
+  "orientation": "portrait",
+  "lang": "hi",
+  "icons": [
+    {
+      "src": "icon-192-1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512-1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education"],
+  "shortcuts": [
+    {
+      "name": "Mock Test",
+      "short_name": "Mock",
+      "description": "Start a mock test",
+      "url": "/?tab=mock"
+    },
+    {
+      "name": "Current Affairs",
+      "short_name": "CA",
+      "description": "Today's current affairs",
+      "url": "/?tab=ca"
+    }
+  ]
+}
