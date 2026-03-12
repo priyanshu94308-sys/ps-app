@@ -5480,7 +5480,7 @@ function initFirebase(){
         loadFromFirestore(function(){initApp();});
       } else {
         currentUser=null;
-        document.getElementById('fbGate').style.display='flex'; checkWAJoined();
+        document.getElementById('fbGate').style.display='flex'; 
         document.getElementById('userPill').style.display='none';
       }
     });
@@ -5587,26 +5587,6 @@ window.addEventListener('DOMContentLoaded',function(){initFirebase();});
   });
 }
 
-function showLoginAfterWA(){
-  setTimeout(function(){
-    var btn=document.getElementById('googleLoginBtn');
-    var st=document.getElementById('fbLoginStatus');
-    var wrap=document.getElementById('wa-wrap');
-    if(btn) btn.style.removeProperty('display');
-    if(st) st.style.removeProperty('display');
-    if(wrap) wrap.style.display='none';
-    localStorage.setItem('ps_wa_joined','1');
-  },800);
-}
-function checkWAJoined(){
-  if(localStorage.getItem('ps_wa_joined')==='1'){
-    var btn=document.getElementById('googleLoginBtn');
-    var st=document.getElementById('fbLoginStatus');
-    var wrap=document.getElementById('wa-wrap');
-    if(btn) btn.style.removeProperty('display');
-    if(st) st.style.removeProperty('display');
-    if(wrap) wrap.style.display='none';
-  }
 }
 </script>
 </body>
