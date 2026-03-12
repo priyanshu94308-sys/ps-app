@@ -1275,7 +1275,9 @@ function groqFetch(gkey, payload, cb, errcb){
   var models = payload._models || GROQ_MODELS;
   var idx = 0;
   function tryNext(){
-    if(idx>=models.length){errcb('Sabhi models fail ho gaye. Thodi der baad try karo.');return;}
+    if(idx>=models.length){var now=new Date();
+    var resetTime=new Date(now.getTime()+60000);
+    errcb('Rate limit! 1-2 minute baad try karo. ('+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes()+' pe try kiya)');return;}
     var model = models[idx++];
     var body = Object.assign({}, payload, {model: model});
     delete body._models;
@@ -4778,17 +4780,18 @@ function loadCAQuestions(id,name,more){
 
   var offset=cont.querySelectorAll('.qcard').length;
 
-    var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
+    var qcount=more?50:40;
+  var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
     +'\n\nTopic: "'+name+'" ke baare mein do cheezein do:'
-    +'\n\n1. STORY: 150-180 word ka ek interesting Hindi news story/explanation. Real events, facts, dates ke saath. Engaging aur informative.'
-    +'\n2. QUESTIONS: Is topic par 15 UNIQUE MCQ.'
+    +'\n\n1. STORY: 300-350 word ka ek detailed aur interesting Hindi news story/explanation. Real events, important facts, dates, background context ke saath. Jaise ek newspaper article ho — shuru mein topic introduce karo, phir details, phir significance batao.'
+    +'\n2. QUESTIONS: Is topic par '+qcount+' UNIQUE aur VARIED MCQ. Easy se hard tak mix karo.'
     +'\n\n🚨 LANGUAGE RULE: Har cheez SIRF Hindi Devanagari mein. Proper nouns English mein allowed.'
     +'\n\n⚠️ DATA RULE: Sirf LATEST data ('+yr+' tak). CMs/appointments abhi ke likho.'
     +'\n\nSTRICT MCQ RULES:'
-    +'\n1. 4 options BILKUL ALAG'
-    +'\n2. ans index 0/1/2/3 vary karo'
-    +'\n3. Factual, exam-style'
-    +'\n4. Sol mein fact explain karo'
+    +'\n1. 4 options BILKUL ALAG — plausible wrong options'
+    +'\n2. ans index 0/1/2/3 equally vary karo'
+    +'\n3. Factual, exam-style — SSC/Bihar Police pattern'
+    +'\n4. Sol mein latest fact explain karo'
     +avoid
     +'\\n\\nReturn ONLY valid JSON object (no markdown): {story: string, questions: array}'
   function doGroqCA(cb,errcb){
