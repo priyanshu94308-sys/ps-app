@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PS Study — Admin Panel</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;
+    --ac:#f5a623;--ac2:#ff6b35;--gr:#22c55e;--rd:#ef4444;
+    --t1:#ffffff;--t2:#8b8ba0;--t3:#4a4a6a;
+    --border:rgba(255,255,255,.08);
+  }
+  body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',sans-serif;min-height:100vh;}
+
+  /* LOGIN PAGE */
+  #loginPage{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(245,166,35,.12),transparent 60%),var(--bg);
+    z-index:999;
+  }
+  .login-card{
+    background:var(--bg2);border:1px solid var(--border);
+    border-radius:24px;padding:32px 28px;width:90%;max-width:360px;text-align:center;
+  }
+  .admin-badge{
+    display:inline-block;background:linear-gradient(135deg,#f5a623,#ff6b35);
+    color:#000;font-size:.6rem;font-weight:900;padding:3px 10px;border-radius:20px;
+    letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;
+  }
+  .login-title{font-size:1.5rem;font-weight:900;margin-bottom:6px;}
+  .login-sub{font-size:.72rem;color:var(--t2);margin-bottom:24px;}
+  #loginBtn{
+    width:100%;background:#fff;border:none;border-radius:12px;
+    color:#1f1f1f;font-size:.85rem;font-weight:700;padding:13px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,.3);
+  }
+  #loginBtn:hover{opacity:.9;}
+  #loginStatus{font-size:.65rem;color:var(--rd);margin-top:10px;min-height:16px;}
+
+  /* MAIN APP */
+  #app{display:none;}
+  .topbar{
+    background:var(--bg2);border-bottom:1px solid var(--border);
+    padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:100;
+  }
+  .topbar-left{display:flex;align-items:center;gap:10px;}
+  .topbar-logo{font-size:1rem;font-weight:900;background:linear-gradient(135deg,#f5a623,#ff6b35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .topbar-badge{font-size:.55rem;background:var(--rd);color:#fff;padding:2px 7px;border-radius:20px;font-weight:800;}
+  .admin-user{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--t2);}
+  .admin-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--ac);}
+  #logoutBtn{background:none;border:1px solid var(--border);color:var(--t2);font-size:.65rem;padding:5px 10px;border-radius:8px;cursor:pointer;}
+
+  .container{padding:20px;max-width:800px;margin:0 auto;}
+
+  /* STATS GRID */
+  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+  .stat-card{
+    background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+    padding:18px 16px;
+  }
+  .stat-val{font-size:1.8rem;font-weight:900;color:var(--ac);}
+  .stat-label{font-size:.65rem;color:var(--t2);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+  .stat-sub{font-size:.6rem;color:var(--t3);margin-top:2px;}
+
+  /* ACTION CARDS */
+  .section-title{font-size:.7rem;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:2px;margin:20px 0 10px;}
+  .action-card{
+    background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+    padding:16px;margin-bottom:10px;
+  }
+  .action-title{font-size:.85rem;font-weight:800;margin-bottom:4px;}
+  .action-desc{font-size:.65rem;color:var(--t2);margin-bottom:12px;line-height:1.6;}
+  .btn{
+    border:none;border-radius:10px;font-family:inherit;font-size:.78rem;
+    font-weight:700;padding:10px 16px;cursor:pointer;transition:.2s;
+  }
+  .btn-danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;}
+  .btn-warning{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;}
+  .btn-success{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;}
+  .btn-primary{background:linear-gradient(135deg,#5c6af0,#7c3aed);color:#fff;}
+  .btn:hover{opacity:.85;transform:translateY(-1px);}
+  .btn:active{transform:translateY(0);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+  /* USERS TABLE */
+  .users-table{width:100%;border-collapse:collapse;font-size:.72rem;}
+  .users-table th{color:var(--t2);font-size:.6rem;text-transform:uppercase;letter-spacing:1px;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+  .users-table td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.04);}
+  .users-table tr:hover td{background:rgba(255,255,255,.02);}
+  .user-name{font-weight:700;}
+  .user-email{color:var(--t2);font-size:.62rem;}
+  .ban-btn{background:var(--rd);border:none;color:#fff;font-size:.6rem;padding:3px 8px;border-radius:6px;cursor:pointer;font-weight:700;}
+  .banned-badge{background:rgba(239,68,68,.2);color:var(--rd);font-size:.6rem;padding:2px 7px;border-radius:6px;font-weight:700;}
+
+  /* NOTIFICATION */
+  .notif-textarea{
+    width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+    color:var(--t1);font-family:inherit;font-size:.78rem;padding:12px;
+    resize:vertical;min-height:80px;margin-bottom:10px;
+  }
+  .notif-textarea:focus{outline:none;border-color:var(--ac);}
+
+  /* LOG */
+  .log-box{
+    background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+    padding:12px;font-size:.65rem;color:var(--t2);max-height:150px;overflow-y:auto;
+    font-family:monospace;line-height:1.8;
+  }
+  .log-ok{color:var(--gr);}
+  .log-err{color:var(--rd);}
+  .log-info{color:var(--ac);}
+
+  /* TOAST */
+  #toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#1e1e2e;border:1px solid var(--border);color:var(--t1);
+    font-size:.78rem;font-weight:700;padding:10px 20px;border-radius:12px;
+    opacity:0;transition:.3s;pointer-events:none;z-index:9999;white-space:nowrap;
+  }
+  #toast.show{opacity:1;}
+
+  /* CONFIRM MODAL */
+  #modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9998;}
+  #modal.show{display:flex;}
+  .modal-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:320px;width:90%;text-align:center;}
+  .modal-title{font-size:1rem;font-weight:900;margin-bottom:8px;}
+  .modal-desc{font-size:.72rem;color:var(--t2);margin-bottom:20px;line-height:1.6;}
+  .modal-btns{display:flex;gap:10px;}
+  .modal-btns .btn{flex:1;}
+
+  @media(min-width:500px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="admin-badge">🔐 Admin Only</div>
+    <div class="login-title">PS Study Admin</div>
+    <div class="login-sub">Sirf authorized admin login kar sakta hai</div>
+    <button id="loginBtn" onclick="adminLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google se Admin Login
+    </button>
+    <div id="loginStatus"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PS Study</div>
+      <div class="topbar-badge">ADMIN</div>
+    </div>
+    <div class="admin-user">
+      <img id="adminAvatar" class="admin-avatar" src="" alt="">
+      <span id="adminName"></span>
+      <button id="logoutBtn" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-val" id="totalUsers">—</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-sub">Registered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="activeToday">—</div>
+        <div class="stat-label">Active Today</div>
+        <div class="stat-sub">Last 24 hours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="chatMsgs">—</div>
+        <div class="stat-label">Chat Messages</div>
+        <div class="stat-sub">Community</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="bannedUsers">—</div>
+        <div class="stat-label">Banned</div>
+        <div class="stat-sub">Users</div>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="section-title">⚡ Quick Actions</div>
+
+    <div class="action-card">
+      <div class="action-title">🗑️ Chat Clear Karo</div>
+      <div class="action-desc">Community chat ke saare messages ek click mein delete karo। Firestore reads/writes bachenge।</div>
+      <button class="btn btn-danger" onclick="confirmAction('chat','Sach mein community chat clear karna hai?','Saare messages delete ho jaayenge!',clearChat)">Chat Clear Karo</button>
+    </div>
+
+    <div class="action-card">
+      <div class="action-title">🔥 Firestore Data Clear</div>
+      <div class="action-desc">Saare users ka app data (progress, bookmarks, mocks) delete karo। Ye action UNDO nahi ho sakta!</div>
+      <button class="btn btn-danger" onclick="confirmAction('data','SURE HO? Saara user data delete hoga!','Ye action permanent hai — wapas nahi aa sakta!',clearAllData)">Saara Data Clear Karo</button>
+    </div>
+
+    <div class="action-card">
+      <div class="action-title">📢 Sab Users ko Notification</div>
+      <div class="action-desc">Ek message likho — agla baar jab koi login kare tab dikhega।</div>
+      <textarea class="notif-textarea" id="notifMsg" placeholder="Message likho... (e.g. App update ho gaya! Naye features dekho 🎉)"></textarea>
+      <button class="btn btn-primary" onclick="sendNotification()">📢 Send Notification</button>
+    </div>
+
+    <!-- USERS LIST -->
+    <div class="section-title">👥 Users</div>
+    <div class="action-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:.78rem;font-weight:700">Registered Users</span>
+        <button class="btn btn-success" style="padding:6px 12px;font-size:.65rem" onclick="loadUsers()">🔄 Refresh</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Last Active</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody">
+            <tr><td colspan="3" style="text-align:center;color:var(--t2);padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="section-title">📋 Activity Log</div>
+    <div class="log-box" id="logBox">
+      <div class="log-info">Admin panel ready...</div>
+    </div>
+
+    <div style="height:40px;"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- CONFIRM MODAL -->
+<div id="modal">
+  <div class="modal-card">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-btns">
+      <button class="btn btn-warning" onclick="closeModal()">Ruk Ja</button>
+      <button class="btn btn-danger" id="modalConfirm">Haan, Karo!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──
+var ADMIN_EMAIL = 'priyanshusingh94308@gmail.com'; // Sirf ye email admin hai
+var firebaseConfig = {
+  apiKey: "AIzaSyBTkrEU8TJXtxqCrZlaWC6W7KBcpM8YG8Y",
+  authDomain: "ps-study-app.firebaseapp.com",
+  projectId: "ps-study-app",
+  storageBucket: "ps-study-app.firebasestorage.app",
+  messagingSenderId: "806312075451",
+  appId: "1:806312075451:web:47e663c89f96edfe74099e"
+};
+
+var db, auth;
+firebase.initializeApp(firebaseConfig);
+db = firebase.firestore();
+auth = firebase.auth();
+
+auth.onAuthStateChanged(function(user){
+  if(user && user.email === ADMIN_EMAIL){
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('adminName').textContent = user.displayName.split(' ')[0];
+    document.getElementById('adminAvatar').src = user.photoURL || '';
+    log('✅ Admin login: ' + user.email, 'ok');
+    loadStats();
+    loadUsers();
+  } else if(user){
+    auth.signOut();
+    document.getElementById('loginStatus').textContent = '❌ Ye account admin nahi hai!';
+    log('❌ Unauthorized login attempt: ' + user.email, 'err');
+  }
+});
+
+function adminLogin(){
+  var provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(function(e){
+    document.getElementById('loginStatus').textContent = '❌ ' + e.message;
+  });
+}
+
+function adminLogout(){
+  auth.signOut();
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ── STATS ──
+function loadStats(){
+  // Total users
+  db.collection('users').get().then(function(snap){
+    document.getElementById('totalUsers').textContent = snap.size;
+    
+    // Active today
+    var yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    var active = snap.docs.filter(function(d){
+      var data = d.data();
+      if(!data.updatedAt) return false;
+      return data.updatedAt.toDate() > yesterday;
+    }).length;
+    document.getElementById('activeToday').textContent = active;
+
+    // Banned
+    var banned = snap.docs.filter(function(d){ return d.data().banned; }).length;
+    document.getElementById('bannedUsers').textContent = banned;
+    
+    log('📊 Stats loaded: ' + snap.size + ' users', 'info');
+  }).catch(function(e){ log('❌ Stats error: ' + e.message, 'err'); });
+
+  // Chat messages
+  db.collection('community_chat').get().then(function(snap){
+    document.getElementById('chatMsgs').textContent = snap.size;
+  });
+}
+
+// ── USERS ──
+function loadUsers(){
+  var tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--t2);padding:20px;">Loading...</td></tr>';
+  
+  db.collection('users').orderBy('updatedAt','desc').limit(50).get().then(function(snap){
+    if(snap.empty){
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--t2);padding:20px;">Koi user nahi</td></tr>';
+      return;
+    }
+    var html = '';
+    snap.docs.forEach(function(d){
+      var data = d.data();
+      var name = data.name || 'Unknown';
+      var uid = d.id;
+      var lastActive = data.updatedAt ? timeAgo(data.updatedAt.toDate()) : 'N/A';
+      var banned = data.banned;
+      html += '<tr>';
+      html += '<td><div class="user-name">' + esc(name) + '</div><div class="user-email">' + uid.substring(0,16) + '...</div></td>';
+      html += '<td>' + lastActive + '</td>';
+      html += '<td>';
+      if(banned){
+        html += '<span class="banned-badge">Banned</span> ';
+        html += '<button onclick="unbanUser(\'' + uid + '\')" style="background:var(--gr);border:none;color:#fff;font-size:.6rem;padding:3px 8px;border-radius:6px;cursor:pointer;font-weight:700;">Unban</button>';
+      } else {
+        html += '<button class="ban-btn" onclick="banUser(\'' + uid + '\',\'' + esc(name) + '\')">Ban</button>';
+      }
+      html += '</td></tr>';
+    });
+    tbody.innerHTML = html;
+    log('👥 ' + snap.size + ' users loaded', 'info');
+  }).catch(function(e){ 
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--rd)">❌ ' + e.message + '</td></tr>';
+    log('❌ Users error: ' + e.message, 'err');
+  });
+}
+
+// ── BAN / UNBAN ──
+function banUser(uid, name){
+  confirmAction('ban', name + ' ko ban karna hai?', 'Ye user app use nahi kar paayega!', function(){
+    db.collection('users').doc(uid).update({banned: true}).then(function(){
+      toast('🚫 ' + name + ' banned!');
+      log('🚫 Banned: ' + name + ' (' + uid + ')', 'err');
+      loadUsers(); loadStats();
+    });
+  });
+}
+
+function unbanUser(uid){
+  db.collection('users').doc(uid).update({banned: false}).then(function(){
+    toast('✅ User unbanned!');
+    log('✅ Unbanned: ' + uid, 'ok');
+    loadUsers(); loadStats();
+  });
+}
+
+// ── CLEAR CHAT ──
+function clearChat(){
+  log('🗑️ Clearing chat...', 'info');
+  db.collection('community_chat').get().then(function(snap){
+    var batch = db.batch();
+    snap.docs.forEach(function(d){ batch.delete(d.ref); });
+    return batch.commit();
+  }).then(function(){
+    toast('✅ Chat clear ho gaya!');
+    log('✅ Chat cleared!', 'ok');
+    loadStats();
+  }).catch(function(e){ 
+    toast('❌ Error: ' + e.message);
+    log('❌ Chat clear error: ' + e.message, 'err');
+  });
+}
+
+// ── CLEAR ALL DATA ──
+function clearAllData(){
+  log('⚠️ Clearing ALL user data...', 'err');
+  db.collection('users').get().then(function(snap){
+    var batch = db.batch();
+    snap.docs.forEach(function(d){
+      batch.update(d.ref, {appData: null, examDates: {}, streak: 0});
+    });
+    return batch.commit();
+  }).then(function(){
+    toast('✅ Saara data clear ho gaya!');
+    log('✅ All user data cleared', 'ok');
+    loadStats();
+  }).catch(function(e){
+    toast('❌ Error: ' + e.message);
+    log('❌ Clear data error: ' + e.message, 'err');
+  });
+}
+
+// ── NOTIFICATION ──
+function sendNotification(){
+  var msg = (document.getElementById('notifMsg').value || '').trim();
+  if(!msg){ toast('❌ Message likho pehle!'); return; }
+  db.collection('admin').doc('notification').set({
+    message: msg,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    active: true
+  }).then(function(){
+    toast('📢 Notification send ho gaya!');
+    log('📢 Notification: ' + msg.substring(0,50), 'ok');
+    document.getElementById('notifMsg').value = '';
+  }).catch(function(e){
+    toast('❌ Error: ' + e.message);
+    log('❌ Notif error: ' + e.message, 'err');
+  });
+}
+
+// ── HELPERS ──
+function confirmAction(type, title, desc, fn){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('modal').classList.add('show');
+  document.getElementById('modalConfirm').onclick = function(){
+    closeModal();
+    fn();
+  };
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+
+function log(msg, type){
+  var box = document.getElementById('logBox');
+  var d = document.createElement('div');
+  d.className = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-info';
+  var time = new Date().toLocaleTimeString('hi-IN');
+  d.textContent = '[' + time + '] ' + msg;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function timeAgo(date){
+  var diff = Math.floor((Date.now() - date) / 1000);
+  if(diff < 60) return diff + 's ago';
+  if(diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if(diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function esc(s){ 
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modal on outside click
+document.getElementById('modal').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
