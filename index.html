@@ -1111,6 +1111,27 @@ body::before{
       </div>
     </div>
     <!-- SETTINGS -->
+    <div class="tab" id="tab-chat">
+      <div style="display:flex;flex-direction:column;height:calc(100vh - 120px)">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 10px">
+          <div>
+            <div style="font-size:.88rem;font-weight:900">💬 Community Chat</div>
+            <div style="font-size:.6rem;color:var(--t2)" id="chat-online">Loading...</div>
+          </div>
+          <div style="font-size:.58rem;color:var(--t2);text-align:right">Messages 12h baad<br>auto-delete hote hain</div>
+        </div>
+        <!-- Messages -->
+        <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:8px">
+          <div style="text-align:center;color:var(--t2);font-size:.72rem;padding:20px">Loading messages...</div>
+        </div>
+        <!-- Input -->
+        <div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--br)">
+          <input id="chat-input" class="fi" placeholder="Message likho..." style="flex:1;font-size:.8rem" maxlength="300" onkeydown="if(event.key==='Enter')sendChatMsg()">
+          <button onclick="sendChatMsg()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.8rem;font-weight:800;padding:0 14px;cursor:pointer">Send</button>
+        </div>
+      </div>
+    </div>
     <div class="tab" id="tab-settings">
       <div class="scard" style="margin-bottom:10px">
         <div onclick="toggleCDFolder()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0">
@@ -1172,6 +1193,7 @@ body::before{
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
     <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
     <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Report</button>
+    <button class="tb" onclick="sw('chat')" id="tb-chat"><span>💬</span>Chat</button>
     <button class="tb" onclick="sw('settings')" id="tb-settings"><span>⚙️</span>Settings</button>
   </div>
 
@@ -3559,6 +3581,7 @@ function sw(tab){
   if(tab==='report') initReport();
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
+  if(tab==='chat'){initChat();}
 }
 function clearRWACache(){
   try{
@@ -4029,6 +4052,116 @@ function toggleCatFolder(id){
   el.style.display=open?'none':'block';
   if(arr) arr.style.transform=open?'':'rotate(90deg)';
 }
+
+// ── COMMUNITY CHAT ──
+var _chatUnsub=null;
+var _chatLoaded=false;
+
+function initChat(){
+  if(!currentUser){
+    document.getElementById('chat-messages').innerHTML='<div style="text-align:center;padding:20px;font-size:.78rem;color:var(--t2)">Login karo chat ke liye</div>';
+    return;
+  }
+  if(_chatUnsub) return; // already listening
+  _chatLoaded=false;
+
+  // Delete expired messages first
+  _deleteOldChatMsgs();
+
+  // Real-time listener
+  var cutoff=Date.now()-(12*60*60*1000);
+  _chatUnsub=db.collection('community_chat')
+    .where('ts','>',cutoff)
+    .orderBy('ts','asc')
+    .limit(100)
+    .onSnapshot(function(snap){
+      _renderChatMsgs(snap.docs);
+      _chatLoaded=true;
+      // Update online count (rough — unique users in last 5 min)
+      var recent=snap.docs.filter(function(d){return d.data().ts>Date.now()-300000;});
+      var uids={};
+      recent.forEach(function(d){uids[d.data().uid]=1;});
+      var onlineEl=document.getElementById('chat-online');
+      if(onlineEl) onlineEl.textContent=Object.keys(uids).length+' active (last 5 min)';
+    },function(err){
+      console.error('Chat error:',err);
+      document.getElementById('chat-messages').innerHTML='<div style="text-align:center;padding:20px;font-size:.78rem;color:var(--t2)">Chat load nahi hua. Reload karo.</div>';
+    });
+}
+
+function _renderChatMsgs(docs){
+  var el=document.getElementById('chat-messages');
+  if(!el) return;
+  var uid=currentUser?currentUser.uid:'';
+  if(!docs.length){
+    el.innerHTML='<div style="text-align:center;padding:30px;font-size:.75rem;color:var(--t2)">Koi message nahi — pehla message tum bhejo! 🚀</div>';
+    return;
+  }
+  var html='';
+  var now=Date.now();
+  docs.forEach(function(doc){
+    var d=doc.data();
+    var isMe=d.uid===uid;
+    var age=now-d.ts;
+    var timeStr=age<60000?'Abhi'
+      :age<3600000?Math.round(age/60000)+'m pehle'
+      :Math.round(age/3600000)+'h pehle';
+    var expires=Math.round((12*3600000-age)/3600000);
+    html+='<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+'">'
+      +'<div style="font-size:.57rem;color:var(--t2);margin-bottom:2px;'+(isMe?'text-align:right':'')+'">'
+      +(isMe?'':('<span style="font-weight:800;color:var(--ac)">'+esc(d.name||'User')+'</span> · '))
+      +timeStr+(expires<=1?' · 🕐 '+expires+'h bachi':'')
+      +(isMe?' · Tu':'')
+      +'</div>'
+      +'<div style="max-width:80%;padding:8px 11px;border-radius:'+(isMe?'12px 12px 3px 12px':'12px 12px 12px 3px')+';background:'+(isMe?'var(--ac)':'var(--cd2)')+';color:'+(isMe?'#fff':'var(--tx)')+';font-size:.78rem;line-height:1.4;word-break:break-word">'
+      +esc(d.text)+'</div></div>';
+  });
+  el.innerHTML=html;
+  // Scroll to bottom
+  el.scrollTop=el.scrollHeight;
+}
+
+function sendChatMsg(){
+  if(!currentUser){toast('Pehle login karo','w');return;}
+  var inp=document.getElementById('chat-input');
+  if(!inp) return;
+  var text=(inp.value||'').trim();
+  if(!text) return;
+  if(text.length>300){toast('300 chars se zyada nahi','w');return;}
+  inp.value='';
+  inp.disabled=true;
+  db.collection('community_chat').add({
+    text:text,
+    name:S.name||currentUser.displayName||'Student',
+    uid:currentUser.uid,
+    ts:Date.now(),
+    expires:Date.now()+(12*60*60*1000)
+  }).then(function(){
+    inp.disabled=false;
+    inp.focus();
+  }).catch(function(e){
+    inp.disabled=false;
+    toast('Send nahi hua: '+e.message,'w');
+  });
+}
+
+function _deleteOldChatMsgs(){
+  if(!db) return;
+  var cutoff=Date.now()-(12*60*60*1000);
+  db.collection('community_chat')
+    .where('ts','<',cutoff)
+    .get()
+    .then(function(snap){
+      var batch=db.batch();
+      snap.docs.forEach(function(doc){batch.delete(doc.ref);});
+      if(snap.docs.length) batch.commit();
+    }).catch(function(){});
+}
+
+function leaveChat(){
+  if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
+}
+
 function initApp(){
   load();
   // Apply saved dark/light mode
