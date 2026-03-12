@@ -4735,23 +4735,26 @@ function loadCAQuestions(id,name,more){
 
   var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
     +'\n\nTopic: "'+name+'" par 15 UNIQUE MCQ banao.'
-    +'\n\n⚠️ SABSE IMPORTANT: Sirf LATEST aur CURRENT data use karo ('+yr+' tak ka).'
+    +'\n\n🚨 LANGUAGE RULE (SABSE IMPORTANT): Har ek cheez SIRF Hindi Devanagari lipi mein likhna hai.'
+    +'\nQuestion, options, explanation — SAB KUCH Hindi mein. Ek bhi English word allowed NAHI hai.'
+    +'\nSirf proper nouns (naam, jagah) English mein reh sakte hain.'
+    +'\n\n⚠️ DATA RULE: Sirf LATEST aur CURRENT data use karo ('+yr+' tak ka).'
     +'\nJaise: CMs, Governors, appointments, awards — ABHI JO HAI wo likho, purana nahi.'
     +'\nExample: MP CM = Mohan Yadav (NOT Shivraj), Bihar CM = Nitish Kumar, etc.'
     +'\n\nSTRICT RULES:'
     +'\n1. 4 options BILKUL ALAG — plausible wrong options'
     +'\n2. ans index 0/1/2/3 equally vary karo — sirf 0 mat dena'
-    +'\n3. Factual, exam-style Hindi'
+    +'\n3. Factual, exam-style'
     +'\n4. Sol mein latest fact explain karo'
     +avoid
-    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या"}]';
+    +'\n\nReturn ONLY valid JSON array (NO markdown):\n[{"q":"प्रश्न?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":2,"sol":"व्याख्या"}]';
 
   var tvKey=getTavilyKey();
   function doGroqCA(ctx, cb, errcb){
     var fp=prompt+(ctx?'\n\nLatest news:\n'+ctx:'');
     groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
       messages:[
-        {role:'system',content:'JSON generator. ONLY valid JSON array. SIRF Hindi Devanagari. No markdown.'},
+        {role:'system',content:'Tu ek JSON generator hai. SIRF aur SIRF Hindi Devanagari mein likho. Questions, options, explanation — sab Hindi mein. English bilkul mat likhna. Sirf proper nouns English mein allowed hain. Output: valid JSON array only, koi markdown nahi.'},
         {role:'user',content:fp}
       ],
       max_tokens:4500,temperature:0.3
@@ -4772,6 +4775,46 @@ function loadCAQuestions(id,name,more){
     });
     if(!arr.length) throw new Error('Valid questions nahi mile, retry karo.');
 
+    // ── FACT CHECK LAYER ──
+    var factCheckPrompt='Niche diye gaye MCQ questions ke facts verify karo. '
+      +'Agar koi question galat hai toh correct karo. '
+      +'IMPORTANT: Sirf JSON array return karo, same format mein. '
+      +'Hindi Devanagari mein likhna hai. '
+      +'Current year '+new Date().getFullYear()+' ke facts use karo.\n\n'
+      +'Questions:\n'+JSON.stringify(arr);
+    groqFetch(key,{
+      _models:['compound-beta','llama-3.3-70b-versatile'],
+      messages:[
+        {role:'system',content:'Tu fact-checker hai. Diye gaye MCQ JSON array ke facts verify aur correct kar. Sirf corrected JSON array return kar, koi extra text nahi. Hindi Devanagari mein.'},
+        {role:'user',content:factCheckPrompt}
+      ],
+      max_tokens:4500,temperature:0.1
+    },function(fcData,_m){
+      try{
+        var fctxt=fcData.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+        var fcs=fctxt.indexOf('['),fce=fctxt.lastIndexOf(']');
+        if(fcs>-1){
+          var fcArr=JSON.parse(fctxt.substring(fcs,fce+1));
+          if(fcArr.length>0) arr=fcArr;
+        }
+      }catch(e){}
+      renderCAQuestions(arr,cont,more,id,offset);
+    },function(){
+      // Fact check fail — show original
+      renderCAQuestions(arr,cont,more,id,offset);
+    });
+  },function(e){
+    var ind=document.getElementById('ca_ind');if(ind)ind.remove();
+    if(!more){
+      cont.innerHTML='<div class="empty">❌ '+esc(e.substring(0,80))
+        +'<br><button class="btn" style="margin-top:10px;font-size:.78rem" id="caRetryBtn">🔄 Retry</button></div>';
+      var rb=document.getElementById('caRetryBtn');
+      if(rb) rb.onclick=function(){loadCAQuestions(id,name,false);};
+    }
+  });
+}
+
+function renderCAQuestions(arr,cont,more,id,offset){
     var ind=document.getElementById('ca_ind');
     if(ind) ind.remove();
     _saveCAHistory(id,arr);
@@ -4798,7 +4841,7 @@ function loadCAQuestions(id,name,more){
       out+='</div>';
     });
 
-    out+='<button id="caMoreBtn" style="width:100%;background:var(--cd2);border:1.5px dashed rgba(255,255,255,.15);border-radius:14px;color:var(--t3);font-family:inherit;font-size:.78rem;font-weight:700;padding:13px;cursor:pointer;margin-top:8px;">🔄 Aur 15 Questions</button>';
+    out+='<button id="caMoreBtn" style="width:100%;background:var(--cd2);border:1.5px dashed rgba(255,255,255,.15);border-radius:14px;color:var(--t3);font-family:inherit;font-size:.78rem;font-weight:700;padding:13px;cursor:pointer;margin-top:8px;">🔄 और 15 प्रश्न</button>';
 
     if(more){
       var ob=document.getElementById('caMoreBtn');if(ob)ob.remove();
@@ -4809,15 +4852,6 @@ function loadCAQuestions(id,name,more){
     var lb=document.getElementById('caMoreBtn');
     if(lb) lb.onclick=function(){loadCAQuestions(id,name,true);};
     toast('✅ '+arr.length+' questions!','i');
-  },function(e){
-    var ind=document.getElementById('ca_ind');if(ind)ind.remove();
-    if(!more){
-      cont.innerHTML='<div class="empty">❌ '+esc(e.substring(0,80))
-        +'<br><button class="btn" style="margin-top:10px;font-size:.78rem" id="caRetryBtn">🔄 Retry</button></div>';
-      var rb=document.getElementById('caRetryBtn');
-      if(rb) rb.onclick=function(){loadCAQuestions(id,name,false);};
-    }
-  });
 }
 
 function pickCA(qi,oi,correct){
