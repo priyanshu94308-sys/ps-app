@@ -805,6 +805,22 @@ body::before{
 .dot{display:inline-block;width:5px;height:5px;background:var(--t2);border-radius:50%;margin:0 2px;animation:td 1.2s infinite;}
 .dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
 @keyframes td{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+#adminNotif{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:999998;
+  background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:20px;
+}
+#adminNotif.show{display:flex;}
+.notif-popup{
+  background:var(--bg2);border:1px solid rgba(245,166,35,.4);
+  border-radius:20px;padding:24px 20px;max-width:340px;width:100%;text-align:center;
+  animation:popIn .3s ease;
+}
+@keyframes popIn{from{transform:scale(.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+.notif-icon{font-size:2.5rem;margin-bottom:10px;}
+.notif-title{font-size:.78rem;font-weight:900;color:var(--ac);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+.notif-msg{font-size:.82rem;line-height:1.7;color:var(--t1);margin-bottom:16px;}
+.notif-ok{background:linear-gradient(135deg,#f5a623,#ff6b35);border:none;border-radius:12px;color:#000;font-family:inherit;font-size:.82rem;font-weight:800;padding:11px 24px;cursor:pointer;width:100%;}
 </style>
 </head>
 <body>
@@ -1227,6 +1243,15 @@ body::before{
   <div style="position:relative;z-index:1;margin-top:12px;font-size:.58rem;color:var(--t2);">Tera data safe hai 🔒</div>
 </div>
 
+
+<div id="adminNotif">
+  <div class="notif-popup">
+    <div class="notif-icon">📢</div>
+    <div class="notif-title">Admin ka Message</div>
+    <div class="notif-msg" id="adminNotifMsg">...</div>
+    <button class="notif-ok" onclick="closeAdminNotif()">✅ Samajh Gaya!</button>
+  </div>
+</div>
 <div id="userPill" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99998;background:rgba(13,15,26,.97);padding:8px 14px;border-bottom:1px solid var(--br);align-items:center;gap:10px;">
   <img id="userAvatar" src="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--ac);object-fit:cover;" alt="">
   <div style="flex:1"><div style="font-size:.73rem;font-weight:800" id="userDisplayName">-</div><div style="font-size:.56rem;color:var(--gr)">✅ Cloud Synced</div></div>
@@ -1274,6 +1299,25 @@ function groqFetch(gkey, payload, cb, errcb){
     }).catch(function(){tryNext();});
   }
   tryNext();
+}
+
+function checkAdminNotification(){
+  if(!db||!currentUser) return;
+  var key='ps_notif_seen';
+  db.collection('admin').doc('notification').get().then(function(doc){
+    if(!doc.exists||!doc.data().active) return;
+    var data=doc.data();
+    var ts=data.timestamp?data.timestamp.toMillis():0;
+    var seen=localStorage.getItem(key)||0;
+    if(ts>parseInt(seen)){
+      document.getElementById('adminNotifMsg').textContent=data.message||'';
+      document.getElementById('adminNotif').classList.add('show');
+      localStorage.setItem(key,ts);
+    }
+  }).catch(function(){});
+}
+function closeAdminNotif(){
+  document.getElementById('adminNotif').classList.remove('show');
 }
 
 var QB = {
@@ -4778,29 +4822,19 @@ function loadCAQuestions(id,name,more){
     // ── FACT CHECK LAYER (Tavily + Groq) ──
     var tvKey=getTavilyKey();
     if(tvKey){
-      // Step 1: Tavily se har question ka key fact search karo
-      var searchPromises=arr.map(function(q){
-        var searchQuery=q.q.replace(/[?।]/g,'').trim().substring(0,80);
-        return fetch('https://api.tavily.com/search',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({api_key:tvKey,query:searchQuery,search_depth:'basic',max_results:2})
-        }).then(function(r){return r.json();}).then(function(d){
-          return (d.results||[]).map(function(r){return r.content||'';}).join(' ').substring(0,300);
-        }).catch(function(){return '';});
-      });
-      Promise.all(searchPromises).then(function(contexts){
-        // Step 2: Groq se verify + correct karo with Tavily context
-        var verifyPrompt='Niche diye gaye MCQ questions ko Tavily search results ke basis pe verify aur correct karo.\n'
-          +'Agar answer galat hai toh sahi karo. SIRF Hindi Devanagari mein. Sirf JSON array return karo.\n\n'
-          +'Questions with context:\n'
-          +arr.map(function(q,i){
-            return JSON.stringify(q)+'\nContext: '+contexts[i];
-          }).join('\n---\n');
+      // Sirf 1 Tavily search — topic ke baare mein
+      var topicQuery=name+' current affairs 2026 India';
+      fetch('https://api.tavily.com/search',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({api_key:tvKey,query:topicQuery,search_depth:'basic',max_results:5})
+      }).then(function(r){return r.json();}).then(function(d){
+        var ctx=(d.results||[]).map(function(r){return r.content||'';}).join(' ').substring(0,1500);
+        var verifyPrompt='Web search context:\n'+ctx+'\n\nIn questions ke facts verify karo aur galat correct karo. SIRF Hindi Devanagari. Sirf JSON array return karo:\n'+JSON.stringify(arr);
         groqFetch(key,{
           _models:['llama-3.3-70b-versatile','llama3-70b-8192'],
           messages:[
-            {role:'system',content:'Tu expert fact-checker hai. Tavily search context dekh ke MCQ verify kar. Galat answers correct kar. SIRF Hindi Devanagari. Sirf JSON array return kar.'},
+            {role:'system',content:'Tu expert fact-checker hai. Web context dekh ke MCQ verify kar. Galat answers correct kar. SIRF Hindi Devanagari. Sirf JSON array return kar.'},
             {role:'user',content:verifyPrompt}
           ],
           max_tokens:4500,temperature:0.1
@@ -4812,7 +4846,7 @@ function loadCAQuestions(id,name,more){
           }catch(e){}
           renderCAQuestions(arr,cont,more,id,offset);
         },function(){renderCAQuestions(arr,cont,more,id,offset);});
-      });
+      }).catch(function(){renderCAQuestions(arr,cont,more,id,offset);});
     } else {
       // No Tavily key — sirf Groq se verify
       var factCheckPrompt='Niche diye gaye MCQ questions ke facts verify karo. Galat hai toh correct karo. SIRF Hindi Devanagari. Sirf JSON array return karo.\n\nQuestions:\n'+JSON.stringify(arr);
@@ -5544,7 +5578,7 @@ function initFirebase(){
         currentUser=user;
         document.getElementById('fbGate').style.display='none';
         showUserPill(user);
-        loadFromFirestore(function(){initApp();});
+        loadFromFirestore(function(){initApp();checkAdminNotification();});
       } else {
         currentUser=null;
         document.getElementById('fbGate').style.display='flex'; 
