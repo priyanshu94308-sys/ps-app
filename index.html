@@ -4780,7 +4780,7 @@ function loadCAQuestions(id,name,more){
 
   var offset=cont.querySelectorAll('.qcard').length;
 
-    var qcount=more?50:40;
+    var qcount=more?30:20;
   var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
     +'\n\nTopic: "'+name+'" ke baare mein do cheezein do:'
     +'\n\n1. STORY: 300-350 word ka ek detailed aur interesting Hindi news story/explanation. Real events, important facts, dates, background context ke saath. Jaise ek newspaper article ho — shuru mein topic introduce karo, phir details, phir significance batao.'
@@ -4799,7 +4799,7 @@ function loadCAQuestions(id,name,more){
       messages:[
         {role:'system',content:'Tu ek JSON generator hai. SIRF Hindi Devanagari mein likho. Output: valid JSON object with story and questions fields only. Koi markdown nahi.'},
         {role:'user',content:prompt}
-      ],max_tokens:5000,temperature:0.3
+      ],max_tokens:8000,temperature:0.3
     },cb,errcb);
   }
 
