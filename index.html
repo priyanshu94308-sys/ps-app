@@ -4822,7 +4822,7 @@ function loadCAQuestions(id,name,more){
       });
       if(!arr.length) throw new Error('Valid questions nahi mile');
       if(!more && story){
-        var sc='<div style="background:linear-gradient(135deg,rgba(92,106,240,.12),rgba(245,166,35,.08));border:1px solid rgba(92,106,240,.25);border-radius:18px;padding:16px;margin-bottom:14px;">'
+        var sc='<div class="news-story-card" style="background:linear-gradient(135deg,rgba(92,106,240,.12),rgba(245,166,35,.08));border:1px solid rgba(92,106,240,.25);border-radius:18px;padding:16px;margin-bottom:14px;">'
           +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
           +'<div style="background:linear-gradient(135deg,var(--in),var(--in2));border-radius:8px;padding:5px 10px;font-size:.58rem;font-weight:900;color:#fff;letter-spacing:1px;">📰 NEWS STORY</div>'
           +'<div style="font-size:.68rem;color:var(--t2);font-weight:700;">'+name+'</div></div>'
@@ -4887,6 +4887,8 @@ function renderCAQuestions(arr,cont,more,id,offset){
 
     if(more){
       var ob=document.getElementById('caMoreBtn');if(ob)ob.remove();
+      cont.insertAdjacentHTML('beforeend',out);
+    } else if(cont.querySelector('.news-story-card')){
       cont.insertAdjacentHTML('beforeend',out);
     } else {
       cont.innerHTML=out;
