@@ -1173,14 +1173,14 @@ body::before{
         <div style="font-size:.63rem;font-weight:700" id="gkStatus">⚪ Key nahi hai</div>
         <a href="https://console.groq.com/keys" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Groq Key Lo</a>
       <div class="scard">
-        <div class="sec">&#128269; Tavily Key (CA News)</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Real 2026 news context CA mein — 1000/month free!</div>
+        <div class="sec">📰 NewsData Key (CA News)</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Real India news → Verified CA MCQ — 200 req/day free!</div>
         <div style="display:flex;gap:5px;margin-bottom:5px">
-          <input type="text" class="fi" id="tavilyKey" placeholder="tvly-...">
-          <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveTavilyKey()">Save</button>
+          <input type="text" class="fi" id="newsdataKey" placeholder="pub_...">
+          <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveNewsDataKey()">Save</button>
         </div>
-        <div style="font-size:.63rem;font-weight:700" id="tavilyStatus">&#9898; Key nahi hai</div>
-        <a href="https://app.tavily.com/home" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">&#128273; FREE Tavily Key Lo</a>
+        <div style="font-size:.63rem;font-weight:700" id="newsdataStatus">⚪ Key nahi hai</div>
+        <a href="https://newsdata.io/register" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE NewsData Key Lo</a>
       </div>
       </div>
       <div class="scard">
@@ -3678,6 +3678,13 @@ function sw(tab){
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='chat'){initChat();}
+  if(tab==='settings'){
+    var gk2=document.getElementById('geminiKey');
+    if(gk2){try{var gv=localStorage.getItem('ps_gkey');if(gv)gk2.value=gv;}catch(e){}}
+    var ndk2=document.getElementById('newsdataKey');
+    if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
+    updateGKStatus();updateNewsDataStatus();
+  }
 }
 function clearRWACache(){
   try{
@@ -3697,17 +3704,17 @@ function getGKey(){
   try{return localStorage.getItem('ps_gkey')||'';}catch(e){return '';}
 }
 
-function getTavilyKey(){try{return localStorage.getItem('ps_tvkey')||'';}catch(e){return '';}}
-function saveTavilyKey(){
-  var v=(document.getElementById('tavilyKey')||{}).value||'';
-  if(!v.startsWith('tvly-')){toast('Invalid key — tvly- se shuru hona chahiye','w');return;}
-  try{localStorage.setItem('ps_tvkey',v);}catch(e){}
-  updateTavilyStatus(); toast('Tavily key saved!','i');
+function getNewsDataKey(){try{return localStorage.getItem('ps_ndkey')||'';}catch(e){return '';}}
+function saveNewsDataKey(){
+  var v=(document.getElementById('newsdataKey')||{}).value||'';
+  if(!v.startsWith('pub_')){toast('Invalid key — pub_ se shuru hona chahiye','w');return;}
+  try{localStorage.setItem('ps_ndkey',v);}catch(e){}
+  updateNewsDataStatus(); toast('NewsData key saved! 📰','i');
 }
-function updateTavilyStatus(){
-  var el=document.getElementById('tavilyStatus'); if(!el) return;
-  var k=getTavilyKey();
-  el.textContent=k?'✅ Tavily Active — Real news milegi':'⚪ Key nahi hai — compound-beta use hoga';
+function updateNewsDataStatus(){
+  var el=document.getElementById('newsdataStatus'); if(!el) return;
+  var k=getNewsDataKey();
+  el.textContent=k?'✅ NewsData Active — Real India news milegi':'⚪ Key nahi hai — compound-beta use hoga';
   el.style.color=k?'var(--gr)':'var(--t2)';
 }
 
@@ -4279,6 +4286,9 @@ function initApp(){
   if(ni) ni.value=S.name;
   var gk=document.getElementById('geminiKey');
   if(gk){try{var k=localStorage.getItem('ps_gkey');if(k)gk.value=k;}catch(e){}}
+  var ndk=document.getElementById('newsdataKey');
+  if(ndk){try{var ndv=localStorage.getItem('ps_ndkey');if(ndv)ndk.value=ndv;}catch(e){}}
+  updateNewsDataStatus();
   updateHeader();
   renderHome();
   renderCountdown();
@@ -4766,8 +4776,8 @@ function loadCAQuestions(id,name,more){
 
   var yr=new Date().getFullYear();
   var mn3=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var now=new Date();
-  var currentDate=now.getDate()+' '+mn3[now.getMonth()]+' '+yr;
+  var now2=new Date();
+  var currentDate=now2.getDate()+' '+mn3[now2.getMonth()]+' '+yr;
   var hist=_getCAHistory(id);
   var avoid='';
   if(hist.length>0){
@@ -4775,87 +4785,82 @@ function loadCAQuestions(id,name,more){
     avoid='\n\nYE MAT REPEAT KARO:\n'+sample.map(function(q,i){return (i+1)+'. '+q;}).join('\n');
   }
   var offset=cont.querySelectorAll('.qcard').length;
-  var qcount=more?15:15;
 
-  var prompt='Date: '+currentDate+'. Exam expert: Bihar Police, SSC GD, CGL.'
-    +'\n\nTopic: "'+name+'"'
-    +'\n\n1. STORY: 200-250 word ki Hindi mein detailed news story. Real facts, dates, important points.'
-    +'\n2. QUESTIONS: '+qcount+' unique MCQ is topic par.'
-    +'\n\nRULES:'
-    +'\n- Sab kuch Hindi Devanagari mein (proper nouns chhod ke)'
-    +'\n- Latest '+yr+' data use karo'
-    +'\n- 4 options alag alag'
-    +'\n- ans 0/1/2/3 vary karo'
-    +'\n- Sol mein explanation do'
-    +avoid
-    +'\n\nSIRF JSON return karo, koi aur text nahi:'
-    +'\n{"story":"...","questions":[{"q":"...","opts":["A","B","C","D"],"ans":0,"sol":"..."}]}';
+  function generateMCQ(context){
+    var qprompt='Date: '+currentDate+'. Topic: "'+name+'" par 15 UNIQUE MCQ banao Bihar Police/SSC GD/CGL pattern mein.'
+      +(context ? '\n\n✅ VERIFIED FACTS (inhi facts pe MCQ banao):\n'+context : '')
+      +'\n\nRULES:'
+      +'\n- Sab kuch Hindi Devanagari mein'
+      +'\n- Latest '+yr+' ka VERIFIED data hi use karo'
+      +'\n- 4 bilkul alag options'
+      +'\n- ans 0/1/2/3 equally vary karo'
+      +'\n- Sol mein short explanation'
+      +avoid
+      +'\n\nSIRF JSON array return karo:'
+      +'\n[{"q":"...","opts":["(A) ...","(B) ...","(C) ...","(D) ..."],"ans":0,"sol":"..."}]';
 
-  groqFetch(key,{
-    _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
-    messages:[
-      {role:'system',content:'JSON generator. Return only valid JSON. No markdown. Hindi Devanagari only.'},
-      {role:'user',content:prompt}
-    ],
-    max_tokens:6000,temperature:0.3
-  },function(data){
-    try{
-      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=txt.indexOf('{'),e=txt.lastIndexOf('}');
-      if(s===-1){
-        var sa=txt.indexOf('['),ea=txt.lastIndexOf(']');
-        if(sa>-1){
-          var arr2=JSON.parse(txt.substring(sa,ea+1));
-          renderCAQuestions(arr2,cont,more,id,offset);
-          return;
-        }
-        throw new Error('JSON nahi mila');
+    groqFetch(key,{
+      _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
+      messages:[
+        {role:'system',content:'JSON array generator. Return ONLY valid JSON array. Hindi Devanagari. No markdown.'},
+        {role:'user',content:qprompt}
+      ],
+      max_tokens:5000,temperature:0.3
+    },function(data){
+      try{
+        var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+        var s=txt.indexOf('['),e=txt.lastIndexOf(']');
+        if(s===-1) throw new Error('JSON nahi mila');
+        var arr=JSON.parse(txt.substring(s,e+1));
+        arr=arr.filter(function(q){ return q.opts&&q.opts.length>=4; });
+        if(!arr.length) throw new Error('Valid questions nahi mile');
+        renderCAQuestions(arr,cont,more,id,offset);
+      }catch(err){
+        showCAError(cont,id,name,String(err).substring(0,80),more);
       }
-      var parsed=JSON.parse(txt.substring(s,e+1));
-      var story=parsed.story||'';
-      var arr=parsed.questions||[];
-      if(!arr.length) throw new Error('Questions nahi mile');
-      arr=arr.filter(function(q){
-        if(!q.opts||q.opts.length<4) return false;
-        var clean=q.opts.map(function(o){return (o||'').replace(/^[A-D][.)]\s*/,'').trim().toLowerCase();});
-        return clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;}).length>=3;
-      });
-      if(!arr.length) throw new Error('Valid questions nahi mile');
-      if(!more && story){
-        var sc='<div class="news-story-card" style="background:linear-gradient(135deg,rgba(92,106,240,.12),rgba(245,166,35,.08));border:1px solid rgba(92,106,240,.25);border-radius:18px;padding:16px;margin-bottom:14px;">'
-          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
-          +'<div style="background:linear-gradient(135deg,var(--in),var(--in2));border-radius:8px;padding:5px 10px;font-size:.58rem;font-weight:900;color:#fff;letter-spacing:1px;">📰 NEWS STORY</div>'
-          +'<div style="font-size:.68rem;color:var(--t2);font-weight:700;">'+name+'</div></div>'
-          +'<div style="font-size:.8rem;line-height:1.85;color:var(--tx);">'+story+'</div>'
-          +'<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);font-size:.65rem;color:var(--t2);font-weight:700;">👇 Ab in MCQs ko solve karo</div></div>';
-        cont.innerHTML=sc;
-      }
-      renderCAQuestions(arr,cont,more,id,offset);
-    }catch(err){
-      var ind=document.getElementById('ca_ind');if(ind)ind.remove();
-      if(!more){
-        cont.innerHTML='<div class="empty">❌ '+esc(String(err).substring(0,80))+'<br><button class="btn" style="margin-top:12px;width:auto;padding:10px 20px" id="caRetryBtn">🔄 Retry</button></div>';
-        var rb=document.getElementById('caRetryBtn');
-        if(rb)rb.onclick=function(){loadCAQuestions(id,name,false);};
-      }else{
-        var ind2=document.getElementById('ca_ind');if(ind2)ind2.remove();
-        toast('❌ Parse error, retry karo','e');
-      }
-    }
-  },function(e){
-    var ind=document.getElementById('ca_ind');if(ind)ind.remove();
-    if(!more){
-      cont.innerHTML='<div class="empty">❌ '+esc(String(e).substring(0,100))+'<br><button class="btn" style="margin-top:12px;width:auto;padding:10px 20px" id="caRetryBtn">🔄 Retry</button></div>';
-      var rb=document.getElementById('caRetryBtn');
-      if(rb)rb.onclick=function(){loadCAQuestions(id,name,false);};
-    }else{
-      var ind2=document.getElementById('ca_ind');if(ind2)ind2.remove();
-      toast('❌ '+String(e).substring(0,50),'e');
-    }
-  });
+    },function(e){
+      showCAError(cont,id,name,String(e).substring(0,100),more);
+    });
+  }
 
-
+  // NewsData se real India news lo, phir MCQ banao
+  var ndKey=getNewsDataKey();
+  if(ndKey && !more){
+    cont.innerHTML='<div style="text-align:center;padding:30px">'
+      +'<div style="font-size:2.5rem">📰</div>'
+      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Real news dhundh rahe hain...</div>'
+      +'<div style="font-size:.68rem;color:var(--t2)">NewsData → Verified MCQ</div>'
+      +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
+    var ndQuery=encodeURIComponent(name+' India');
+    var ndUrl='https://newsdata.io/api/1/news?apikey='+ndKey+'&q='+ndQuery+'&country=in&language=hi,en&size=5';
+    fetch(ndUrl)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var ctx='';
+      if(d.results&&d.results.length){
+        ctx=d.results.map(function(r){
+          return (r.title||'')+(r.description?' — '+r.description:'');
+        }).join('\n\n').substring(0,2000);
+      }
+      generateMCQ(ctx);
+    })
+    .catch(function(){ generateMCQ(''); });
+  } else {
+    generateMCQ('');
+  }
 }
+
+function showCAError(cont,id,name,msg,more){
+  var ind=document.getElementById('ca_ind');if(ind)ind.remove();
+  if(!more){
+    cont.innerHTML='<div class="empty">❌ '+esc(msg)+'<br><button class="btn" style="margin-top:12px;width:auto;padding:10px 20px" id="caRetryBtn">🔄 Retry</button></div>';
+    var rb=document.getElementById('caRetryBtn');
+    if(rb)rb.onclick=function(){loadCAQuestions(id,name,false);};
+  }else{
+    toast('❌ '+msg.substring(0,40),'e');
+  }
+}
+
 function renderCAQuestions(arr,cont,more,id,offset){
     var ind=document.getElementById('ca_ind');
     if(ind) ind.remove();
