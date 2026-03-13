@@ -4787,17 +4787,26 @@ function loadCAQuestions(id,name,more){
   var offset=cont.querySelectorAll('.qcard').length;
 
   function generateMCQ(context){
-    var qprompt='Date: '+currentDate+'. Topic: "'+name+'" par 15 UNIQUE MCQ banao Bihar Police/SSC GD/CGL pattern mein.'
-      +(context ? '\n\n✅ VERIFIED FACTS (inhi facts pe MCQ banao):\n'+context : '')
-      +'\n\nRULES:'
-      +'\n- Sab kuch Hindi Devanagari mein'
-      +'\n- Latest '+yr+' ka VERIFIED data hi use karo'
-      +'\n- 4 bilkul alag options'
-      +'\n- ans 0/1/2/3 equally vary karo'
-      +'\n- Sol mein short explanation'
+    var qprompt='Aaj ki date: '+currentDate+'.'
+      +'\n\nTu Bihar Police Sipahi Bharti, SSC GD Constable, aur SSC CGL ka EXPERT question setter hai.'
+      +'\nTera kaam hai: Topic "'+name+'" par 15 UNIQUE, HIGH-QUALITY MCQ banana.'
+      +(context ? '\n\n📰 REAL NEWS CONTEXT (SIRF inhi verified facts pe questions banana):\n'+context : '\n\n⚠️ Sirf '+yr+' tak ke VERIFIED aur ACCURATE facts use karo. Kuch bhi mat banana.')
+      +'\n\n🎯 QUESTION QUALITY RULES:'
+      +'\n1. Har question EXAM-WORTHY ho — wahi poochho jo actually Bihar Police/SSC mein aata hai'
+      +'\n2. Questions variety mein rakho: naam, date, jagah, rank, award, appointment, fact'
+      +'\n3. Wrong options PLAUSIBLE rakho — easily guess na ho sake'
+      +'\n4. Ek bhi REPEATED ya OBVIOUS question nahi'
+      +'\n5. ans field mein 0/1/2/3 equally distribute karo — sirf 0 mat dena'
+      +'\n\n🔤 LANGUAGE RULES:'
+      +'\n- Saare questions, options, explanation SIRF Hindi Devanagari mein'
+      +'\n- Proper nouns (naam, jagah, scheme naam) English mein allowed'
+      +'\n- Options format: "(A) विकल्प" "(B) विकल्प" "(C) विकल्प" "(D) विकल्प"'
+      +'\n\n💡 SOL (explanation) RULES:'
+      +'\n- Sol mein sirf key fact batao — 1-2 line mein'
+      +'\n- Galat options kyun galat hain woh bhi briefly batao'
       +avoid
-      +'\n\nSIRF JSON array return karo:'
-      +'\n[{"q":"...","opts":["(A) ...","(B) ...","(C) ...","(D) ..."],"ans":0,"sol":"..."}]';
+      +'\n\n⚡ OUTPUT: SIRF valid JSON array — koi heading, koi markdown, koi extra text NAHI:'
+      +'\n[{"q":"प्रश्न?","opts":["(A) ","(B) ","(C) ","(D) "],"ans":2,"sol":"व्याख्या"}]';
 
     groqFetch(key,{
       _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
