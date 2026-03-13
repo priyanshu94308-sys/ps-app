@@ -4762,10 +4762,7 @@ function loadCAQuestions(id,name,more){
   }
 
   var key=getGKey();
-  if(!key){
-    cont.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
-    return;
-  }
+  if(!key){ cont.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>'; return; }
 
   var yr=new Date().getFullYear();
   var mn3=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -4774,74 +4771,91 @@ function loadCAQuestions(id,name,more){
   var hist=_getCAHistory(id);
   var avoid='';
   if(hist.length>0){
-    var sample=hist.slice(-25);
-    avoid='\n\nYE ALREADY POOCHE JA CHUKE HAIN - REPEAT MAT KARO:\n'+sample.map(function(q,i){return (i+1)+'. '+q;}).join('\n');
+    var sample=hist.slice(-20);
+    avoid='\n\nYE MAT REPEAT KARO:\n'+sample.map(function(q,i){return (i+1)+'. '+q;}).join('\n');
   }
-
   var offset=cont.querySelectorAll('.qcard').length;
+  var qcount=more?15:15;
 
-    var qcount=more?30:20;
-  var prompt='Aaj ki date: '+currentDate+'. Bihar Police/SSC GD/CGL exam expert.'
-    +'\n\nTopic: "'+name+'" ke baare mein do cheezein do:'
-    +'\n\n1. STORY: 300-350 word ka ek detailed aur interesting Hindi news story/explanation. Real events, important facts, dates, background context ke saath. Jaise ek newspaper article ho — shuru mein topic introduce karo, phir details, phir significance batao.'
-    +'\n2. QUESTIONS: Is topic par '+qcount+' UNIQUE aur VARIED MCQ. Easy se hard tak mix karo.'
-    +'\n\n🚨 LANGUAGE RULE: Har cheez SIRF Hindi Devanagari mein. Proper nouns English mein allowed.'
-    +'\n\n⚠️ DATA RULE: Sirf LATEST data ('+yr+' tak). CMs/appointments abhi ke likho.'
-    +'\n\nSTRICT MCQ RULES:'
-    +'\n1. 4 options BILKUL ALAG — plausible wrong options'
-    +'\n2. ans index 0/1/2/3 equally vary karo'
-    +'\n3. Factual, exam-style — SSC/Bihar Police pattern'
-    +'\n4. Sol mein latest fact explain karo'
+  var prompt='Date: '+currentDate+'. Exam expert: Bihar Police, SSC GD, CGL.'
+    +'\n\nTopic: "'+name+'"'
+    +'\n\n1. STORY: 200-250 word ki Hindi mein detailed news story. Real facts, dates, important points.'
+    +'\n2. QUESTIONS: '+qcount+' unique MCQ is topic par.'
+    +'\n\nRULES:'
+    +'\n- Sab kuch Hindi Devanagari mein (proper nouns chhod ke)'
+    +'\n- Latest '+yr+' data use karo'
+    +'\n- 4 options alag alag'
+    +'\n- ans 0/1/2/3 vary karo'
+    +'\n- Sol mein explanation do'
     +avoid
-    +'\\n\\nReturn ONLY valid JSON object (no markdown): {story: string, questions: array}'
-  function doGroqCA(cb,errcb){
-    groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
-      messages:[
-        {role:'system',content:'Tu ek JSON generator hai. SIRF Hindi Devanagari mein likho. Output: valid JSON object with story and questions fields only. Koi markdown nahi.'},
-        {role:'user',content:prompt}
-      ],max_tokens:8000,temperature:0.3
-    },cb,errcb);
-  }
+    +'\n\nSIRF JSON return karo, koi aur text nahi:'
+    +'\n{"story":"...","questions":[{"q":"...","opts":["A","B","C","D"],"ans":0,"sol":"..."}]}';
 
-  doGroqCA(function(data){
-    if(data.error) throw new Error(data.error.message);
-    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=txt.indexOf('{'),e=txt.lastIndexOf('}');
-    if(s===-1){
-      var sa=txt.indexOf('['),ea=txt.lastIndexOf(']');
-      if(sa>-1){var arr2=JSON.parse(txt.substring(sa,ea+1));renderCAQuestions(arr2,cont,more,id,offset);return;}
-      throw new Error('JSON nahi mila');
+  groqFetch(key,{
+    _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
+    messages:[
+      {role:'system',content:'JSON generator. Return only valid JSON. No markdown. Hindi Devanagari only.'},
+      {role:'user',content:prompt}
+    ],
+    max_tokens:6000,temperature:0.3
+  },function(data){
+    try{
+      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var s=txt.indexOf('{'),e=txt.lastIndexOf('}');
+      if(s===-1){
+        var sa=txt.indexOf('['),ea=txt.lastIndexOf(']');
+        if(sa>-1){
+          var arr2=JSON.parse(txt.substring(sa,ea+1));
+          renderCAQuestions(arr2,cont,more,id,offset);
+          return;
+        }
+        throw new Error('JSON nahi mila');
+      }
+      var parsed=JSON.parse(txt.substring(s,e+1));
+      var story=parsed.story||'';
+      var arr=parsed.questions||[];
+      if(!arr.length) throw new Error('Questions nahi mile');
+      arr=arr.filter(function(q){
+        if(!q.opts||q.opts.length<4) return false;
+        var clean=q.opts.map(function(o){return (o||'').replace(/^[A-D][.)]\s*/,'').trim().toLowerCase();});
+        return clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;}).length>=3;
+      });
+      if(!arr.length) throw new Error('Valid questions nahi mile');
+      if(!more && story){
+        var sc='<div style="background:linear-gradient(135deg,rgba(92,106,240,.12),rgba(245,166,35,.08));border:1px solid rgba(92,106,240,.25);border-radius:18px;padding:16px;margin-bottom:14px;">'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
+          +'<div style="background:linear-gradient(135deg,var(--in),var(--in2));border-radius:8px;padding:5px 10px;font-size:.58rem;font-weight:900;color:#fff;letter-spacing:1px;">📰 NEWS STORY</div>'
+          +'<div style="font-size:.68rem;color:var(--t2);font-weight:700;">'+name+'</div></div>'
+          +'<div style="font-size:.8rem;line-height:1.85;color:var(--tx);">'+story+'</div>'
+          +'<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);font-size:.65rem;color:var(--t2);font-weight:700;">👇 Ab in MCQs ko solve karo</div></div>';
+        cont.innerHTML=sc;
+      }
+      renderCAQuestions(arr,cont,more,id,offset);
+    }catch(err){
+      var ind=document.getElementById('ca_ind');if(ind)ind.remove();
+      if(!more){
+        cont.innerHTML='<div class="empty">❌ '+esc(String(err).substring(0,80))+'<br><button class="btn" style="margin-top:12px;width:auto;padding:10px 20px" id="caRetryBtn">🔄 Retry</button></div>';
+        var rb=document.getElementById('caRetryBtn');
+        if(rb)rb.onclick=function(){loadCAQuestions(id,name,false);};
+      }else{
+        var ind2=document.getElementById('ca_ind');if(ind2)ind2.remove();
+        toast('❌ Parse error, retry karo','e');
+      }
     }
-    var parsed=JSON.parse(txt.substring(s,e+1));
-    var story=parsed.story||'';
-    var arr=parsed.questions||[];
-    if(!arr.length) throw new Error('Questions nahi mile');
-    arr=arr.filter(function(q){
-      if(!q.opts||q.opts.length<4) return false;
-      var clean=q.opts.map(function(o){return (o||'').replace(/^[A-D][.)]\s*/,'').trim().toLowerCase();});
-      return clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;}).length===4;
-    });
-    if(!arr.length) throw new Error('Valid questions nahi mile');
-    if(!more && story){
-      var sc='<div style="background:linear-gradient(135deg,rgba(92,106,240,.12),rgba(245,166,35,.08));border:1px solid rgba(92,106,240,.25);border-radius:18px;padding:16px;margin-bottom:14px;">'
-        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
-        +'<div style="background:linear-gradient(135deg,var(--in),var(--in2));border-radius:8px;padding:5px 10px;font-size:.58rem;font-weight:900;color:#fff;letter-spacing:1px;">📰 NEWS STORY</div>'
-        +'<div style="font-size:.68rem;color:var(--t2);font-weight:700;">'+name+'</div></div>'
-        +'<div style="font-size:.8rem;line-height:1.85;color:var(--tx);">'+story+'</div>'
-        +'<div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07);font-size:.65rem;color:var(--t2);font-weight:700;">👇 Ab in MCQs ko solve karo</div></div>';
-      cont.innerHTML=sc;
-    }
-    renderCAQuestions(arr,cont,more,id,offset);
   },function(e){
     var ind=document.getElementById('ca_ind');if(ind)ind.remove();
     if(!more){
-      cont.innerHTML='<div class="empty">❌ '+esc(String(e).substring(0,80))+'<br><button class="btn" style="margin-top:12px;width:auto;padding:10px 20px" id="caRetryBtn">🔄 Retry</button></div>';
+      cont.innerHTML='<div class="empty">❌ '+esc(String(e).substring(0,100))+'<br><button class="btn" style="margin-top:12px;width:auto;padding:10px 20px" id="caRetryBtn">🔄 Retry</button></div>';
       var rb=document.getElementById('caRetryBtn');
       if(rb)rb.onclick=function(){loadCAQuestions(id,name,false);};
-    }else{var ind2=document.getElementById('ca_ind');if(ind2)ind2.remove();toast('❌ '+String(e).substring(0,50),'e');}
+    }else{
+      var ind2=document.getElementById('ca_ind');if(ind2)ind2.remove();
+      toast('❌ '+String(e).substring(0,50),'e');
+    }
   });
-}
 
+
+}
 function renderCAQuestions(arr,cont,more,id,offset){
     var ind=document.getElementById('ca_ind');
     if(ind) ind.remove();
