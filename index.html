@@ -3836,7 +3836,7 @@ function checkSavedAnswer(idx,i){
 function deleteSavedQ(idx){
   if(!S.bookmarks) return;
   S.bookmarks.splice(idx,1);
-  saveState();
+  autoSaveBookmarks();
   toast('🗑 Removed!','i');
   openSavedQuestions();
   renderRWASavedBtn();
@@ -4107,15 +4107,28 @@ function checkRWAAnswer(i){
   }
 }
 
+function autoSaveBookmarks(){
+  var uid=getUid();if(!uid)return;
+  try{localStorage.setItem('ps_v3',JSON.stringify(S));}catch(e){}
+  // Direct Firestore write — sirf bookmarks field update karo
+  db.collection('users').doc(uid).set({
+    bookmarks:S.bookmarks,
+    appData:JSON.stringify(S),
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true}).then(function(){
+    log&&console.log('✅ Bookmarks auto-saved to Firebase');
+  }).catch(function(e){console.error('Bookmark save error:',e);});
+}
+
 function saveRWABookmark(btn){
   try{
     var data=window._pendingBM;
     if(!data){toast('❌ Data nahi mila','e');return;}
     if(!S.bookmarks) S.bookmarks=[];
     S.bookmarks.push(data);
-    saveState();
-    btn.parentElement.innerHTML='<div style="font-size:.65rem;color:var(--gr);padding:4px">✅ Saved in Bookmarks!</div>';
-    toast('🔖 Question saved!','i');
+    autoSaveBookmarks();
+    btn.parentElement.innerHTML='<div style="font-size:.65rem;color:var(--gr);padding:4px">✅ Saved! ☁️ Firebase pe bhi!</div>';
+    toast('🔖 Saved to Firebase!','i');
     renderRWASavedBtn();
   }catch(e){toast('❌ Save nahi hua','e');}
 }
