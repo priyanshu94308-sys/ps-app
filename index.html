@@ -927,12 +927,19 @@ body::before{
         </div>
         <div style="font-size:.75rem;font-weight:800;margin-bottom:8px;color:var(--t2)">📚 Subject Choose Karo</div>
         <div id="rwa-subjects"></div>
+        <div id="rwa-saved-btn-wrap" style="margin-top:12px"></div>
       </div>
       <!-- Level 2: Topics list -->
       <div id="rwa-topics-view" style="display:none">
         <button onclick="rwaBreadcrumbBack(0)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Subjects</button>
         <div style="font-size:.88rem;font-weight:900;margin-bottom:10px" id="rwa-topic-title"></div>
         <div id="rwa-topics-list"></div>
+      </div>
+      <!-- Saved Questions View -->
+      <div id="rwa-saved-view" style="display:none">
+        <button onclick="showRWAView('subjects')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Back</button>
+        <div style="font-size:.88rem;font-weight:900;margin-bottom:12px">🔖 Saved Questions</div>
+        <div id="rwa-saved-list"></div>
       </div>
       <!-- Level 3: Quiz -->
       <div id="rwa-quiz-view" style="display:none">
@@ -3575,7 +3582,7 @@ var LVLCLS={easy:'le',moderate:'lm',hard:'lh'};
 var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[]};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[]};
 if(!S.examDates) S.examDates={};
 if(!S.customExams) S.customExams=[];
 var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
@@ -3767,6 +3774,75 @@ function initRWA(){
       +'<div style="font-size:1rem">›</div></div>';
   });
   grid.innerHTML=html;
+  renderRWASavedBtn();
+}
+
+function showRWAView(view){
+  ['subjects','topics','quiz','saved'].forEach(function(v){
+    var el=document.getElementById('rwa-'+v+'-view');
+    if(el) el.style.display=(v===view?'block':'none');
+  });
+}
+
+function renderRWASavedBtn(){
+  var wrap=document.getElementById('rwa-saved-btn-wrap');
+  if(!wrap) return;
+  var count=(S.bookmarks||[]).length;
+  if(count===0){wrap.innerHTML='';return;}
+  wrap.innerHTML='<div onclick="openSavedQuestions()" style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.35);border-radius:12px;padding:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+    +'<div><div style="font-size:.87rem;font-weight:800">🔖 Saved Questions</div>'
+    +'<div style="font-size:.6rem;color:var(--t2);margin-top:2px">'+count+' galat questions saved</div></div>'
+    +'<div style="font-size:1rem;color:var(--ac)">›</div></div>';
+}
+
+function openSavedQuestions(){
+  var bms=S.bookmarks||[];
+  var list=document.getElementById('rwa-saved-list');
+  if(!bms.length){
+    list.innerHTML='<div style="text-align:center;padding:30px;color:var(--t2);font-size:.78rem">Koi saved question nahi</div>';
+    showRWAView('saved');return;
+  }
+  var html='<div style="font-size:.65rem;color:var(--t2);margin-bottom:10px">'+bms.length+' questions saved — dobara practice karo</div>';
+  bms.forEach(function(bm,idx){
+    html+='<div style="background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:14px;margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<div style="font-size:.6rem;color:var(--t2)">'+esc(bm.topic||'')+'</div>'
+      +'<button onclick="deleteSavedQ('+idx+')" style="background:rgba(255,80,80,.15);border:1px solid rgba(255,80,80,.3);border-radius:6px;color:var(--rd);font-size:.6rem;padding:3px 8px;cursor:pointer">🗑 Delete</button>'
+      +'</div>'
+      +'<div style="font-size:.8rem;font-weight:700;margin-bottom:10px;line-height:1.5">'+esc(bm.q)+'</div>'
+      +'<div id="saved-opts-'+idx+'">';
+    var opts=bm.opts||[];
+    opts.forEach(function(opt,i){
+      html+='<div onclick="checkSavedAnswer('+idx+','+i+')" id="saved-opt-'+idx+'-'+i+'" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:.75rem;transition:.2s">'+esc(opt)+'</div>';
+    });
+    html+='</div>'
+      +'<div id="saved-sol-'+idx+'" style="display:none;background:rgba(124,111,255,.1);border-left:3px solid var(--ac);border-radius:6px;padding:8px 10px;font-size:.72rem;line-height:1.6;margin-top:8px">💡 '+esc(bm.sol||'')+'</div>'
+      +'</div>';
+  });
+  list.innerHTML=html;
+  showRWAView('saved');
+}
+
+function checkSavedAnswer(idx,i){
+  var bm=(S.bookmarks||[])[idx]; if(!bm) return;
+  var correct=bm.ans;
+  var opts=document.querySelectorAll('[id^="saved-opt-'+idx+'-"]');
+  opts.forEach(function(el){el.style.cursor='default';el.onclick=null;});
+  opts.forEach(function(el,j){
+    if(j===correct) el.style.background='rgba(0,200,100,.25)';
+    else if(j===i&&i!==correct) el.style.background='rgba(255,80,80,.25)';
+  });
+  var sol=document.getElementById('saved-sol-'+idx);
+  if(sol) sol.style.display='block';
+}
+
+function deleteSavedQ(idx){
+  if(!S.bookmarks) return;
+  S.bookmarks.splice(idx,1);
+  saveState();
+  toast('🗑 Removed!','i');
+  openSavedQuestions();
+  renderRWASavedBtn();
 }
 
 function openRWASubject(key){
@@ -3985,9 +4061,12 @@ function renderRWAQuestion(){
     html+='<div onclick="checkRWAAnswer('+i+')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.78rem;transition:background .2s">'+opt+'</div>';
   });
   html+='</div><div id="rwa-sol" style="display:none"></div>'
-    +'<div id="rwa-next-btn" style="display:none;text-align:right;margin-top:12px">'
-    +'<button onclick="nextRWAQ()" style="background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:.78rem;font-weight:800;padding:9px 24px;cursor:pointer">Next ›</button>'
-    +'</div>';
+    +'<div id="rwa-bookmark-btn" style="display:none;margin-top:8px"></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">'
+    +'<button onclick="skipRWAQ()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--t2);font-size:.72rem;font-weight:700;padding:8px 16px;cursor:pointer">Skip ›</button>'
+    +'<div id="rwa-next-btn" style="display:none">'
+    +'<button onclick="nextRWAQ()" style="background:var(--ac);border:none;border-radius:10px;color:#000;font-size:.78rem;font-weight:800;padding:9px 24px;cursor:pointer">Next ›</button>'
+    +'</div></div>';
   document.getElementById('rwa-quiz-content').innerHTML=html;
 }
 
@@ -4010,6 +4089,39 @@ function checkRWAAnswer(i){
     document.getElementById('rwa-sol').innerHTML='<div style="background:rgba(124,111,255,.1);border-left:3px solid var(--ac);border-radius:6px;padding:8px 10px;font-size:.72rem;line-height:1.6;margin-top:6px">💡 '+esc(sol)+'</div>';
   }
   document.getElementById('rwa-next-btn').style.display='block';
+  // Bookmark button - wrong answer pe show karo
+  if(i!==correct){
+    var bmDiv=document.getElementById('rwa-bookmark-btn');
+    if(bmDiv){
+      var q2=rwaQuizState.qs[rwaQuizState.cur];
+      var bmData={q:q2.q,opts:q2.opts||q2.options||[],ans:correct,sol:q2.sol||'',topic:rwaQuizState.topic,src:'rwa',ts:Date.now()};
+      var bmKey=q2.q.substring(0,40);
+      var alreadySaved=S.bookmarks&&S.bookmarks.some(function(b){return b.q&&b.q.substring(0,40)===bmKey;});
+      window._pendingBM=bmData;
+      bmDiv.innerHTML=alreadySaved
+        ?'<div style="font-size:.65rem;color:var(--gr)">✅ Already saved</div>'
+        :'<button onclick="saveRWABookmark(this)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);border-radius:8px;color:var(--ac);font-size:.7rem;font-weight:700;padding:6px 14px;cursor:pointer;width:100%">🔖 Galat tha — Save karo</button>';
+    }
+  }
+}
+
+function saveRWABookmark(btn){
+  try{
+    var data=window._pendingBM;
+    if(!data){toast('❌ Data nahi mila','e');return;}
+    if(!S.bookmarks) S.bookmarks=[];
+    S.bookmarks.push(data);
+    saveState();
+    btn.parentElement.innerHTML='<div style="font-size:.65rem;color:var(--gr);padding:4px">✅ Saved in Bookmarks!</div>';
+    toast('🔖 Question saved!','i');
+    renderRWASavedBtn();
+  }catch(e){toast('❌ Save nahi hua','e');}
+}
+
+function skipRWAQ(){
+  rwaQuizState.cur++;
+  rwaQuizState.answered=false;
+  renderRWAQuestion();
 }
 
 function nextRWAQ(){
@@ -4020,9 +4132,8 @@ function nextRWAQ(){
 
 function rwaBreadcrumbBack(level){
   if(level===0){
-    document.getElementById('rwa-subjects-view').style.display='block';
-    document.getElementById('rwa-topics-view').style.display='none';
-    document.getElementById('rwa-quiz-view').style.display='none';
+    showRWAView('subjects');
+    renderRWASavedBtn();
   } else {
     document.getElementById('rwa-topics-view').style.display='block';
     document.getElementById('rwa-quiz-view').style.display='none';
