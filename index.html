@@ -4088,18 +4088,22 @@ function checkRWAAnswer(i){
   document.getElementById('rwa-next-btn').style.display='block';
   // Bookmark button - wrong answer pe show karo
   if(i!==correct){
-    var bmDiv=document.getElementById('rwa-bookmark-btn');
-    if(bmDiv){
-      var q2=rwaQuizState.qs[rwaQuizState.cur];
-      var bmData={q:q2.q,opts:q2.opts||q2.options||[],ans:correct,sol:q2.sol||'',topic:rwaQuizState.topic,src:'rwa',ts:Date.now()};
-      var bmKey=q2.q.substring(0,40);
-      var alreadySaved=S.bookmarks&&S.bookmarks.some(function(b){return b.q&&b.q.substring(0,40)===bmKey;});
-      window._pendingBM=bmData;
-      bmDiv.style.display='block';
-      bmDiv.innerHTML=alreadySaved
-        ?'<div style="font-size:.65rem;color:var(--gr)">✅ Already saved</div>'
-        :'<button onclick="saveRWABookmark(this)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);border-radius:8px;color:var(--ac);font-size:.7rem;font-weight:700;padding:6px 14px;cursor:pointer;width:100%">🔖 Galat tha — Save karo</button>';
-    }
+    var q2=rwaQuizState.qs[rwaQuizState.cur];
+    var bmData={q:q2.q,opts:q2.opts||q2.options||[],ans:correct,sol:q2.sol||'',topic:rwaQuizState.topic,src:'rwa',ts:Date.now()};
+    var bmKey=q2.q.substring(0,40);
+    var alreadySaved=S.bookmarks&&S.bookmarks.some(function(b){return b.q&&b.q.substring(0,40)===bmKey;});
+    window._pendingBM=bmData;
+    // Inject bookmark button directly into quiz content area
+    var existing=document.getElementById('rwa-bookmark-btn');
+    if(existing) existing.parentNode.removeChild(existing);
+    var bmEl=document.createElement('div');
+    bmEl.id='rwa-bookmark-btn';
+    bmEl.style.cssText='margin-top:8px;margin-bottom:4px';
+    bmEl.innerHTML=alreadySaved
+      ?'<div style="font-size:.65rem;color:var(--gr);padding:4px">✅ Already saved</div>'
+      :'<button onclick="saveRWABookmark(this)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);border-radius:8px;color:var(--ac);font-size:.72rem;font-weight:700;padding:8px 14px;cursor:pointer;width:100%">🔖 Galat tha — Save karo</button>';
+    var solEl=document.getElementById('rwa-sol');
+    if(solEl&&solEl.parentNode) solEl.parentNode.insertBefore(bmEl,solEl.nextSibling);
   }
 }
 
