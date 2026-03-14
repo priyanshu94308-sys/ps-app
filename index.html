@@ -4095,6 +4095,7 @@ function checkRWAAnswer(i){
       var bmKey=q2.q.substring(0,40);
       var alreadySaved=S.bookmarks&&S.bookmarks.some(function(b){return b.q&&b.q.substring(0,40)===bmKey;});
       window._pendingBM=bmData;
+      bmDiv.style.display='block';
       bmDiv.innerHTML=alreadySaved
         ?'<div style="font-size:.65rem;color:var(--gr)">✅ Already saved</div>'
         :'<button onclick="saveRWABookmark(this)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);border-radius:8px;color:var(--ac);font-size:.7rem;font-weight:700;padding:6px 14px;cursor:pointer;width:100%">🔖 Galat tha — Save karo</button>';
@@ -4124,6 +4125,8 @@ function skipRWAQ(){
 function nextRWAQ(){
   rwaQuizState.cur++;
   rwaQuizState.answered=false;
+  var bmDiv=document.getElementById('rwa-bookmark-btn');
+  if(bmDiv){bmDiv.style.display='none';bmDiv.innerHTML='';}
   renderRWAQuestion();
 }
 
