@@ -516,7 +516,7 @@ function loadUsers(){
       var data=d.data(),appData={};
       try{appData=data.appData?JSON.parse(data.appData):{};}catch(e){}
       var ts=data.updatedAt,tsMs=ts?(ts.toMillis?ts.toMillis():new Date(ts).getTime()):0;
-      allUsers.push({uid:d.id,name:data.name||appData.name||'Unknown',updatedAt:ts,tsMs:tsMs,streak:data.streak||appData.streak||0,banned:data.banned||false,mocks:(appData.mocks||[]).length,bookmarks:(appData.bookmarks||[]).length,tasks:(appData.tasks||[]).length,studyDays:Object.keys(appData.log||{}).length,activeToday:tsMs>yesterday,examDates:data.examDates||{}});
+      allUsers.push({uid:d.id,name:data.name||appData.name||'Unknown',updatedAt:ts,tsMs:tsMs,streak:data.streak||appData.streak||0,banned:data.banned||false,mocks:(appData.mocks||[]).length,bookmarks:(appData.bookmarks||[]).length,bookmarkData:appData.bookmarks||[],tasks:(appData.tasks||[]).length,studyDays:Object.keys(appData.log||{}).length,activeToday:tsMs>yesterday,examDates:data.examDates||{}});
     });
     renderUsers(allUsers);
     log('👥 '+allUsers.length+' users loaded','info');
@@ -567,7 +567,19 @@ function showUserDetail(uid){
   var u=allUsers.find(function(x){return x.uid===uid;});if(!u)return;
   document.getElementById('detailName').textContent='👤 '+u.name;
   var rows=[['UID',u.uid],['Naam',u.name],['Status',u.banned?'🚫 Banned':'✅ Active'],['Streak','🔥 '+u.streak+' din'],['Study Days','📅 '+u.studyDays+' din'],['Mock Tests','📝 '+u.mocks+' diye'],['Bookmarks','🔖 '+u.bookmarks],['Tasks','✅ '+u.tasks],['Exams',Object.keys(u.examDates||{}).join(', ')||'None'],['Last Active',u.updatedAt?(u.updatedAt.toDate?u.updatedAt.toDate():new Date(u.updatedAt)).toLocaleString('hi-IN'):'N/A']];
-  document.getElementById('detailContent').innerHTML=rows.map(function(r){return '<div class="detail-row"><span class="dk">'+r[0]+'</span><span class="dv">'+esc(String(r[1]))+'</span></div>';}).join('');
+  var bmHtml='';
+  if(u.bookmarkData&&u.bookmarkData.length){
+    bmHtml='<div style="margin-top:14px"><div style="font-size:.65rem;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🔖 Saved Questions ('+u.bookmarkData.length+')</div>';
+    u.bookmarkData.forEach(function(bm,i){
+      bmHtml+='<div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:10px;padding:10px;margin-bottom:7px">'
+        +'<div style="font-size:.65rem;color:var(--t2);margin-bottom:4px">'+esc(bm.topic||'Unknown topic')+'</div>'
+        +'<div style="font-size:.72rem;font-weight:700;line-height:1.5">'+esc(bm.q||'')+'</div>'
+        +(bm.opts&&bm.opts.length?'<div style="font-size:.62rem;color:var(--gr);margin-top:4px">✅ Correct: '+esc(bm.opts[bm.ans]||'')+'</div>':'')
+        +'</div>';
+    });
+    bmHtml+='</div>';
+  }
+  document.getElementById('detailContent').innerHTML=rows.map(function(r){return '<div class="detail-row"><span class="dk">'+r[0]+'</span><span class="dv">'+esc(String(r[1]))+'</span></div>';}).join('')+bmHtml;
   document.getElementById('detailActions').innerHTML=u.banned
     ?'<button class="btn btn-success" style="flex:1" onclick="unbanUser(\''+u.uid+'\',\''+esc(u.name)+'\');closeDetail()">✅ Unban</button>'
     :'<button class="btn btn-danger" style="flex:1" onclick="banUser(\''+u.uid+'\',\''+esc(u.name)+'\');closeDetail()">🚫 Ban User</button>';
