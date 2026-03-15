@@ -8,10 +8,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PS App">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PS Study App — Competitive Exam Prep</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -53,7 +53,6 @@
   --tl:#00c8c8;
   --teal:#00c8c8;
   --ye:#f5c518;
-  --ye:#f5c518;
   --teal:#00c8c8;
 
   /* Shadows */
@@ -83,7 +82,7 @@ body::before{
     radial-gradient(ellipse 50% 40% at 50% 50%,rgba(176,106,245,.04) 0%,transparent 70%);
   pointer-events:none;
 }
-#app{position:relative;z-index:1;height:100vh;}
+#app{position:relative;z-index:1;min-height:100vh;}
 
 /* ═══════════════════════════════
    HEADER
@@ -819,13 +818,13 @@ body::before{
 @keyframes popIn{from{transform:scale(.8);opacity:0;}to{transform:scale(1);opacity:1;}}
 .notif-icon{font-size:2.5rem;margin-bottom:10px;}
 .notif-title{font-size:.78rem;font-weight:900;color:var(--ac);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
-.notif-msg{font-size:.82rem;line-height:1.7;color:var(--t1);margin-bottom:16px;}
+.notif-msg{font-size:.82rem;line-height:1.7;color:var(--tx);margin-bottom:16px;}
 .notif-ok{background:linear-gradient(135deg,#f5a623,#ff6b35);border:none;border-radius:12px;color:#000;font-family:inherit;font-size:.82rem;font-weight:800;padding:11px 24px;cursor:pointer;width:100%;}
 </style>
 </head>
 <body>
 
-<div id="app" style="display:block;height:100vh;">
+<div id="app" style="display:block;min-height:100vh;">
   <div class="hdr">
     <div style="display:flex;align-items:center;gap:10px">
       <div class="ps-logo"><span style="font-size:.9rem">PS STUDY</span></div>
@@ -989,7 +988,7 @@ body::before{
       </div>
       <div class="chat-area" id="chatArea"></div>
       <!-- Image preview -->
-      <div id="imgPreviewWrap" style="display:none;margin-bottom:6px;position:relative;display:none">
+      <div id="imgPreviewWrap" style="display:none;margin-bottom:6px;position:relative">
         <img id="imgPreview" style="max-height:100px;border-radius:10px;border:1.5px solid var(--ac);object-fit:cover;" src="" alt="">
         <button onclick="clearImg()" style="position:absolute;top:-6px;right:-6px;background:var(--a2);border:none;border-radius:50%;width:20px;height:20px;color:#fff;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900">✕</button>
       </div>
@@ -5817,5 +5816,22 @@ window.addEventListener('DOMContentLoaded',function(){initFirebase();});
 
 }
 </script>
+
+<script>
+window.addEventListener("error",function(e){
+console.log("App Error:",e.message);
+});
+window.addEventListener("unhandledrejection",function(e){
+console.log("Promise Error:",e.reason);
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+console.log("PS Study App loaded safely");
+});
+</script>
+
 </body>
 </html>
