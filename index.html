@@ -17,7 +17,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 
@@ -53,8 +52,6 @@
   --tl:#00c8c8;
   --teal:#00c8c8;
   --ye:#f5c518;
-  --ye:#f5c518;
-  --teal:#00c8c8;
 
   /* Shadows */
   --sh:0 8px 40px rgba(0,0,0,.6);
@@ -819,14 +816,14 @@ body::before{
 @keyframes popIn{from{transform:scale(.8);opacity:0;}to{transform:scale(1);opacity:1;}}
 .notif-icon{font-size:2.5rem;margin-bottom:10px;}
 .notif-title{font-size:.78rem;font-weight:900;color:var(--ac);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
-.notif-msg{font-size:.82rem;line-height:1.7;color:var(--t1);margin-bottom:16px;}
+.notif-msg{font-size:.82rem;line-height:1.7;color:var(--tx);margin-bottom:16px;}
 .notif-ok{background:linear-gradient(135deg,#f5a623,#ff6b35);border:none;border-radius:12px;color:#000;font-family:inherit;font-size:.82rem;font-weight:800;padding:11px 24px;cursor:pointer;width:100%;}
 </style>
 </head>
 <body>
 <button id="globalBackBtn" onclick="appGoBack()" style="
 position:fixed;
-top:10px;
+top:70px;
 left:10px;
 z-index:9999;
 padding:6px 10px;
@@ -836,6 +833,7 @@ background:#1e2a44;
 color:white;
 font-size:14px;
 cursor:pointer;
+display:none;
 ">
 ⬅ Back
 </button>
@@ -1129,6 +1127,72 @@ cursor:pointer;
       </div>
     </div>
     <div class="tab" id="tab-report">
+
+      <!-- ── STUDY TIMER CARD ── -->
+      <div class="scard" style="margin-bottom:10px;background:linear-gradient(135deg,rgba(92,106,240,.08),rgba(245,166,35,.05));border-color:rgba(92,106,240,.2)">
+        <div class="sec">⏱️ Study Timer</div>
+        <div style="text-align:center;padding:8px 0 4px">
+          <div id="studyTimerDisplay" style="font-size:2.8rem;font-weight:900;color:var(--ac);font-variant-numeric:tabular-nums;letter-spacing:3px;line-height:1;text-shadow:0 0 20px rgba(245,166,35,.3)">00:00:00</div>
+          <div style="font-size:.62rem;color:var(--t2);margin-top:4px" id="studyTimerSubject">Koi subject select nahi</div>
+        </div>
+        <div style="display:flex;gap:6px;margin:10px 0 8px;flex-wrap:wrap">
+          <select id="studySubjectSel" style="flex:1;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-family:inherit;font-size:.72rem;padding:7px 9px;outline:none">
+            <option value="GK/GS">📚 GK/GS</option>
+            <option value="Maths">🔢 Maths</option>
+            <option value="Reasoning">🧠 Reasoning</option>
+            <option value="Hindi">📝 Hindi</option>
+            <option value="English">🔤 English</option>
+            <option value="Science">🔬 Science</option>
+            <option value="History">🏛️ History</option>
+            <option value="Polity">⚖️ Polity</option>
+            <option value="Geography">🌍 Geography</option>
+            <option value="Current Affairs">📰 Current Affairs</option>
+            <option value="Mock Practice">📋 Mock Practice</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="studyTimerBtn" onclick="toggleStudyTimer()" style="flex:1;background:linear-gradient(135deg,var(--gr),var(--tl));border:none;border-radius:12px;color:#000;font-family:inherit;font-size:.82rem;font-weight:800;padding:11px;cursor:pointer">▶ Start</button>
+          <button onclick="resetStudyTimer()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:12px;color:var(--t3);font-family:inherit;font-size:.82rem;font-weight:700;padding:11px 16px;cursor:pointer">↺ Reset</button>
+        </div>
+        <div style="margin-top:10px;font-size:.62rem;color:var(--t2);text-align:center" id="studyTodayTotal">Aaj ka total: 0 min</div>
+      </div>
+
+      <!-- ── AAJ KA STUDY LOG ── -->
+      <div class="scard" style="margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="sec" style="margin:0">📓 Aaj ka Study Log</div>
+          <div style="font-size:.58rem;color:var(--t2)" id="studyLogDate"></div>
+        </div>
+        <div id="studyLogToday">
+          <div style="text-align:center;padding:16px;font-size:.72rem;color:var(--t2)">⏱️ Timer start karo — session automatically save hoga</div>
+        </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--br)">
+          <div style="display:flex;justify-content:space-between;font-size:.68rem;font-weight:800">
+            <span style="color:var(--t2)">📊 Aaj Total Study Time</span>
+            <span style="color:var(--ac)" id="studyLogTotalMin">0 min</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TASK COMPLETION LOG ── -->
+      <div class="scard" style="margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="sec" style="margin:0">✅ Task Completion Log</div>
+          <select id="taskLogDateSel" onchange="renderTaskLog()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-family:inherit;font-size:.62rem;padding:5px 8px;outline:none"></select>
+        </div>
+        <div id="taskLogList"></div>
+      </div>
+
+      <!-- ── 7 DIN KI STUDY SUMMARY ── -->
+      <div class="scard" style="margin-bottom:10px">
+        <div class="sec">📅 7-Din Study Summary</div>
+        <div id="studyWeekSummary" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px"></div>
+        <div style="margin-top:10px">
+          <div class="sec" style="margin-bottom:8px;font-size:.55rem">📈 Subject-wise Time (Is Hafte)</div>
+          <div id="studySubjectBreakdown"></div>
+        </div>
+      </div>
+
       <div class="scard" style="margin-bottom:10px">
         <div class="sec">📊 Subject-wise Weakness</div>
         <div id="rpt-weakness"></div>
@@ -1294,10 +1358,16 @@ var HINDI_SYSTEM='IMPORTANT: Saare questions, options aur explanation SIRF Hindi
 function groqFetch(gkey, payload, cb, errcb){
   var models = payload._models || GROQ_MODELS;
   var idx = 0;
+  var _reject = null;
+  var promise = new Promise(function(resolve, reject){ _reject = reject; });
   function tryNext(){
-    if(idx>=models.length){var now=new Date();
-    var resetTime=new Date(now.getTime()+60000);
-    errcb('Rate limit! 1-2 minute baad try karo. ('+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes()+' pe try kiya)');return;}
+    if(idx>=models.length){
+      var now=new Date();
+      var msg='Rate limit! 1-2 minute baad try karo. ('+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes()+' pe try kiya)';
+      if(errcb) errcb(msg);
+      if(_reject) _reject(new Error(msg));
+      return;
+    }
     var model = models[idx++];
     var body = Object.assign({}, payload, {model: model});
     delete body._models;
@@ -1321,6 +1391,7 @@ function groqFetch(gkey, payload, cb, errcb){
     }).catch(function(){tryNext();});
   }
   tryNext();
+  return promise;
 }
 
 function checkAdminNotification(){
@@ -3635,28 +3706,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function bold(s){var p=s.split('**'),o='';for(var i=0;i<p.length;i++)o+=i%2?'<strong>'+p[i]+'</strong>':p[i];return o;}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
-function toggleTheme(){
-  S.dark=!S.dark;
-  var r=document.documentElement;
-  if(S.dark){
-    r.style.setProperty('--bg','#0b0d14');r.style.setProperty('--bg2','#0f1119');
-    r.style.setProperty('--card','#13161f');r.style.setProperty('--cd2','#181c28');
-    r.style.setProperty('--tx','#f0f3ff');r.style.setProperty('--t2','#5c6580');
-    r.style.setProperty('--t3','#8892b0');r.style.setProperty('--br','rgba(255,255,255,.07)');
-    r.style.setProperty('--br2','rgba(255,255,255,.11)');r.style.setProperty('--glass','rgba(255,255,255,.04)');
-    document.querySelector('.ibtn[onclick*="toggleTheme"]').textContent='☀️';
-  } else {
-    r.style.setProperty('--bg','#f0f4ff');r.style.setProperty('--bg2','#e8edf8');
-    r.style.setProperty('--card','#ffffff');r.style.setProperty('--cd2','#eef1fb');
-    r.style.setProperty('--tx','#1a1d2e');r.style.setProperty('--t2','#7b85a8');
-    r.style.setProperty('--t3','#5c6580');r.style.setProperty('--br','rgba(0,0,0,.08)');
-    r.style.setProperty('--br2','rgba(0,0,0,.13)');r.style.setProperty('--glass','rgba(0,0,0,.03)');
-    document.querySelector('.ibtn[onclick*="toggleTheme"]').textContent='🌙';
-  }
-  save();
-}
-
-function toggleTheme(){
+function sw(tab){
   S.dark=!S.dark;
   var r=document.documentElement;
   if(S.dark){
@@ -3694,7 +3744,7 @@ function sw(tab){
   document.getElementById('tab-'+tab).classList.add('active');
   document.getElementById('tb-'+tab).classList.add('on');
   document.querySelector('.content').scrollTop=0;
-  if(tab==='report') initReport();
+  if(tab==='report') { initReport(); initStudyLog(); }
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='chat'){initChat();}
@@ -4131,9 +4181,7 @@ function autoSaveBookmarks(){
     bookmarks:S.bookmarks,
     appData:JSON.stringify(S),
     updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-  },{merge:true}).then(function(){
-    log&&console.log('✅ Bookmarks auto-saved to Firebase');
-  }).catch(function(e){console.error('Bookmark save error:',e);});
+  },{merge:true}).catch(function(e){console.error('Bookmark save error:',e);});
 }
 
 function saveRWABookmark(btn){
@@ -4407,7 +4455,7 @@ function leaveChat(){
 
 function initApp(){
   var fg=document.getElementById('fbGate');if(fg){fg.style.display='none';fg.style.visibility='hidden';fg.style.zIndex='-1';}
-  load();
+  // Note: load() is already called by loadFromFirestore before initApp
   // Apply saved dark/light mode
   if(!S.dark){
     var r=document.documentElement;
@@ -4583,6 +4631,8 @@ function toggleTask(id){
   log.tasks[id]=log.tasks[id]===true?false:true;
   save();renderTasks();updateProgress();
   if(log.tasks[id]===true) toast('Done! 🎉');
+  // Firebase sync
+  saveStudyLogToFirestore(today(), log);
 }
 
 function deleteTask(id){
@@ -4720,7 +4770,9 @@ function openChapter(ch,lvl){
   var pt=document.getElementById('pTitle');
   if(pt) pt.textContent=curSubj.icon+' '+ch+' ('+pracQs.length+'Q)';
   var ps=document.getElementById('pScore');
-  if(ps){ps.style.display='flex';ps.querySelector('#pScoreN').textContent='0/0';}
+  if(ps){ps.style.display='flex';}
+  var psn=document.getElementById('pScoreN');
+  if(psn) psn.textContent='0/0';
   showV('pv3','pv2');
   renderPracQs();
 }
@@ -4756,6 +4808,13 @@ function ansP(qi,oi){
   if(!S.sStats[curSubj.id]) S.sStats[curSubj.id]={d:0,t:0,chs:{}};
   S.sStats[curSubj.id].t++;
   if(ok) S.sStats[curSubj.id].d++;
+  // Chapter-wise stats bhi update karo
+  if(q.ch){
+    if(!S.sStats[curSubj.id].chs) S.sStats[curSubj.id].chs={};
+    if(!S.sStats[curSubj.id].chs[q.ch]) S.sStats[curSubj.id].chs[q.ch]={d:0,t:0};
+    S.sStats[curSubj.id].chs[q.ch].t++;
+    if(ok) S.sStats[curSubj.id].chs[q.ch].d++;
+  }
   save();
   toast(ok?'✅ Sahi!':'❌ Galat!',ok?'':'e');
   renderPracQs();
@@ -4798,7 +4857,7 @@ function renderYogaUI(){
   var yb=document.getElementById('yBtn');if(yb)yb.textContent=yRun?'⏸ Pause':'▶ Start';
   var total=YOGA_STEPS[yIdx].dur;
   var ring=document.getElementById('yogaRing');
-  if(ring) ring.style.strokeDashoffset=194.8*(1-yLeft/total);
+  if(ring) ring.style.strokeDashoffset=194.8*(yLeft/total);
   var yl=document.getElementById('yStepList');
   if(yl) yl.innerHTML=YOGA_STEPS.map(function(s,i){
     var cls='ysc'+(i===yIdx&&yRun?' cur':i<yIdx?' done':'');
@@ -5153,6 +5212,7 @@ function loadDailyCA(force){
   groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3},function(data,_m){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
+    if(s===-1||e===0){throw new Error('Invalid JSON response');}
     var parsed=JSON.parse(txt.substring(s,e));
     // AI said no news today
     if(parsed.noNews){
@@ -5399,6 +5459,276 @@ function initReport(){
         +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+( m.pct||0)+'%</div></div>';
     }).join('');}
   }
+}
+
+// ══════════════════════════════════════
+// STUDY LOG & TIMER SYSTEM
+// ══════════════════════════════════════
+
+var _studyTimer = {
+  running: false,
+  startTime: null,
+  elapsed: 0,       // seconds already counted before current start
+  interval: null,
+  subject: 'GK/GS'
+};
+
+function toggleStudyTimer(){
+  var btn = document.getElementById('studyTimerBtn');
+  if(_studyTimer.running){
+    // PAUSE
+    clearInterval(_studyTimer.interval);
+    _studyTimer.interval = null;
+    _studyTimer.elapsed += Math.floor((Date.now() - _studyTimer.startTime) / 1000);
+    _studyTimer.running = false;
+    if(btn){ btn.textContent = '▶ Resume'; btn.style.background = 'linear-gradient(135deg,var(--ac),#e8940d)'; }
+  } else {
+    // START / RESUME
+    _studyTimer.subject = document.getElementById('studySubjectSel').value;
+    _studyTimer.startTime = Date.now();
+    _studyTimer.running = true;
+    if(btn){ btn.textContent = '⏸ Pause'; btn.style.background = 'linear-gradient(135deg,var(--a2),#cc0000)'; }
+    _studyTimer.interval = setInterval(_studyTimerTick, 1000);
+    var sub = document.getElementById('studyTimerSubject');
+    if(sub) sub.textContent = '📖 ' + _studyTimer.subject + ' padh rahe ho...';
+  }
+}
+
+function _studyTimerTick(){
+  var total = _studyTimer.elapsed + Math.floor((Date.now() - _studyTimer.startTime) / 1000);
+  var h = Math.floor(total / 3600);
+  var m = Math.floor((total % 3600) / 60);
+  var s = total % 60;
+  var disp = document.getElementById('studyTimerDisplay');
+  if(disp) disp.textContent = (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  // Auto-save every 60 seconds
+  if(total > 0 && total % 60 === 0) _saveCurrentSession(false);
+}
+
+function resetStudyTimer(){
+  if(_studyTimer.running){
+    clearInterval(_studyTimer.interval);
+    _studyTimer.interval = null;
+  }
+  // Save current session before reset
+  if(_studyTimer.elapsed > 30 || (_studyTimer.running && Math.floor((Date.now()-_studyTimer.startTime)/1000) > 30)){
+    _saveCurrentSession(true);
+  }
+  _studyTimer.running = false;
+  _studyTimer.elapsed = 0;
+  _studyTimer.startTime = null;
+  var disp = document.getElementById('studyTimerDisplay');
+  if(disp) disp.textContent = '00:00:00';
+  var btn = document.getElementById('studyTimerBtn');
+  if(btn){ btn.textContent = '▶ Start'; btn.style.background = 'linear-gradient(135deg,var(--gr),var(--tl))'; }
+  var sub = document.getElementById('studyTimerSubject');
+  if(sub) sub.textContent = 'Koi subject select nahi';
+  renderStudyLogToday();
+}
+
+function _saveCurrentSession(final){
+  var total = _studyTimer.elapsed;
+  if(_studyTimer.running && _studyTimer.startTime){
+    total += Math.floor((Date.now() - _studyTimer.startTime) / 1000);
+  }
+  var mins = Math.round(total / 60);
+  if(mins < 1) return;
+
+  var todayKey = today();
+  var log = getLog(todayKey);
+  if(!log.studySessions) log.studySessions = [];
+
+  var now = new Date();
+  var timeStr = (now.getHours()<10?'0':'')+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+
+  // Check if last session is same subject within 2 min — update it
+  var lastS = log.studySessions[log.studySessions.length - 1];
+  if(lastS && lastS.subject === _studyTimer.subject && !final){
+    lastS.mins = mins;
+    lastS.endTime = timeStr;
+  } else if(final || !lastS || lastS.subject !== _studyTimer.subject){
+    if(final && lastS && lastS.subject === _studyTimer.subject){
+      lastS.mins = mins;
+      lastS.endTime = timeStr;
+    } else {
+      log.studySessions.push({
+        subject: _studyTimer.subject,
+        mins: mins,
+        startTime: timeStr,
+        endTime: timeStr,
+        ts: Date.now()
+      });
+    }
+  }
+
+  save();
+  saveStudyLogToFirestore(todayKey, log);
+  renderStudyLogToday();
+}
+
+function saveStudyLogToFirestore(dateKey, logData){
+  var uid = getUid();
+  if(!uid || !db) return;
+  var update = {};
+  update['studyLog.' + dateKey] = {
+    sessions: logData.studySessions || [],
+    tasks: logData.tasks || {},
+    mood: logData.mood || '',
+    water: logData.water || 0,
+    savedAt: Date.now()
+  };
+  db.collection('users').doc(uid).set(update, {merge:true})
+    .catch(function(e){ console.error('StudyLog save error:', e); });
+}
+
+function renderStudyLogToday(){
+  var todayKey = today();
+  var log = S.log[todayKey] || {};
+  var sessions = log.studySessions || [];
+
+  // Date label
+  var dl = document.getElementById('studyLogDate');
+  var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var d = new Date();
+  if(dl) dl.textContent = d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
+
+  var el = document.getElementById('studyLogToday');
+  if(!el) return;
+
+  if(!sessions.length){
+    el.innerHTML = '<div style="text-align:center;padding:16px;font-size:.72rem;color:var(--t2)">⏱️ Timer start karo — session automatically save hoga</div>';
+  } else {
+    var totalMins = sessions.reduce(function(sum, s){ return sum + (s.mins||0); }, 0);
+    el.innerHTML = sessions.map(function(s, i){
+      var color = ['var(--in2)','var(--ac)','var(--gr)','var(--pu)','var(--or)','var(--tl)'][i % 6];
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)">'
+        + '<div style="width:3px;height:32px;background:'+color+';border-radius:2px;flex-shrink:0"></div>'
+        + '<div style="flex:1">'
+        + '<div style="font-size:.78rem;font-weight:700">'+esc(s.subject)+'</div>'
+        + '<div style="font-size:.58rem;color:var(--t2);margin-top:1px">'+esc(s.startTime||'')+(s.endTime&&s.endTime!==s.startTime?' → '+esc(s.endTime):'')+'</div>'
+        + '</div>'
+        + '<div style="text-align:right">'
+        + '<div style="font-size:.88rem;font-weight:900;color:'+color+'">'+s.mins+'<span style="font-size:.55rem;font-weight:600"> min</span></div>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+    // Update totals
+    var tl = document.getElementById('studyLogTotalMin');
+    if(tl) tl.textContent = totalMins + ' min';
+    var tt = document.getElementById('studyTodayTotal');
+    if(tt) tt.textContent = 'Aaj ka total: ' + totalMins + ' min (' + (totalMins>=60?Math.floor(totalMins/60)+'h '+(totalMins%60)+'m':totalMins+'m') + ')';
+  }
+}
+
+function renderTaskLog(){
+  var sel = document.getElementById('taskLogDateSel');
+  var dateKey = sel ? sel.value : today();
+  var log = S.log[dateKey] || {};
+  var tasksDone = log.tasks || {};
+
+  var el = document.getElementById('taskLogList');
+  if(!el) return;
+
+  if(!S.tasks.length){
+    el.innerHTML = '<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Koi task nahi hai — pehle tasks add karo</div>';
+    return;
+  }
+
+  var doneCount = S.tasks.filter(function(t){ return tasksDone[t.id]===true; }).length;
+  var pct = Math.round(doneCount / S.tasks.length * 100);
+  var barColor = pct>=80?'var(--gr)':pct>=50?'var(--ac)':'var(--or)';
+
+  var html = '<div style="margin-bottom:10px">'
+    + '<div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px">'
+    + '<span style="color:var(--t2);font-weight:700">Completion</span>'
+    + '<span style="font-weight:900;color:'+barColor+'">'+doneCount+'/'+S.tasks.length+' ('+pct+'%)</span></div>'
+    + '<div style="background:var(--cd2);border-radius:4px;height:6px"><div style="width:'+pct+'%;height:6px;background:'+barColor+';border-radius:4px;transition:width .4s"></div></div>'
+    + '</div>';
+
+  html += S.tasks.map(function(t){
+    var done = tasksDone[t.id] === true;
+    return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--br)">'
+      + '<div style="width:20px;height:20px;border-radius:50%;background:'+(done?'var(--gr)':'var(--cd2)')+';border:2px solid '+(done?'var(--gr)':'var(--br2)')+';display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0">'+(done?'✓':'')+'</div>'
+      + '<div style="flex:1;font-size:.75rem;font-weight:600;'+(done?'text-decoration:line-through;opacity:.55':'')+'">'+(t.emoji||'')+ ' '+esc(t.name)+'</div>'
+      + '<div style="font-size:.6rem;color:var(--t2)">'+esc(t.time||'')+'</div>'
+      + '</div>';
+  }).join('');
+
+  el.innerHTML = html;
+}
+
+function renderTaskLogDateOptions(){
+  var sel = document.getElementById('taskLogDateSel');
+  if(!sel) return;
+  var opts = '';
+  var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for(var i = 0; i < 7; i++){
+    var d = new Date(); d.setDate(d.getDate() - i);
+    var k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    var label = i===0?'Aaj':i===1?'Kal':d.getDate()+' '+mn[d.getMonth()];
+    opts += '<option value="'+k+'">' + label + '</option>';
+  }
+  sel.innerHTML = opts;
+}
+
+function renderStudyWeekSummary(){
+  var el = document.getElementById('studyWeekSummary');
+  var subEl = document.getElementById('studySubjectBreakdown');
+  if(!el) return;
+
+  var mn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var subjectTotals = {};
+  var html = '';
+
+  for(var i = 6; i >= 0; i--){
+    var d = new Date(); d.setDate(d.getDate() - i);
+    var k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    var log = S.log[k] || {};
+    var sessions = log.studySessions || [];
+    var mins = sessions.reduce(function(sum, s){ return sum + (s.mins||0); }, 0);
+    // Collect subject totals
+    sessions.forEach(function(s){
+      subjectTotals[s.subject] = (subjectTotals[s.subject]||0) + s.mins;
+    });
+    var maxH = 60;
+    var barH = Math.min(Math.round(mins/120*maxH), maxH);
+    var col = mins>=120?'var(--gr)':mins>=60?'var(--ac)':mins>0?'var(--in2)':'var(--cd2)';
+    var isToday = i===0;
+    html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:36px">'
+      + '<div style="font-size:.62rem;font-weight:800;color:'+col+'">'+(mins?mins+'m':'')+'</div>'
+      + '<div style="width:100%;height:'+maxH+'px;display:flex;align-items:flex-end">'
+      + '<div style="width:100%;height:'+(barH||3)+'px;background:'+col+';border-radius:4px 4px 0 0;'+(isToday?'box-shadow:0 0 8px '+col:'')+'"></div></div>'
+      + '<div style="font-size:.55rem;color:'+(isToday?'var(--ac)':'var(--t2)')+';font-weight:'+(isToday?'900':'600')+'">'+mn[d.getDay()]+'</div>'
+      + '</div>';
+  }
+  el.innerHTML = html;
+
+  // Subject breakdown
+  if(subEl){
+    var keys = Object.keys(subjectTotals).sort(function(a,b){ return subjectTotals[b]-subjectTotals[a]; });
+    if(!keys.length){
+      subEl.innerHTML = '<div style="font-size:.68rem;color:var(--t2)">Koi study session nahi</div>';
+    } else {
+      var maxM = Math.max.apply(null, keys.map(function(k){ return subjectTotals[k]; }));
+      subEl.innerHTML = keys.map(function(k){
+        var m = subjectTotals[k];
+        var pct = Math.round(m/maxM*100);
+        return '<div style="margin-bottom:6px">'
+          + '<div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:2px">'
+          + '<span style="font-weight:700">'+esc(k)+'</span>'
+          + '<span style="color:var(--ac);font-weight:800">'+(m>=60?Math.floor(m/60)+'h '+(m%60)+'m':m+'m')+'</span></div>'
+          + '<div style="background:var(--cd2);border-radius:4px;height:5px"><div style="width:'+pct+'%;height:5px;background:var(--ac);border-radius:4px"></div></div>'
+          + '</div>';
+      }).join('');
+    }
+  }
+}
+
+function initStudyLog(){
+  renderStudyLogToday();
+  renderTaskLogDateOptions();
+  renderTaskLog();
+  renderStudyWeekSummary();
 }
 
 function drawCharts(){
@@ -5689,7 +6019,7 @@ function renderMockHistory(){
   el.innerHTML=S.mocks.slice().reverse().slice(0,5).map(function(m){
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--cd2);border-radius:10px;margin-bottom:6px">'
       +'<div><div style="font-size:.72rem;font-weight:700">'+esc(m.name||'Mock')+'</div>'
-      +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+' · '+esc(m.correct||0)+'/'+esc(m.total||0)+' · '+esc(m.time||'')+'</div></div>'
+      +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+' · '+esc(String(m.correct||0))+'/'+esc(String(m.total||0))+' · '+esc(m.time||'')+'</div></div>'
       +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+m.pct+'%</div>'
       +'</div>';
   }).join('');
@@ -5764,8 +6094,13 @@ function signInWithGoogle(){
 
 function signOutUser(){
   if(!confirm('Logout karna chahte ho?')) return;
-  if(auth) auth.signOut();
-  document.getElementById('userPill').style.display='none';
+  if(auth) auth.signOut().then(function(){
+    document.getElementById('userPill').style.display='none';
+    var fg=document.getElementById('fbGate');
+    if(fg){fg.style.display='flex';fg.style.visibility='visible';fg.style.pointerEvents='auto';fg.style.zIndex='9999';}
+    currentUser=null;
+    S={dark:S.dark,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:{},customExams:[]};
+  });
 }
 
 function showUserPill(user){
@@ -5792,6 +6127,15 @@ function loadFromFirestore(cb){
           var p=JSON.parse(doc.data().appData);
           S=Object.assign({},S,p);
           if(doc.data().examDates) S.examDates=Object.assign({},S.examDates||{},doc.data().examDates);
+          // Merge studyLog sessions from Firestore
+          if(doc.data().studyLog){
+            var fsl=doc.data().studyLog;
+            Object.keys(fsl).forEach(function(dateKey){
+              if(!S.log[dateKey]) S.log[dateKey]={tasks:{},mood:'',water:0};
+              if(fsl[dateKey].sessions) S.log[dateKey].studySessions=fsl[dateKey].sessions;
+              if(fsl[dateKey].tasks) S.log[dateKey].tasks=Object.assign({},S.log[dateKey].tasks,fsl[dateKey].tasks);
+            });
+          }
         }catch(e){}
       } else {load();}
       if(cb)cb();
@@ -5809,7 +6153,7 @@ function saveToFirestore(){
       appData:JSON.stringify(S),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       name:S.name,streak:calcStreak(),examDates:S.examDates||{}
-    },{merge:true}, function(e){console.error('Save error:',e);});
+    },{merge:true}).catch(function(e){console.error('Save error:',e);});
   },1500);
 }
 
@@ -5830,8 +6174,6 @@ window.addEventListener('DOMContentLoaded',function(){initFirebase();});
       .catch(function(e){console.log('SW error:',e);});
   });
 }
-
-}
 </script>
 
 <script>
@@ -5841,7 +6183,7 @@ function appGoBack(){
     }else{
         const home = document.getElementById("home");
         if(home){
-            document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+            document.querySelectorAll(".tab").forEach(p=>p.style.display="none");
             home.style.display="block";
         }
     }
