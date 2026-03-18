@@ -4235,7 +4235,7 @@ function renderHome(){renderTasks();updateProgress();updateHeader();renderCountd
 function updateProgress(){
   var log=getLog(today());
   var total=S.tasks.length;
-  var done=S.tasks.filter(function(t){return log.tasks[t.id]===true;}).length;
+  var done=S.tasks.filter(function(t){return log.tasks[String(t.id)]===true;}).length;
   var pct=total?Math.round(done/total*100):0;
   var ring=document.getElementById('homeRing');
   var circ=175.9;
@@ -4315,6 +4315,7 @@ function addTask(){
   if(!name){toast('Task ka naam likho!','e');return;}
   var t={id:Date.now(),name:name,time:'',cat:'study',emoji:'📋'};
   S.tasks.push(t);
+  _saveTaskSnapshot();
   save();renderTasks();updateProgress();
   if(tName) tName.value='';
   var af=document.getElementById('addForm');
@@ -4322,11 +4323,18 @@ function addTask(){
   toast('✅ Task add ho gaya!');
 }
 
+function _saveTaskSnapshot(){
+  // Save current task list snapshot in today's log so history shows correct tasks
+  var log=getLog(today());
+  log.taskSnapshot=S.tasks.map(function(t){return {id:String(t.id),name:t.name};});
+}
+
 function toggleTask(id){
   var log=getLog(today());
   if(!log.tasks) log.tasks={};
   var sid=String(id);
   log.tasks[sid]=log.tasks[sid]===true?false:true;
+  _saveTaskSnapshot(); // update snapshot with latest task list
   save();renderTasks();updateProgress();
   if(log.tasks[sid]===true) toast('Done! 🎉');
 }
@@ -4334,9 +4342,9 @@ function toggleTask(id){
 function deleteTask(id){
   if(!confirm('Delete?')) return;
   S.tasks=S.tasks.filter(function(t){return t.id!==id;});
-  // Clean up today's log entry for this task
   var log=getLog(today());
   if(log.tasks) delete log.tasks[String(id)];
+  _saveTaskSnapshot();
   save();renderTasks();updateProgress();
 }
 
@@ -5015,28 +5023,46 @@ function renderTaskLog(){
   var el = document.getElementById('taskLogList');
   if(!el) return;
 
-  if(!S.tasks.length){
-    el.innerHTML='<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Koi task nahi — pehle add karo</div>';
+  // Use snapshot for historical dates, current S.tasks for today
+  var isToday = (dateKey === today());
+  var taskList;
+  if(isToday){
+    taskList = S.tasks;
+  } else {
+    // Use saved snapshot if available, else fall back to current tasks
+    taskList = (log.taskSnapshot && log.taskSnapshot.length)
+      ? log.taskSnapshot.map(function(s){ return {id:s.id, name:s.name}; })
+      : S.tasks;
+  }
+
+  if(!taskList.length){
+    el.innerHTML='<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Is din koi task nahi tha</div>';
     return;
   }
-  var doneCount = S.tasks.filter(function(t){ return tasksDone[t.id]===true; }).length;
-  var pct = Math.round(doneCount/S.tasks.length*100);
+
+  var doneCount = taskList.filter(function(t){ return tasksDone[String(t.id)]===true; }).length;
+  var pct = Math.round(doneCount/taskList.length*100);
   var barCol = pct>=80?'var(--gr)':pct>=50?'var(--ac)':'var(--or)';
 
   var html = '<div style="margin-bottom:12px">'
     +'<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:5px">'
     +'<span style="font-weight:700;color:var(--t2)">Completion</span>'
-    +'<span style="font-weight:900;color:'+barCol+'">'+doneCount+'/'+S.tasks.length+' · '+pct+'%</span></div>'
+    +'<span style="font-weight:900;color:'+barCol+'">'+doneCount+'/'+taskList.length+' · '+pct+'%</span></div>'
     +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
     +'<div style="width:'+pct+'%;height:7px;background:'+barCol+';border-radius:6px;transition:width .5s"></div></div>'
     +'</div>';
 
-  html += S.tasks.map(function(t){
-    var done = tasksDone[t.id]===true;
-    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)">'
-      +'<div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;background:'+(done?'var(--gr)':'transparent')+';border:2px solid '+(done?'var(--gr)':'var(--br2)')+';">'+(done?'✓':'')+'</div>'
-      +'<div style="flex:1;font-size:.77rem;font-weight:600;'+(done?'opacity:.45;text-decoration:line-through':'')+'">'+(t.emoji||'')+' '+esc(t.name)+'</div>'
-      +'<div style="font-size:.6rem;color:var(--t2)">'+esc(t.time||'')+'</div>'
+  html += taskList.map(function(t){
+    var done = tasksDone[String(t.id)]===true;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--br)">'
+      +'<div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;'
+      +(done?'background:var(--gr);border:2px solid var(--gr);color:#000':'border:2px solid var(--br2)')+';">'
+      +(done?'✓':'')+'</div>'
+      +'<div style="flex:1;font-size:.8rem;font-weight:600;color:'+(done?'var(--t2)':'var(--tx)')+';">'
+      +(done?'<s>':'')+esc(t.name)+(done?'</s>':'')
+      +'</div>'
+      +'<div style="font-size:.65rem;font-weight:800;color:'+(done?'var(--gr)':'var(--t2)')+';">'
+      +(done?'✅':'')+'</div>'
       +'</div>';
   }).join('');
 
