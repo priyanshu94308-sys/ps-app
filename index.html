@@ -949,6 +949,16 @@ display:none;
       </div>
       <div class="scard">
         <div class="sec">🔐 Account</div>
+        <!-- User info card - shown when logged in -->
+        <div id="settingsUserCard" style="display:none;background:var(--cd2);border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--br)">
+          <div style="display:flex;align-items:center;gap:12px">
+            <img id="userAvatar" src="" style="width:44px;height:44px;border-radius:50%;border:2px solid var(--ac);object-fit:cover;flex-shrink:0" alt="👤">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.82rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="userDisplayName">-</div>
+              <div style="font-size:.6rem;color:var(--gr);margin-top:2px;font-weight:700">✅ Cloud Synced</div>
+            </div>
+          </div>
+        </div>
         <button onclick="signOutUser()" style="width:100%;background:linear-gradient(135deg,#ff4b4b,#cc0000);border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.83rem;font-weight:800;padding:12px;cursor:pointer">🚪 Logout</button>
       </div>
       <div style="text-align:center;padding:10px;font-size:.62rem;color:var(--t2)">PS Study App v3.0 🚀 · 1,110+ Questions Built-in</div>
@@ -998,11 +1008,7 @@ display:none;
     <button class="notif-ok" onclick="closeAdminNotif()">✅ Samajh Gaya!</button>
   </div>
 </div>
-<div id="userPill" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99998;background:rgba(13,15,26,.97);padding:8px 14px;border-bottom:1px solid var(--br);align-items:center;gap:10px;">
-  <img id="userAvatar" src="" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--ac);object-fit:cover;" alt="">
-  <div style="flex:1"><div style="font-size:.73rem;font-weight:800" id="userDisplayName">-</div><div style="font-size:.56rem;color:var(--gr)">✅ Cloud Synced</div></div>
-  
-</div>
+<div id="userPill" style="display:none"></div>
 
 <div class="toast" id="toast"></div>
 <script>
@@ -5210,8 +5216,9 @@ function initFirebase(){
         loadFromFirestore(function(){initApp();checkAdminNotification();});
       } else {
         currentUser=null;
-        document.getElementById('fbGate').style.display='flex'; 
-        document.getElementById('userPill').style.display='none';
+        document.getElementById('fbGate').style.display='flex';
+        var card2=document.getElementById('settingsUserCard');
+        if(card2) card2.style.display='none';
       }
     });
   }catch(e){
@@ -5251,7 +5258,8 @@ function signInWithGoogle(){
 function signOutUser(){
   if(!confirm('Logout karna chahte ho?')) return;
   if(auth) auth.signOut().then(function(){
-    document.getElementById('userPill').style.display='none';
+    var card=document.getElementById('settingsUserCard');
+    if(card) card.style.display='none';
     var fg=document.getElementById('fbGate');
     if(fg){fg.style.display='flex';fg.style.visibility='visible';fg.style.pointerEvents='auto';fg.style.zIndex='9999';}
     currentUser=null;
@@ -5260,12 +5268,14 @@ function signOutUser(){
 }
 
 function showUserPill(user){
-  var pill=document.getElementById('userPill');
-  if(pill) pill.style.display='flex';
+  // Show user info in settings card (not header)
+  var card=document.getElementById('settingsUserCard');
+  if(card) card.style.display='block';
   var dn=document.getElementById('userDisplayName');
-  if(dn) dn.textContent=user.displayName||user.email;
+  if(dn) dn.textContent=user.displayName||user.email||'User';
   var av=document.getElementById('userAvatar');
   if(av&&user.photoURL) av.src=user.photoURL;
+  else if(av) av.style.display='none';
   if(user.displayName&&S.name==='Student'){
     S.name=user.displayName.split(' ')[0];
   }
