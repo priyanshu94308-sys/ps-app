@@ -3330,11 +3330,12 @@ var activeCat='all'; // task filter
 function save(){
   var d=JSON.stringify(S);
   try{localStorage.setItem('ps_v3',d);}catch(e){}
-  try{sessionStorage.setItem('ps_v3',d);}catch(e){}
-  try{
-    var exp=new Date();exp.setFullYear(exp.getFullYear()+1);
-    if(d.length<3900) document.cookie='ps_v3='+encodeURIComponent(d)+';expires='+exp.toUTCString()+';path=/;SameSite=Lax';
-  }catch(e){}
+  // Firebase sync - deferred call so saveToFirestore is always defined
+  setTimeout(function(){
+    if(typeof saveToFirestore==='function' && typeof currentUser!=='undefined' && currentUser){
+      saveToFirestore();
+    }
+  },0);
 }
 function load(){
   // Fix #8: localStorage primary source, cookie fallback only
@@ -3359,7 +3360,7 @@ function load(){
 }
 function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function pad(n){return n<10?'0'+n:n;}
-function getLog(k){if(!S.log[k])S.log[k]={tasks:{},mood:'',water:0};return S.log[k];}
+function getLog(k){if(!S.log[k])S.log[k]={tasks:{}};return S.log[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
@@ -3413,7 +3414,7 @@ function sw(tab){
     if(gk2){try{var gv=localStorage.getItem('ps_gkey');if(gv)gk2.value=gv;}catch(e){}}
     var ndk2=document.getElementById('newsdataKey');
     if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
-    updateGKStatus();updateNewsDataStatus();
+    updateGKStatus();updateNewsDataStatus();renderCountdown();
   }
   // Fix #3: pushState for back button
   try{history.pushState({tab:tab},'','#'+tab);}catch(e){}
@@ -3956,25 +3957,65 @@ function renderCountdown(){
 }
 function setExamDate(key,label,isCustom){
   var cur=(S.examDates&&S.examDates[key])||'';
-  var d=window.prompt(label+' ki exam date daalo\n(YYYY-MM-DD, e.g. 2025-11-15)\nHatane ke liye khali chodo:', cur);
-  if(d===null) return;
-  if(!S.examDates) S.examDates={};
-  if(!d.trim()){
+  // Create inline date picker overlay instead of window.prompt (mobile-friendly)
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML='<div style="background:var(--card);border-radius:20px;padding:22px;width:100%;max-width:320px;border:1px solid var(--br2)">'
+    +'<div style="font-size:.88rem;font-weight:900;margin-bottom:4px">📅 '+esc(label)+'</div>'
+    +'<div style="font-size:.65rem;color:var(--t2);margin-bottom:14px">Exam date set karo</div>'
+    +'<input type="date" id="_examDateInp" value="'+esc(cur)+'" style="width:100%;background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:11px 13px;color:var(--tx);font-family:inherit;font-size:.85rem;margin-bottom:12px">'
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="_examDelBtn" style="flex:1;background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);border-radius:10px;color:var(--a2);font-family:inherit;font-size:.78rem;font-weight:700;padding:10px;cursor:pointer">🗑 Hatao</button>'
+    +'<button id="_examCancelBtn" style="flex:1;background:var(--cd2);border:1px solid var(--br2);border-radius:10px;color:var(--t2);font-family:inherit;font-size:.78rem;font-weight:700;padding:10px;cursor:pointer">Raho</button>'
+    +'<button id="_examSaveBtn" style="flex:1.5;background:linear-gradient(135deg,var(--in),var(--in2));border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.78rem;font-weight:800;padding:10px;cursor:pointer">✅ Save</button>'
+    +'</div></div>';
+  document.body.appendChild(overlay);
+  var inp=document.getElementById('_examDateInp');
+  if(inp) setTimeout(function(){inp.focus();},100);
+  function _close(){document.body.removeChild(overlay);}
+  document.getElementById('_examCancelBtn').onclick=_close;
+  overlay.addEventListener('click',function(ev){if(ev.target===overlay)_close();});
+  document.getElementById('_examDelBtn').onclick=function(){
+    if(!S.examDates) S.examDates={};
     delete S.examDates[key];
     if(isCustom&&S.customExams) S.customExams=S.customExams.filter(function(e){return e.key!==key;});
-  } else {
-    S.examDates[key]=d.trim();
-  }
-  save(); if(currentUser) saveToFirestore();
-  renderCountdown();
+    save();renderCountdown();_close();
+  };
+  document.getElementById('_examSaveBtn').onclick=function(){
+    var val=document.getElementById('_examDateInp').value;
+    if(!val){toast('Date choose karo!','e');return;}
+    if(!S.examDates) S.examDates={};
+    S.examDates[key]=val;
+    save();renderCountdown();_close();
+    toast('✅ Date save ho gaya!');
+  };
 }
 function addCustomExam(){
-  var name=window.prompt('Custom exam ka naam:\n(e.g. BPSC 70th, BSSC CGL)','');
-  if(!name||!name.trim()) return;
-  var key='custom_'+Date.now();
-  if(!S.customExams) S.customExams=[];
-  S.customExams.push({key:key,label:name.trim(),cat:'Custom',custom:true});
-  setExamDate(key,name.trim(),true);
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.innerHTML='<div style="background:var(--card);border-radius:20px;padding:22px;width:100%;max-width:320px;border:1px solid var(--br2)">'
+    +'<div style="font-size:.88rem;font-weight:900;margin-bottom:4px">⭐ Custom Exam</div>'
+    +'<div style="font-size:.65rem;color:var(--t2);margin-bottom:14px">Exam ka naam daalo</div>'
+    +'<input type="text" id="_customExamInp" placeholder="e.g. BPSC 70th, BSSC CGL" style="width:100%;background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:11px 13px;color:var(--tx);font-family:inherit;font-size:.85rem;margin-bottom:12px">'
+    +'<div style="display:flex;gap:8px">'
+    +'<button id="_customCancelBtn" style="flex:1;background:var(--cd2);border:1px solid var(--br2);border-radius:10px;color:var(--t2);font-family:inherit;font-size:.78rem;font-weight:700;padding:10px;cursor:pointer">Raho</button>'
+    +'<button id="_customSaveBtn" style="flex:2;background:linear-gradient(135deg,var(--in),var(--in2));border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.78rem;font-weight:800;padding:10px;cursor:pointer">✅ Aage</button>'
+    +'</div></div>';
+  document.body.appendChild(overlay);
+  var inp=document.getElementById('_customExamInp');
+  if(inp) setTimeout(function(){inp.focus();},100);
+  function _close(){document.body.removeChild(overlay);}
+  document.getElementById('_customCancelBtn').onclick=_close;
+  overlay.addEventListener('click',function(ev){if(ev.target===overlay)_close();});
+  document.getElementById('_customSaveBtn').onclick=function(){
+    var name=document.getElementById('_customExamInp').value.trim();
+    if(!name){toast('Naam daalo!','e');return;}
+    var key='custom_'+Date.now();
+    if(!S.customExams) S.customExams=[];
+    S.customExams.push({key:key,label:name,cat:'Custom',custom:true});
+    _close();
+    setExamDate(key,name,true);
+  };
 }
 function toggleCDFolder(){
   var el=document.getElementById('cd-folder');
@@ -4189,7 +4230,7 @@ function saveGKey(){
 }
 
 // ── HOME ──
-function renderHome(){renderTasks();updateProgress();updateHeader();}
+function renderHome(){renderTasks();updateProgress();updateHeader();renderCountdown();}
 
 function updateProgress(){
   var log=getLog(today());
@@ -4235,18 +4276,18 @@ function fCat(cat,el){
 
 function renderTasks(){
   var log=getLog(today());
+  if(!log.tasks) log.tasks={};
   var show=S.tasks.filter(function(t){return activeCat==='all'||t.cat===activeCat;});
   var tl=document.getElementById('taskList');
   if(!tl) return;
 
-  // Update count badge
-  var done_total=S.tasks.filter(function(t){return log.tasks[t.id]===true;}).length;
+  // Update count badge - only count today's tasks
+  var done_total=S.tasks.filter(function(t){return log.tasks[String(t.id)]===true;}).length;
   var badge=document.getElementById('taskCountBadge');
   if(badge){
     badge.textContent=done_total+' / '+S.tasks.length;
     badge.style.color=done_total===S.tasks.length&&S.tasks.length>0?'var(--gr)':'var(--t2)';
-    if(done_total===S.tasks.length&&S.tasks.length>0) badge.style.borderColor='rgba(0,214,143,.3)';
-    else badge.style.borderColor='var(--br)';
+    badge.style.borderColor=done_total===S.tasks.length&&S.tasks.length>0?'rgba(0,214,143,.3)':'var(--br)';
   }
 
   if(!S.tasks.length){
@@ -4259,7 +4300,7 @@ function renderTasks(){
   }
 
   tl.innerHTML=show.map(function(t){
-    var done=log.tasks[t.id]===true;
+    var done=log.tasks[String(t.id)]===true;
     return '<div class="ti'+(done?' done':'')+'" data-c="'+esc(t.cat||'')+'">'
       +'<button class="chk" onclick="toggleTask('+t.id+')">'+(done?'✓':'')+'</button>'
       +'<div style="flex:1;min-width:0"><div class="tn">'+esc(t.name)+'</div></div>'
@@ -4283,14 +4324,19 @@ function addTask(){
 
 function toggleTask(id){
   var log=getLog(today());
-  log.tasks[id]=log.tasks[id]===true?false:true;
+  if(!log.tasks) log.tasks={};
+  var sid=String(id);
+  log.tasks[sid]=log.tasks[sid]===true?false:true;
   save();renderTasks();updateProgress();
-  if(log.tasks[id]===true) toast('Done! 🎉');
+  if(log.tasks[sid]===true) toast('Done! 🎉');
 }
 
 function deleteTask(id){
   if(!confirm('Delete?')) return;
   S.tasks=S.tasks.filter(function(t){return t.id!==id;});
+  // Clean up today's log entry for this task
+  var log=getLog(today());
+  if(log.tasks) delete log.tasks[String(id)];
   save();renderTasks();updateProgress();
 }
 
@@ -5209,31 +5255,53 @@ function loadFromFirestore(cb){
       if(doc.exists&&doc.data().appData){
         try{
           var p=JSON.parse(doc.data().appData);
-          S=Object.assign({},S,p);
+          // Save local log BEFORE overwrite
+          var localLog=S.log||{};
+          var todayKey=today();
+
+          // Merge everything EXCEPT log (log gets special treatment)
+          var pWithoutLog=Object.assign({},p);
+          delete pWithoutLog.log;
+          S=Object.assign({},S,pWithoutLog);
+
+          // Merge log: Firestore base + local overlay per day
+          var fireLog=p.log||{};
+          S.log={};
+          // Start with Firestore log for all past days
+          Object.keys(fireLog).forEach(function(dk){
+            S.log[dk]=Object.assign({},fireLog[dk]);
+          });
+          // Overlay local data - local always wins for each day
+          Object.keys(localLog).forEach(function(dk){
+            if(!S.log[dk]) S.log[dk]={tasks:{},mood:'',water:0};
+            // Tasks: local wins (per task ID)
+            if(localLog[dk].tasks){
+              S.log[dk].tasks=Object.assign({},S.log[dk].tasks||{},localLog[dk].tasks);
+            }
+            if(localLog[dk].mood) S.log[dk].mood=localLog[dk].mood;
+            if(localLog[dk].water) S.log[dk].water=localLog[dk].water;
+            if(localLog[dk].studySessions) S.log[dk].studySessions=localLog[dk].studySessions;
+          });
+
+          // examDates merge
           if(doc.data().examDates) S.examDates=Object.assign({},S.examDates||{},doc.data().examDates);
-          // Fix #5: Proper merge - don't overwrite local sessions
+
+          // studyLog field merge (separate Firestore field for sessions)
           if(doc.data().studyLog){
             var fsl=doc.data().studyLog;
-            Object.keys(fsl).forEach(function(dateKey){
-              if(!S.log[dateKey]) S.log[dateKey]={tasks:{},mood:'',water:0};
-              // Merge sessions - avoid duplicates by timestamp
-              if(fsl[dateKey].sessions){
-                if(!S.log[dateKey].studySessions) S.log[dateKey].studySessions=[];
+            Object.keys(fsl).forEach(function(dk){
+              if(!S.log[dk]) S.log[dk]={tasks:{},mood:'',water:0};
+              if(fsl[dk].sessions){
+                if(!S.log[dk].studySessions) S.log[dk].studySessions=[];
                 var existingTs={};
-                S.log[dateKey].studySessions.forEach(function(s){if(s.ts)existingTs[s.ts]=true;});
-                fsl[dateKey].sessions.forEach(function(s){
-                  if(!s.ts||!existingTs[s.ts]) S.log[dateKey].studySessions.push(s);
+                S.log[dk].studySessions.forEach(function(s){if(s.ts)existingTs[s.ts]=true;});
+                fsl[dk].sessions.forEach(function(s){
+                  if(!s.ts||!existingTs[s.ts]) S.log[dk].studySessions.push(s);
                 });
               }
-              // Merge tasks - local takes priority
-              if(fsl[dateKey].tasks){
-                S.log[dateKey].tasks=Object.assign({},fsl[dateKey].tasks,S.log[dateKey].tasks);
-              }
-              if(fsl[dateKey].mood&&!S.log[dateKey].mood) S.log[dateKey].mood=fsl[dateKey].mood;
-              if(fsl[dateKey].water&&!S.log[dateKey].water) S.log[dateKey].water=fsl[dateKey].water;
             });
           }
-        }catch(e){console.error('Parse error:',e);}
+        }catch(e){console.error('Parse error:',e);load();}
       } else {load();}
       if(cb)cb();
       saveToFirestore();
@@ -5246,18 +5314,24 @@ function saveToFirestore(){
   var uid=getUid();if(!uid)return;
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(function(){
+    // Build studyLog as separate field (last 30 days only to avoid bloat)
+    var studyLog={};
+    var now=new Date();
+    for(var i=0;i<30;i++){
+      var d=new Date(now);d.setDate(d.getDate()-i);
+      var dk=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+      if(S.log[dk]) studyLog[dk]=S.log[dk];
+    }
     db.collection('users').doc(uid).set({
       appData:JSON.stringify(S),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
-      name:S.name,streak:calcStreak(),examDates:S.examDates||{}
+      name:S.name,
+      streak:calcStreak(),
+      examDates:S.examDates||{},
+      studyLog:studyLog
     },{merge:true}).catch(function(e){console.error('Save error:',e);});
   },1500);
 }
-
-// Override save to also sync
-var _localSave=save;
-save=function(){_localSave();saveToFirestore();};
-
 
 // ── START ──
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
