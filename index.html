@@ -254,13 +254,6 @@ body::before{
   transition:border-color .2s,box-shadow .2s;
 }
 .fi:focus{border-color:rgba(245,166,35,.4);box-shadow:0 0 0 3px rgba(245,166,35,.08);}
-.fs{
-  background:var(--cd2);border:1px solid var(--br2);
-  border-radius:12px;color:var(--tx);
-  font-family:inherit;font-size:.8rem;
-  padding:11px 12px;outline:none;flex:1;
-}
-.fr{display:flex;gap:8px;margin-bottom:10px;}
 .empty{text-align:center;padding:32px 16px;color:var(--t2);font-size:.78rem;line-height:1.9;}
 .back{
   display:inline-flex;align-items:center;gap:7px;
@@ -383,44 +376,28 @@ body::before{
 }
 .ti.done .chk{background:var(--gr);border-color:var(--gr);color:#000;font-size:.72rem;}
 .tn{font-size:.83rem;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx);}
-.tm{font-size:.6rem;color:var(--t2);margin-top:2px;}
 .tbtn{background:none;border:none;color:var(--t2);font-size:.85rem;cursor:pointer;padding:4px 6px;transition:color .15s;border-radius:6px;}
 .tbtn:active{color:var(--a2);background:rgba(255,77,109,.1);}
 
-/* Emoji Picker */
-.emoji-opt{
-  width:36px;height:36px;border-radius:10px;
-  background:var(--card);border:1.5px solid var(--br2);
-  cursor:pointer;font-size:1.1rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
-}
-.emoji-opt:active{transform:scale(.9);}
-.emoji-opt.on{
-  background:rgba(92,106,240,.15);
-  border-color:var(--in2);
-  box-shadow:0 0 0 2px rgba(92,106,240,.2);
-}
 
 /* ═══════════════════════════════
    ADD FORM
 ═══════════════════════════════ */
 .add-form{
-  background:var(--cd2);border-radius:20px;
-  padding:18px;border:1px solid var(--br2);
-  margin-bottom:14px;
+  background:var(--card);border-radius:18px;
+  padding:16px;border:1px solid var(--br);
   box-shadow:var(--sh3);
 }
 .add-btn2{
-  width:100%;
+  width:100%;margin-top:2px;
   background:linear-gradient(135deg,var(--in) 0%,var(--in2) 100%);
-  border:none;border-radius:14px;color:#fff;
+  border:none;border-radius:13px;color:#fff;
   font-family:inherit;font-size:.88rem;font-weight:800;
   padding:14px;cursor:pointer;
-  box-shadow:0 6px 20px rgba(92,106,240,.35);
-  transition:all .15s;letter-spacing:.3px;
+  box-shadow:0 6px 20px rgba(92,106,240,.3);
+  transition:all .15s;
 }
-.add-btn2:active{transform:scale(.98);opacity:.88;}
+.add-btn2:active{transform:scale(.98);opacity:.9;}
 
 /* ═══════════════════════════════
    PRACTICE
@@ -433,9 +410,6 @@ body::before{
   transition:transform .12s,border-color .15s;
 }
 .chi:active{transform:scale(.98);}
-.le{background:rgba(0,214,143,.12);color:var(--gr);}
-.lm{background:rgba(245,166,35,.12);color:var(--ac);}
-.lh{background:rgba(255,77,109,.12);color:var(--a2);}
 
 /* ═══════════════════════════════
    QUESTION CARDS
@@ -726,73 +700,39 @@ display:none;
           </div>
         </div>
       </div>
-      <!-- ── ADD TASK TOGGLE ── -->
-      <button class="tog-btn" id="addTaskToggle" onclick="var f=document.getElementById('addForm');var open=f.style.display==='block';f.style.display=open?'none':'block';this.textContent=open?'＋  Nayi Task Add Karo':'✕  Band Karo'">＋  Nayi Task Add Karo</button>
+      <!-- ── TASK SECTION ── -->
+      <div style="margin-bottom:8px">
 
-      <!-- ── ADD TASK FORM ── -->
-      <div class="add-form" id="addForm" style="display:none">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-          <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--in),var(--in2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem">📝</div>
-          <div style="font-size:.78rem;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--tx)">Nayi Task</div>
+        <!-- Header row with Add button -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:.62rem;color:var(--t2);font-weight:800;letter-spacing:1.5px;text-transform:uppercase">📋 Tasks</span>
+            <div id="taskCountBadge" style="font-size:.58rem;font-weight:800;background:var(--cd2);border:1px solid var(--br);border-radius:99px;padding:2px 8px;color:var(--t2)">0 / 0</div>
+          </div>
+          <button id="addTaskToggle" onclick="toggleAddForm()" style="display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--in),var(--in2));border:none;border-radius:10px;color:#fff;font-family:inherit;font-size:.72rem;font-weight:800;padding:7px 13px;cursor:pointer;box-shadow:0 4px 12px rgba(92,106,240,.3);transition:all .2s">
+            <span id="addToggleIcon">＋</span>
+            <span id="addToggleText">Task Add</span>
+          </button>
         </div>
 
-        <!-- Task Name -->
-        <input type="text" class="fi" id="tName" placeholder="Task ka naam likho..." style="margin-bottom:10px">
-
-        <!-- Time + Category Row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div>
-            <div style="font-size:.58rem;font-weight:800;color:var(--t2);margin-bottom:4px;letter-spacing:.5px;text-transform:uppercase">⏰ Samay</div>
-            <input type="time" class="fi" id="tTime" value="06:00" style="width:100%;padding:10px 12px">
-          </div>
-          <div>
-            <div style="font-size:.58rem;font-weight:800;color:var(--t2);margin-bottom:4px;letter-spacing:.5px;text-transform:uppercase">🗂️ Category</div>
-            <select class="fi" id="tCat" style="width:100%;padding:10px 12px">
-              <option value="study">📚 Study</option>
-              <option value="health">🏃 Health</option>
-              <option value="personal">⭐ Personal</option>
-            </select>
+        <!-- ADD TASK FORM -->
+        <div id="addForm" style="display:none;margin-bottom:14px">
+          <div class="add-form">
+            <input type="text" class="fi" id="tName" placeholder="Task ka naam likho..." style="margin-bottom:10px;font-size:.85rem" onkeydown="if(event.key==='Enter')addTask()">
+            <button class="add-btn2" onclick="addTask()">✔️ Task Add Karo</button>
           </div>
         </div>
 
-        <!-- Emoji Picker -->
-        <div style="margin-bottom:14px">
-          <div style="font-size:.58rem;font-weight:800;color:var(--t2);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase">🎯 Icon</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap" id="emojiPicker">
-            <button type="button" class="emoji-opt on" data-emoji="📚" onclick="selectEmoji('📚',this)">📚</button>
-            <button type="button" class="emoji-opt" data-emoji="🏃" onclick="selectEmoji('🏃',this)">🏃</button>
-            <button type="button" class="emoji-opt" data-emoji="🙏" onclick="selectEmoji('🙏',this)">🙏</button>
-            <button type="button" class="emoji-opt" data-emoji="📖" onclick="selectEmoji('📖',this)">📖</button>
-            <button type="button" class="emoji-opt" data-emoji="📝" onclick="selectEmoji('📝',this)">📝</button>
-            <button type="button" class="emoji-opt" data-emoji="🧘" onclick="selectEmoji('🧘',this)">🧘</button>
-            <button type="button" class="emoji-opt" data-emoji="🎯" onclick="selectEmoji('🎯',this)">🎯</button>
-            <button type="button" class="emoji-opt" data-emoji="💤" onclick="selectEmoji('💤',this)">💤</button>
-            <button type="button" class="emoji-opt" data-emoji="🍽️" onclick="selectEmoji('🍽️',this)">🍽️</button>
-            <button type="button" class="emoji-opt" data-emoji="💪" onclick="selectEmoji('💪',this)">💪</button>
-            <button type="button" class="emoji-opt" data-emoji="🧠" onclick="selectEmoji('🧠',this)">🧠</button>
-            <button type="button" class="emoji-opt" data-emoji="⚡" onclick="selectEmoji('⚡',this)">⚡</button>
-          </div>
-          <input type="hidden" id="tEmoji" value="📚">
+        <!-- Category Chips -->
+        <div class="chips" id="catChips" style="margin-bottom:10px">
+          <button class="chip on" onclick="fCat('all',this)">Sab</button>
+          <button class="chip" onclick="fCat('study',this)">📚 Study</button>
+          <button class="chip" onclick="fCat('health',this)">🏃 Health</button>
+          <button class="chip" onclick="fCat('personal',this)">⭐ Personal</button>
         </div>
 
-        <button class="add-btn2" onclick="addTask()">✔️ Task Add Karo</button>
+        <div id="taskList"></div>
       </div>
-
-      <!-- ── TASK LIST HEADER ── -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:.6rem;color:var(--t2);font-weight:800;letter-spacing:1.5px;text-transform:uppercase">📋 Tasks</div>
-        <div id="taskCountBadge" style="font-size:.58rem;font-weight:800;background:var(--cd2);border:1px solid var(--br);border-radius:99px;padding:3px 9px;color:var(--t2)">0 / 0</div>
-      </div>
-
-      <!-- ── CATEGORY CHIPS ── -->
-      <div class="chips" id="catChips" style="margin-bottom:12px">
-        <button class="chip on" onclick="fCat('all',this)">Sab</button>
-        <button class="chip" onclick="fCat('study',this)">📚 Study</button>
-        <button class="chip" onclick="fCat('health',this)">🏃 Health</button>
-        <button class="chip" onclick="fCat('personal',this)">⭐ Personal</button>
-      </div>
-
-      <div id="taskList"></div>
     </div>
     
     
@@ -4327,6 +4267,26 @@ function chgW(d){
   if(d>0&&log.water>=8) toast('💧 8 glasses!');
 }
 
+function toggleAddForm(){
+  var f=document.getElementById('addForm');
+  var icon=document.getElementById('addToggleIcon');
+  var txt=document.getElementById('addToggleText');
+  var btn=document.getElementById('addTaskToggle');
+  var open=f.style.display==='block';
+  f.style.display=open?'none':'block';
+  if(open){
+    if(icon) icon.textContent='＋';
+    if(txt) txt.textContent='Task Add';
+    if(btn){btn.style.background='linear-gradient(135deg,var(--in),var(--in2))';}
+  } else {
+    if(icon) icon.textContent='✕';
+    if(txt) txt.textContent='Band Karo';
+    if(btn){btn.style.background='linear-gradient(135deg,#ff4d6d,#cc0000)';}
+    // Focus on input
+    var n=document.getElementById('tName');if(n)setTimeout(function(){n.focus();},100);
+  }
+}
+
 function fCat(cat,el){
   activeCat=cat;
   document.querySelectorAll('#catChips .chip').forEach(function(c){c.classList.remove('on');});
@@ -4361,51 +4321,25 @@ function renderTasks(){
 
   tl.innerHTML=show.map(function(t){
     var done=log.tasks[t.id]===true;
-    var catColors={study:'var(--in2)',health:'var(--gr)',personal:'var(--pu)'};
-    var catColor=catColors[t.cat]||'var(--br2)';
-    return '<div class="ti'+(done?' done':'')+'" data-c="'+esc(t.cat||'')+'" style="'+(done?'opacity:.45':'')+';">'
-      +'<button class="chk" onclick="toggleTask('+t.id+')" style="border-color:'+catColor+'">'+(done?'<span style="font-size:.75rem">✓</span>':'')+'</button>'
-      +'<div style="flex:1;min-width:0">'
-      +'<div class="tn">'+esc(t.emoji||'')+'&nbsp;'+esc(t.name)+'</div>'
-      +'<div class="tm">⏰ '+esc(t.time||'')+'</div>'
-      +'</div>'
-      +'<button class="tbtn" onclick="deleteTask('+t.id+')" title="Delete">🗑</button>'
+    return '<div class="ti'+(done?' done':'')+'" data-c="'+esc(t.cat||'')+'">'
+      +'<button class="chk" onclick="toggleTask('+t.id+')">'+(done?'✓':'')+'</button>'
+      +'<div style="flex:1;min-width:0"><div class="tn">'+esc(t.name)+'</div></div>'
+      +'<button class="tbtn" onclick="deleteTask('+t.id+')">🗑</button>'
       +'</div>';
   }).join('');
 }
 
-function selectEmoji(emoji, el){
-  document.getElementById('tEmoji').value = emoji;
-  document.querySelectorAll('.emoji-opt').forEach(function(b){ b.classList.remove('on'); });
-  if(el) el.classList.add('on');
-}
-
 function addTask(){
   var tName=document.getElementById('tName');
-  var tTime=document.getElementById('tTime');
-  var tCat=document.getElementById('tCat');
-  var tEmoji=document.getElementById('tEmoji');
   var name=tName?tName.value.trim():'';
-  if(!name){toast('Naam likho!','e');return;}
-  var t={
-    id:Date.now(),
-    name:name,
-    time:(tTime&&tTime.value)||'06:00',
-    cat:(tCat&&tCat.value)||'study',
-    emoji:(tEmoji&&tEmoji.value)||'📚'
-  };
+  if(!name){toast('Task ka naam likho!','e');return;}
+  var t={id:Date.now(),name:name,time:'',cat:'study',emoji:'📋'};
   S.tasks.push(t);
-  S.tasks.sort(function(a,b){return a.time.localeCompare(b.time);});
   save();renderTasks();updateProgress();
   if(tName) tName.value='';
-  // Reset emoji to default
-  document.querySelectorAll('.emoji-opt').forEach(function(b){ b.classList.remove('on'); });
-  var firstEmoji = document.querySelector('.emoji-opt');
-  if(firstEmoji){ firstEmoji.classList.add('on'); if(tEmoji) tEmoji.value='📚'; }
-  // Close form, reset toggle button
-  var af=document.getElementById('addForm');if(af)af.style.display='none';
-  var tb=document.getElementById('addTaskToggle');if(tb)tb.textContent='＋  Nayi Task Add Karo';
-  toast('Task add! 🎯');
+  var af=document.getElementById('addForm');
+  if(af&&af.style.display==='block') toggleAddForm();
+  toast('✅ Task add ho gaya!');
 }
 
 function toggleTask(id){
