@@ -2,12 +2,10 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#f5a623">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="PS App">
-<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>PS Study App — Competitive Exam Prep</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -40,7 +38,6 @@
 
   /* Accents — warm amber + indigo */
   --ac:#f5a623;
-  --ac2:#e8940d;
   --in:#5c6af0;
   --in2:#7b87ff;
 
@@ -54,8 +51,6 @@
   --ye:#f5c518;
 
   /* Shadows */
-  --sh:0 8px 40px rgba(0,0,0,.6);
-  --sh2:0 4px 20px rgba(0,0,0,.4);
   --sh3:0 2px 10px rgba(0,0,0,.3);
 }
 
@@ -330,7 +325,6 @@ body::before{
 /* ═══════════════════════════════
    MOOD
 ═══════════════════════════════ */
-.mood-row{display:flex;gap:7px;margin-bottom:13px;}
 .mb{
   flex:1;background:var(--cd2);
   border:1.5px solid var(--br2);border-radius:14px;
@@ -367,72 +361,70 @@ body::before{
    TASK ITEMS
 ═══════════════════════════════ */
 .ti{
-  background:var(--card);border-radius:14px;
-  padding:13px 15px;margin-bottom:8px;
-  display:flex;align-items:center;gap:11px;
+  background:var(--card);border-radius:16px;
+  padding:14px 15px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
   border:1px solid var(--br);
-  border-left:3px solid var(--br2);
-  transition:opacity .25s;
+  border-left:4px solid var(--br2);
+  transition:opacity .25s, transform .15s;
+  position:relative;overflow:hidden;
 }
+.ti::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);}
+.ti:active{transform:scale(.99);}
 .ti[data-c=study]{border-left-color:var(--in2);}
 .ti[data-c=health]{border-left-color:var(--gr);}
 .ti[data-c=personal]{border-left-color:var(--pu);}
 .ti.done{opacity:.4;}.ti.done .tn{text-decoration:line-through;}
 .chk{
-  width:24px;height:24px;border-radius:50%;
+  width:26px;height:26px;border-radius:50%;
   border:2px solid var(--br2);background:transparent;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   flex-shrink:0;transition:all .2s;
 }
-.ti.done .chk{background:var(--gr);border-color:var(--gr);color:#000;font-size:.7rem;}
-.tn{font-size:.82rem;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ti.done .chk{background:var(--gr);border-color:var(--gr);color:#000;font-size:.72rem;}
+.tn{font-size:.83rem;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx);}
 .tm{font-size:.6rem;color:var(--t2);margin-top:2px;}
-.tbtn{background:none;border:none;color:var(--t2);font-size:.8rem;cursor:pointer;padding:4px;transition:color .15s;}
-.tbtn:active{color:var(--a2);}
+.tbtn{background:none;border:none;color:var(--t2);font-size:.85rem;cursor:pointer;padding:4px 6px;transition:color .15s;border-radius:6px;}
+.tbtn:active{color:var(--a2);background:rgba(255,77,109,.1);}
+
+/* Emoji Picker */
+.emoji-opt{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--card);border:1.5px solid var(--br2);
+  cursor:pointer;font-size:1.1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.emoji-opt:active{transform:scale(.9);}
+.emoji-opt.on{
+  background:rgba(92,106,240,.15);
+  border-color:var(--in2);
+  box-shadow:0 0 0 2px rgba(92,106,240,.2);
+}
 
 /* ═══════════════════════════════
    ADD FORM
 ═══════════════════════════════ */
 .add-form{
-  background:var(--cd2);border-radius:18px;
-  padding:16px;border:1px solid var(--br2);
-  margin-bottom:13px;
+  background:var(--cd2);border-radius:20px;
+  padding:18px;border:1px solid var(--br2);
+  margin-bottom:14px;
+  box-shadow:var(--sh3);
 }
 .add-btn2{
   width:100%;
   background:linear-gradient(135deg,var(--in) 0%,var(--in2) 100%);
-  border:none;border-radius:13px;color:#fff;
-  font-family:inherit;font-size:.85rem;font-weight:800;
-  padding:13px;cursor:pointer;
-  box-shadow:0 6px 20px rgba(92,106,240,.3);
-  transition:all .15s;
+  border:none;border-radius:14px;color:#fff;
+  font-family:inherit;font-size:.88rem;font-weight:800;
+  padding:14px;cursor:pointer;
+  box-shadow:0 6px 20px rgba(92,106,240,.35);
+  transition:all .15s;letter-spacing:.3px;
 }
 .add-btn2:active{transform:scale(.98);opacity:.88;}
-.tog-btn{
-  width:100%;background:transparent;
-  border:1.5px dashed rgba(255,255,255,.1);
-  border-radius:14px;color:var(--t2);
-  font-family:inherit;font-size:.78rem;font-weight:700;
-  padding:12px;cursor:pointer;margin-bottom:12px;
-  transition:all .2s;
-}
-.tog-btn:active{border-color:var(--ac);color:var(--ac);}
 
 /* ═══════════════════════════════
    PRACTICE
 ═══════════════════════════════ */
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.sc{
-  background:var(--cd2);border-radius:18px;
-  padding:16px 10px;border:1px solid var(--br);
-  cursor:pointer;text-align:center;
-  transition:transform .15s,box-shadow .15s;
-  position:relative;overflow:hidden;
-}
-.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);}
-.sc:active{transform:scale(.96);}
-.sc-bar{height:4px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:10px;overflow:hidden;}
-.sc-fill{height:100%;border-radius:99px;}
 .chi{
   background:var(--cd2);border-radius:14px;
   padding:13px 15px;margin-bottom:8px;
@@ -441,12 +433,9 @@ body::before{
   transition:transform .12s,border-color .15s;
 }
 .chi:active{transform:scale(.98);}
-.lbg{font-size:.52rem;font-weight:800;padding:3px 9px;border-radius:99px;}
 .le{background:rgba(0,214,143,.12);color:var(--gr);}
 .lm{background:rgba(245,166,35,.12);color:var(--ac);}
 .lh{background:rgba(255,77,109,.12);color:var(--a2);}
-.lp{background:rgba(255,112,67,.12);color:var(--or);}
-.lu{background:rgba(176,106,245,.12);color:var(--pu);}
 
 /* ═══════════════════════════════
    QUESTION CARDS
@@ -490,119 +479,18 @@ body::before{
 /* ═══════════════════════════════
    MOCK TEST
 ═══════════════════════════════ */
-.mtimer{
-  font-size:3rem;font-weight:900;
-  color:var(--ac);text-align:center;
-  font-variant-numeric:tabular-nums;letter-spacing:5px;
-  line-height:1;text-shadow:0 0 30px rgba(245,166,35,.3);
-}
-.mtimer.warn{color:var(--ac);text-shadow:0 0 30px rgba(245,166,35,.4);}
-.mtimer.danger{color:var(--a2);text-shadow:0 0 30px rgba(255,77,109,.4);}
-.mpb{background:rgba(255,255,255,.06);border-radius:99px;height:6px;overflow:hidden;margin:9px 0;}
-.mpbf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ac),var(--in2));transition:width .3s;}
-.qnav{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;}
-.qnd{
-  width:29px;height:29px;border-radius:8px;
-  border:1.5px solid var(--br2);background:var(--cd2);
-  font-size:.6rem;font-weight:800;cursor:pointer;
-  color:var(--t2);display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
-}
-.qnd.a{background:var(--in);border-color:var(--in);color:#fff;}
-.qnd.cur{border-color:var(--ac);color:var(--ac);}
-.qnd.sk{background:var(--or);border-color:var(--or);color:#fff;}
-.nbtn{
-  flex:1;background:var(--card);border:1.5px solid var(--br2);
-  border-radius:13px;color:var(--tx);
-  font-family:inherit;font-size:.78rem;font-weight:700;
-  padding:12px;cursor:pointer;transition:all .15s;
-}
-.nbtn:active{opacity:.8;}
-.nbtn.p{
-  background:linear-gradient(135deg,var(--in),var(--in2));
-  border-color:transparent;color:#fff;
-  box-shadow:0 5px 18px rgba(92,106,240,.3);
-}
-.nbtn.s{background:rgba(255,112,67,.1);border-color:rgba(255,112,67,.3);color:var(--or);}
 
 /* ═══════════════════════════════
    RESULT
 ═══════════════════════════════ */
-.rhero{
-  background:linear-gradient(135deg,rgba(0,214,143,.1),rgba(92,106,240,.07));
-  border-radius:22px;padding:24px;text-align:center;margin-bottom:13px;
-  border:1px solid rgba(0,214,143,.2);
-  box-shadow:0 12px 40px rgba(0,214,143,.1);
-}
-.rscore{font-size:3.5rem;font-weight:900;line-height:1;}
-.rgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:13px;}
-.rbox{
-  background:var(--card);border-radius:12px;
-  padding:10px 4px;text-align:center;border:1px solid var(--br);
-}
-.rnum{font-size:1.1rem;font-weight:800;}
 
 /* ═══════════════════════════════
    YOGA
 ═══════════════════════════════ */
-.yscene{
-  background:linear-gradient(135deg,rgba(0,214,143,.08),rgba(0,200,200,.05));
-  border-radius:22px;border:1px solid rgba(0,214,143,.18);
-  padding:20px;margin-bottom:13px;text-align:center;
-}
-.yring{position:relative;width:86px;height:86px;margin:0 auto 10px;}
-.yring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
-.yrb{stroke:rgba(255,255,255,.07);stroke-width:5;fill:none;}
-.yrf{stroke:var(--gr);stroke-width:5;fill:none;stroke-linecap:round;transition:stroke-dashoffset .8s linear;}
-.ynum{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.15rem;font-weight:900;color:var(--gr);}
-.ybtn{
-  flex:1;max-width:115px;background:var(--cd2);
-  border:1.5px solid var(--br2);border-radius:13px;
-  color:var(--tx);font-family:inherit;font-size:.79rem;
-  font-weight:700;padding:11px;cursor:pointer;transition:all .18s;
-}
-.ybtn.go{
-  background:linear-gradient(135deg,var(--gr),var(--tl));
-  border-color:transparent;color:#000;
-  box-shadow:0 6px 20px rgba(0,214,143,.3);font-weight:800;
-}
-.ysc{
-  background:var(--card);border-radius:13px;
-  padding:11px 15px;border:1px solid var(--br);
-  display:flex;align-items:center;gap:10px;margin-bottom:7px;
-}
-.ysc.cur{border-color:rgba(0,214,143,.35);background:rgba(0,214,143,.06);}
-.ysc.done{opacity:.35;}
 
 /* ═══════════════════════════════
    NOTES
 ═══════════════════════════════ */
-.tbox{
-  background:var(--cd2);border-radius:14px;
-  padding:13px 15px;border:1px solid var(--br);
-  margin-bottom:9px;border-left:4px solid var(--in2);
-}
-.tcont{font-size:.75rem;line-height:1.8;color:var(--t2);}
-.mcard{background:var(--cd2);border-radius:14px;padding:13px 15px;border:1px solid var(--br);margin-bottom:9px;}
-.mq{font-size:.82rem;font-weight:700;margin-bottom:10px;line-height:1.6;}
-.mo{
-  background:rgba(255,255,255,.03);border:1.5px solid var(--br2);
-  border-radius:11px;padding:10px 13px;
-  font-size:.78rem;font-weight:500;
-  cursor:pointer;text-align:left;color:var(--tx);
-  font-family:inherit;width:100%;margin-bottom:6px;
-  transition:all .15s;
-}
-.mo.c{background:rgba(0,214,143,.1);border-color:var(--gr);color:var(--gr);}
-.mo.w{background:rgba(255,77,109,.08);border-color:var(--a2);color:var(--a2);}
-.mo:disabled{cursor:default;}
-.mexp{
-  font-size:.69rem;color:var(--t3);
-  margin-top:8px;padding:9px 12px;
-  background:rgba(92,106,240,.07);
-  border-radius:10px;line-height:1.75;
-  border-left:3px solid rgba(92,106,240,.4);
-}
 
 /* ═══════════════════════════════
    AI CHAT
@@ -649,37 +537,11 @@ body::before{
 
 /* ═══════════════════════════════
    REPORT
-═══════════════════════════════ */
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;}
-.sbox{
-  background:var(--card);border-radius:18px;
-  padding:18px 8px;text-align:center;
-  border:1px solid var(--br);
-  position:relative;overflow:hidden;
-}
-.sbox:nth-child(1)::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ac),#e8940d);}
-.sbox:nth-child(2)::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--in),var(--in2));}
-.sbox:nth-child(3)::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gr),var(--tl));}
-.sbox:nth-child(4)::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pu),var(--in2));}
-.snum{font-size:1.9rem;font-weight:900;color:var(--ac);}
-.slbl{font-size:.56rem;color:var(--t2);font-weight:700;margin-top:4px;letter-spacing:.5px;text-transform:uppercase;}
-.cc{background:var(--card);border-radius:18px;padding:15px;border:1px solid var(--br);margin-bottom:10px;}
-.ch{height:140px;}
-.hm-w{overflow-x:auto;}.hm-w::-webkit-scrollbar{display:none;}
-.hm{display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;gap:2px;width:max-content;}
-.hmc{width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,.04);}
-.hmc.l1{background:rgba(245,166,35,.18);}.hmc.l2{background:rgba(245,166,35,.4);}.hmc.l3{background:rgba(245,166,35,.7);}.hmc.l4{background:var(--ac);}
 
 /* ═══════════════════════════════
    SETTINGS
 ═══════════════════════════════ */
 .scard{background:var(--card);border-radius:20px;padding:15px;margin-bottom:12px;border:1px solid var(--br);}
-.srow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
-.srow:not(:last-child){border-bottom:1px solid var(--br);}
-.tog{width:46px;height:26px;background:rgba(255,255,255,.08);border-radius:99px;position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background .3s;}
-.tog.on{background:var(--ac);}
-.tog::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .3s;box-shadow:0 2px 8px rgba(0,0,0,.4);}
-.tog.on::after{left:23px;}
 .dbtn{
   width:100%;background:transparent;
   border:1.5px solid rgba(255,77,109,.2);
@@ -726,58 +588,10 @@ body::before{
     radial-gradient(ellipse 60% 40% at 80% 80%,rgba(245,166,35,.08) 0%,transparent 60%);
   pointer-events:none;
 }
-.gt-title{
-  font-size:3.5rem;font-weight:900;
-  background:linear-gradient(135deg,#f5a623 0%,#ff6b6b 50%,#7b87ff 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  margin-bottom:4px;letter-spacing:-1.5px;line-height:1;
-  position:relative;z-index:1;
-}
-.gt-sub{
-  font-size:.66rem;color:var(--t2);
-  margin-bottom:32px;font-weight:700;
-  letter-spacing:3.5px;text-transform:uppercase;
-  position:relative;z-index:1;
-}
-.gt-card{
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:24px;padding:28px 22px;
-  width:100%;max-width:340px;
-  backdrop-filter:blur(20px);
-  position:relative;z-index:1;
-}
-.gt-h{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
-.gt-p{font-size:.73rem;color:var(--t2);line-height:1.8;margin-bottom:22px;}
-.gt-btn{
-  display:block;width:100%;
-  background:linear-gradient(135deg,#25D366,#128C7E);
-  border:none;border-radius:14px;color:#fff;
-  font-family:inherit;font-size:.9rem;font-weight:800;
-  padding:16px;cursor:pointer;
-  text-decoration:none;margin-bottom:12px;text-align:center;
-  box-shadow:0 8px 24px rgba(37,211,102,.2);
-  letter-spacing:.3px;transition:all .15s;
-}
-.gt-ok{
-  width:100%;
-  background:rgba(255,255,255,.06);
-  border:1.5px solid rgba(255,255,255,.1);
-  border-radius:14px;color:var(--t3);
-  font-family:inherit;font-size:.86rem;
-  font-weight:600;padding:13px;cursor:pointer;
-  transition:all .2s;
-}
-.gt-ok:active{background:rgba(255,255,255,.1);}
 
 /* ═══════════════════════════════
    LOADING
 ═══════════════════════════════ */
-.loading{text-align:center;padding:32px 16px;}
-.load-icon{font-size:2.5rem;margin-bottom:12px;}
-.load-txt{font-size:.9rem;font-weight:800;margin-bottom:5px;}
-.load-sub{font-size:.7rem;color:var(--t2);}
 .load-bar{background:rgba(255,255,255,.06);border-radius:99px;height:4px;overflow:hidden;margin:14px auto 6px;width:160px;}
 .load-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ac),var(--in2));animation:ld 1.4s ease-in-out infinite;}
 @keyframes ld{0%{width:0%;margin-left:0}50%{width:70%;margin-left:0}100%{width:0%;margin-left:100%}}
@@ -786,12 +600,6 @@ body::before{
    SHIMMER SKELETON
 ═══════════════════════════════ */
 @keyframes shimmer{from{background-position:-200% 0;}to{background-position:200% 0;}}
-.shimmer{
-  background:linear-gradient(90deg,var(--cd2) 25%,rgba(255,255,255,.06) 50%,var(--cd2) 75%);
-  background-size:200% 100%;
-  animation:shimmer 1.5s infinite;
-  border-radius:8px;
-}
 
 /* ═══════════════════════════════
    MISC
@@ -818,6 +626,20 @@ body::before{
 .notif-title{font-size:.78rem;font-weight:900;color:var(--ac);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
 .notif-msg{font-size:.82rem;line-height:1.7;color:var(--tx);margin-bottom:16px;}
 .notif-ok{background:linear-gradient(135deg,#f5a623,#ff6b35);border:none;border-radius:12px;color:#000;font-family:inherit;font-size:.82rem;font-weight:800;padding:11px 24px;cursor:pointer;width:100%;}
+/* Study Timer Pills */
+.stpill{
+  flex-shrink:0;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:99px;color:rgba(255,255,255,.5);
+  font-family:inherit;font-size:.62rem;font-weight:700;
+  padding:6px 13px;cursor:pointer;white-space:nowrap;
+  transition:all .18s;
+}
+.stpill.on{
+  background:rgba(245,166,35,.2);
+  border-color:rgba(245,166,35,.5);
+  color:var(--ac);font-weight:800;
+}
 </style>
 </head>
 <body>
@@ -904,32 +726,75 @@ display:none;
           </div>
         </div>
       </div>
-      <button class="tog-btn" onclick="var f=document.getElementById('addForm');f.style.display=f.style.display==='block'?'none':'block'">＋  Nayi Task Add Karo</button>
+      <!-- ── ADD TASK TOGGLE ── -->
+      <button class="tog-btn" id="addTaskToggle" onclick="var f=document.getElementById('addForm');var open=f.style.display==='block';f.style.display=open?'none':'block';this.textContent=open?'＋  Nayi Task Add Karo':'✕  Band Karo'">＋  Nayi Task Add Karo</button>
+
+      <!-- ── ADD TASK FORM ── -->
       <div class="add-form" id="addForm" style="display:none">
-        <div style="font-size:.59rem;color:var(--t2);font-weight:800;margin-bottom:6px">📝 NAYI TASK</div>
-        <div class="fr"><input type="text" class="fi" id="tName" placeholder="Task naam..."></div>
-        <div class="fr">
-          <input type="time" class="fs" id="tTime" value="06:00">
-          <select class="fs" id="tCat"><option value="study">📚 Study</option><option value="health">🏃 Health</option><option value="personal">⭐ Personal</option></select>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--in),var(--in2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem">📝</div>
+          <div style="font-size:.78rem;font-weight:900;letter-spacing:.5px;text-transform:uppercase;color:var(--tx)">Nayi Task</div>
         </div>
-        <div class="fr">
-          <select class="fs" id="tEmoji"><option>📚</option><option>🏃</option><option>🙏</option><option>📖</option><option>📝</option><option>🧘</option><option>🎯</option><option>💤</option><option>🍽️</option></select>
+
+        <!-- Task Name -->
+        <input type="text" class="fi" id="tName" placeholder="Task ka naam likho..." style="margin-bottom:10px">
+
+        <!-- Time + Category Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <div style="font-size:.58rem;font-weight:800;color:var(--t2);margin-bottom:4px;letter-spacing:.5px;text-transform:uppercase">⏰ Samay</div>
+            <input type="time" class="fi" id="tTime" value="06:00" style="width:100%;padding:10px 12px">
+          </div>
+          <div>
+            <div style="font-size:.58rem;font-weight:800;color:var(--t2);margin-bottom:4px;letter-spacing:.5px;text-transform:uppercase">🗂️ Category</div>
+            <select class="fi" id="tCat" style="width:100%;padding:10px 12px">
+              <option value="study">📚 Study</option>
+              <option value="health">🏃 Health</option>
+              <option value="personal">⭐ Personal</option>
+            </select>
+          </div>
         </div>
+
+        <!-- Emoji Picker -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:.58rem;font-weight:800;color:var(--t2);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase">🎯 Icon</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="emojiPicker">
+            <button type="button" class="emoji-opt on" data-emoji="📚" onclick="selectEmoji('📚',this)">📚</button>
+            <button type="button" class="emoji-opt" data-emoji="🏃" onclick="selectEmoji('🏃',this)">🏃</button>
+            <button type="button" class="emoji-opt" data-emoji="🙏" onclick="selectEmoji('🙏',this)">🙏</button>
+            <button type="button" class="emoji-opt" data-emoji="📖" onclick="selectEmoji('📖',this)">📖</button>
+            <button type="button" class="emoji-opt" data-emoji="📝" onclick="selectEmoji('📝',this)">📝</button>
+            <button type="button" class="emoji-opt" data-emoji="🧘" onclick="selectEmoji('🧘',this)">🧘</button>
+            <button type="button" class="emoji-opt" data-emoji="🎯" onclick="selectEmoji('🎯',this)">🎯</button>
+            <button type="button" class="emoji-opt" data-emoji="💤" onclick="selectEmoji('💤',this)">💤</button>
+            <button type="button" class="emoji-opt" data-emoji="🍽️" onclick="selectEmoji('🍽️',this)">🍽️</button>
+            <button type="button" class="emoji-opt" data-emoji="💪" onclick="selectEmoji('💪',this)">💪</button>
+            <button type="button" class="emoji-opt" data-emoji="🧠" onclick="selectEmoji('🧠',this)">🧠</button>
+            <button type="button" class="emoji-opt" data-emoji="⚡" onclick="selectEmoji('⚡',this)">⚡</button>
+          </div>
+          <input type="hidden" id="tEmoji" value="📚">
+        </div>
+
         <button class="add-btn2" onclick="addTask()">✔️ Task Add Karo</button>
       </div>
-      <div style="font-size:.6rem;color:var(--t2);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">📋 TASKS</div>
-      <div class="chips" id="catChips">
+
+      <!-- ── TASK LIST HEADER ── -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:.6rem;color:var(--t2);font-weight:800;letter-spacing:1.5px;text-transform:uppercase">📋 Tasks</div>
+        <div id="taskCountBadge" style="font-size:.58rem;font-weight:800;background:var(--cd2);border:1px solid var(--br);border-radius:99px;padding:3px 9px;color:var(--t2)">0 / 0</div>
+      </div>
+
+      <!-- ── CATEGORY CHIPS ── -->
+      <div class="chips" id="catChips" style="margin-bottom:12px">
         <button class="chip on" onclick="fCat('all',this)">Sab</button>
         <button class="chip" onclick="fCat('study',this)">📚 Study</button>
         <button class="chip" onclick="fCat('health',this)">🏃 Health</button>
         <button class="chip" onclick="fCat('personal',this)">⭐ Personal</button>
       </div>
+
       <div id="taskList"></div>
     </div>
-    <!-- PRACTICE -->
     
-    <!-- MOCK -->
-        <!-- YOGA -->
     
     <!-- RWA BOOK -->
     <div class="tab" id="tab-rwa">
@@ -971,7 +836,7 @@ display:none;
               <div style="font-size:.95rem;font-weight:900">📅 Aaj ki CA</div>
               <div style="font-size:.62rem;color:var(--t2)" id="todayDateLbl"></div>
             </div>
-            <button onclick="loadDailyCA()" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;padding:6px 12px;cursor:pointer">🔄 Load</button>
+            <button onclick="loadDailyCA(false)" style="background:var(--ac);border:none;border-radius:8px;color:#fff;font-size:.72rem;font-weight:800;padding:6px 12px;cursor:pointer">🔄 Load</button>
           </div>
           <div style="font-size:.65rem;color:var(--t2);margin-bottom:8px">Bihar Police • SSC • RRB • BSSC ke liye filtered</div>
           <div id="daily-ca-content"><div style="font-size:.7rem;color:var(--t2);text-align:center;padding:10px">⬆️ Load button dabao</div></div>
@@ -1017,198 +882,99 @@ display:none;
       </div>
     </div>
     <!-- REPORT -->
-    <div class="tab" id="tab-mock">
-      <div id="mock-home">
-        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">📝 MOCK TEST चुनो</div>
-        <div style="display:grid;gap:8px;">
-          <div onclick="startMock('ssc_gd')" style="background:linear-gradient(135deg,#5c6af0,#7b4fe8);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🪖</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC GD Constable</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">80 Qs · 60 min · GK+Reasoning+Maths+Hindi</div></div>
-          </div>
-          <div onclick="startMock('bihar_police')" style="background:linear-gradient(135deg,#059669,#0891b2);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">👮</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">Bihar Police Sipahi</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 120 min · GK+Hindi+Maths+Science</div></div>
-          </div>
-          <div onclick="startMock('ssc_cgl')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">📊</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC CGL Tier-1</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 60 min · GK+Reasoning+Maths+English</div></div>
-          </div>
-          <div onclick="startMock('ssc_chsl')" style="background:linear-gradient(135deg,#7c3aed,#db2777);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🖥️</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">SSC CHSL Tier-1</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 60 min · GK+Reasoning+Maths+English</div></div>
-          </div>
-          <div onclick="startMock('rrb_ntpc')" style="background:linear-gradient(135deg,#0284c7,#0d9488);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🚂</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">RRB NTPC</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 90 min · GK+Maths+Reasoning</div></div>
-          </div>
-          <div onclick="startMock('rrb_group_d')" style="background:linear-gradient(135deg,#b45309,#92400e);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🔧</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">RRB Group D</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">100 Qs · 90 min · GK+Maths+Reasoning+Science</div></div>
-          </div>
-          <div onclick="startMock('bssc')" style="background:linear-gradient(135deg,#be185d,#9333ea);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">📋</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">BSSC Inter Level</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">150 Qs · 135 min · GK+Hindi+Maths+Science</div></div>
-          </div>
-          <div onclick="startMock('bpsc')" style="background:linear-gradient(135deg,#1d4ed8,#065f46);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">🎖️</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:#fff">BPSC Prelims</div><div style="font-size:.6rem;color:rgba(255,255,255,.8)">150 Qs · 120 min · GK+History+Polity+Geography</div></div>
-          </div>
-          <div onclick="startMock('custom')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:12px;padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <div style="font-size:1.5rem">⚙️</div>
-            <div><div style="font-size:.82rem;font-weight:900;color:var(--tx)">Custom Mock</div><div style="font-size:.6rem;color:var(--t2)">Khud set karo — subject, questions, time</div></div>
-          </div>
-        </div>
-        <div style="margin-top:14px">
-          <div style="font-size:.66rem;font-weight:800;color:var(--t2);margin-bottom:8px">📊 Recent Mocks</div>
-          <div id="mock-history-list"><div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div></div>
-        </div>
-      </div>
-      <div id="mock-setup" style="display:none">
-        <div style="font-size:.72rem;font-weight:800;color:var(--t2);margin-bottom:10px">⚙️ Custom Mock Setup</div>
-        <div class="cc" style="margin-bottom:10px">
-          <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Questions kitne?</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap" id="mock-qcount-chips">
-            <button class="chip on" onclick="setMockOpt('qcount',25,this)">25</button>
-            <button class="chip" onclick="setMockOpt('qcount',50,this)">50</button>
-            <button class="chip" onclick="setMockOpt('qcount',80,this)">80</button>
-            <button class="chip" onclick="setMockOpt('qcount',100,this)">100</button>
-          </div>
-        </div>
-        <div class="cc" style="margin-bottom:10px">
-          <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Time limit?</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button class="chip on" onclick="setMockOpt('time',30,this)">30 min</button>
-            <button class="chip" onclick="setMockOpt('time',45,this)">45 min</button>
-            <button class="chip" onclick="setMockOpt('time',60,this)">60 min</button>
-          </div>
-        </div>
-        <div class="cc" style="margin-bottom:14px">
-          <div style="font-size:.68rem;font-weight:700;margin-bottom:6px">Subjects?</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap" id="mock-subj-chips">
-            <button class="chip on" onclick="toggleMockSubj('gk',this)">GK</button>
-            <button class="chip on" onclick="toggleMockSubj('reasoning',this)">Reasoning</button>
-            <button class="chip on" onclick="toggleMockSubj('maths',this)">Maths</button>
-            <button class="chip on" onclick="toggleMockSubj('hindi',this)">Hindi</button>
-            <button class="chip" onclick="toggleMockSubj('english',this)">English</button>
-            <button class="chip" onclick="toggleMockSubj('science',this)">Science</button>
-          </div>
-        </div>
-        <button class="btn" onclick="launchCustomMock()" style="width:100%">🚀 Mock Shuru Karo</button>
-        <button onclick="showV('mock-home','mock-setup')" style="background:none;border:none;color:var(--t2);font-size:.7rem;padding:8px;cursor:pointer;display:block;margin:8px auto">← Wapas</button>
-      </div>
-      <div id="mock-test" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:.7rem;font-weight:800;color:var(--t2)" id="mock-qnum">Q 1/25</div>
-          <div style="font-size:.8rem;font-weight:900;color:var(--ac)" id="mock-timer">60:00</div>
-          <button onclick="submitMock()" style="background:var(--in);border:none;border-radius:8px;color:#fff;font-size:.62rem;font-weight:800;padding:5px 10px;cursor:pointer">Submit</button>
-        </div>
-        <div style="background:var(--br);height:3px;border-radius:2px;margin-bottom:14px"><div id="mock-progress" style="height:100%;background:var(--ac);border-radius:2px;transition:width .3s;width:0%"></div></div>
-        <div id="mock-question"></div>
-        <div style="display:flex;justify-content:space-between;margin-top:14px">
-          <button onclick="mockNav(-1)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:8px 16px;font-size:.72rem;cursor:pointer">‹ Pehle</button>
-          <button onclick="mockNav(1)" style="background:var(--ac);border:none;border-radius:10px;color:#fff;padding:8px 16px;font-size:.72rem;font-weight:800;cursor:pointer">Agle ›</button>
-        </div>
-      </div>
-      <div id="mock-result" style="display:none">
-        <div style="text-align:center;padding:20px 0">
-          <div style="font-size:3rem" id="mock-res-emoji">🎯</div>
-          <div style="font-size:1.8rem;font-weight:900;margin:8px 0" id="mock-res-pct">0%</div>
-          <div style="font-size:.75rem;color:var(--t2)" id="mock-res-detail">0/0 sahi</div>
-          <div id="mock-res-grade" style="font-size:.8rem;font-weight:800;margin:8px 0;padding:6px 16px;border-radius:20px;display:inline-block"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
-          <div class="cc" style="text-align:center"><div style="font-size:1.1rem;font-weight:900;color:var(--gr)" id="mock-res-correct">0</div><div style="font-size:.58rem;color:var(--t2)">Sahi</div></div>
-          <div class="cc" style="text-align:center"><div style="font-size:1.1rem;font-weight:900;color:var(--a2)" id="mock-res-wrong">0</div><div style="font-size:.58rem;color:var(--t2)">Galat</div></div>
-          <div class="cc" style="text-align:center"><div style="font-size:1.1rem;font-weight:900;color:var(--t2)" id="mock-res-skip">0</div><div style="font-size:.58rem;color:var(--t2)">Skip</div></div>
-        </div>
-        <div style="font-size:.66rem;font-weight:800;color:var(--t2);margin-bottom:8px">📋 Solutions</div>
-        <div id="mock-solutions"></div>
-        <button class="btn" onclick="showV('mock-home','mock-result');renderMockHistory()" style="width:100%;margin-top:12px">✅ Done</button>
-      </div>
-    </div>
     <div class="tab" id="tab-report">
 
-      <!-- ── STUDY TIMER CARD ── -->
-      <div class="scard" style="margin-bottom:10px;background:linear-gradient(135deg,rgba(92,106,240,.08),rgba(245,166,35,.05));border-color:rgba(92,106,240,.2)">
-        <div class="sec">⏱️ Study Timer</div>
-        <div style="text-align:center;padding:8px 0 4px">
-          <div id="studyTimerDisplay" style="font-size:2.8rem;font-weight:900;color:var(--ac);font-variant-numeric:tabular-nums;letter-spacing:3px;line-height:1;text-shadow:0 0 20px rgba(245,166,35,.3)">00:00:00</div>
-          <div style="font-size:.62rem;color:var(--t2);margin-top:4px" id="studyTimerSubject">Koi subject select nahi</div>
-        </div>
-        <div style="display:flex;gap:6px;margin:10px 0 8px;flex-wrap:wrap">
-          <select id="studySubjectSel" style="flex:1;background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-family:inherit;font-size:.72rem;padding:7px 9px;outline:none">
-            <option value="GK/GS">📚 GK/GS</option>
-            <option value="Maths">🔢 Maths</option>
-            <option value="Reasoning">🧠 Reasoning</option>
-            <option value="Hindi">📝 Hindi</option>
-            <option value="English">🔤 English</option>
-            <option value="Science">🔬 Science</option>
-            <option value="History">🏛️ History</option>
-            <option value="Polity">⚖️ Polity</option>
-            <option value="Geography">🌍 Geography</option>
-            <option value="Current Affairs">📰 Current Affairs</option>
-            <option value="Mock Practice">📋 Mock Practice</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button id="studyTimerBtn" onclick="toggleStudyTimer()" style="flex:1;background:linear-gradient(135deg,var(--gr),var(--tl));border:none;border-radius:12px;color:#000;font-family:inherit;font-size:.82rem;font-weight:800;padding:11px;cursor:pointer">▶ Start</button>
-          <button onclick="resetStudyTimer()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:12px;color:var(--t3);font-family:inherit;font-size:.82rem;font-weight:700;padding:11px 16px;cursor:pointer">↺ Reset</button>
-        </div>
-        <div style="margin-top:10px;font-size:.62rem;color:var(--t2);text-align:center" id="studyTodayTotal">Aaj ka total: 0 min</div>
-      </div>
-
-      <!-- ── AAJ KA STUDY LOG ── -->
-      <div class="scard" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="sec" style="margin:0">📓 Aaj ka Study Log</div>
-          <div style="font-size:.58rem;color:var(--t2)" id="studyLogDate"></div>
-        </div>
-        <div id="studyLogToday">
-          <div style="text-align:center;padding:16px;font-size:.72rem;color:var(--t2)">⏱️ Timer start karo — session automatically save hoga</div>
-        </div>
-        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--br)">
-          <div style="display:flex;justify-content:space-between;font-size:.68rem;font-weight:800">
-            <span style="color:var(--t2)">📊 Aaj Total Study Time</span>
-            <span style="color:var(--ac)" id="studyLogTotalMin">0 min</span>
+      <!-- ── STUDY TIMER ── -->
+      <div style="background:linear-gradient(135deg,#141830,#1a1535);border-radius:22px;padding:20px;margin-bottom:12px;border:1px solid rgba(92,106,240,.25);position:relative;overflow:hidden;">
+        <div style="position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(92,106,240,.25) 0%,transparent 65%);pointer-events:none"></div>
+        <div style="position:absolute;left:-20px;bottom:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(245,166,35,.15) 0%,transparent 65%);pointer-events:none"></div>
+        <div style="position:relative;z-index:1">
+          <div style="font-size:.58rem;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">⏱️ Study Timer</div>
+          <!-- Timer Display -->
+          <div style="text-align:center;margin-bottom:14px">
+            <div id="studyTimerDisplay" style="font-size:3.2rem;font-weight:900;color:var(--ac);font-variant-numeric:tabular-nums;letter-spacing:4px;line-height:1;text-shadow:0 0 30px rgba(245,166,35,.4)">00:00:00</div>
+            <div id="studyTimerSubject" style="font-size:.65rem;color:rgba(255,255,255,.4);margin-top:6px;font-weight:600">Subject select karo ↓</div>
+          </div>
+          <!-- Subject Pills -->
+          <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px" id="subjectPills">
+            <button class="stpill on" onclick="selectStudySubject('GK/GS',this)">📚 GK</button>
+            <button class="stpill" onclick="selectStudySubject('Maths',this)">🔢 Maths</button>
+            <button class="stpill" onclick="selectStudySubject('Reasoning',this)">🧠 Reasoning</button>
+            <button class="stpill" onclick="selectStudySubject('Hindi',this)">📝 Hindi</button>
+            <button class="stpill" onclick="selectStudySubject('English',this)">🔤 English</button>
+            <button class="stpill" onclick="selectStudySubject('Science',this)">🔬 Science</button>
+            <button class="stpill" onclick="selectStudySubject('History',this)">🏛️ History</button>
+            <button class="stpill" onclick="selectStudySubject('Current Affairs',this)">📰 CA</button>
+          </div>
+          <!-- Controls -->
+          <div style="display:flex;gap:8px">
+            <button id="studyTimerBtn" onclick="toggleStudyTimer()" style="flex:1;background:linear-gradient(135deg,var(--gr),var(--tl));border:none;border-radius:14px;color:#000;font-family:inherit;font-size:.88rem;font-weight:900;padding:13px;cursor:pointer;transition:all .2s">▶ Start</button>
+            <button onclick="resetStudyTimer()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;color:rgba(255,255,255,.6);font-family:inherit;font-size:.82rem;font-weight:700;padding:13px 18px;cursor:pointer">↺</button>
+          </div>
+          <!-- Today total -->
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.62rem;color:rgba(255,255,255,.35)">Aaj ka total</span>
+            <span style="font-size:.78rem;font-weight:900;color:var(--ac)" id="studyTodayTotal">0 min</span>
           </div>
         </div>
       </div>
 
-      <!-- ── TASK COMPLETION LOG ── -->
-      <div class="scard" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div class="sec" style="margin:0">✅ Task Completion Log</div>
+      <!-- ── AAJ KA LOG ── -->
+      <div class="scard" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec" style="margin:0">📓 Aaj ka Study Log</div>
+          <div style="font-size:.6rem;font-weight:700;color:var(--ac)" id="studyLogDate"></div>
+        </div>
+        <div id="studyLogToday">
+          <div style="text-align:center;padding:20px;color:var(--t2);font-size:.72rem">⏱️ Timer start karo — log yahan dikhega</div>
+        </div>
+        <div id="studyLogTotalRow" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--br);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.65rem;color:var(--t2);font-weight:700">📊 Aaj ka Total</span>
+          <span style="font-size:.82rem;font-weight:900;color:var(--ac)" id="studyLogTotalMin">0 min</span>
+        </div>
+      </div>
+
+      <!-- ── TASK COMPLETION ── -->
+      <div class="scard" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec" style="margin:0">✅ Task Completion</div>
           <select id="taskLogDateSel" onchange="renderTaskLog()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-family:inherit;font-size:.62rem;padding:5px 8px;outline:none"></select>
         </div>
         <div id="taskLogList"></div>
       </div>
 
-      <!-- ── 7 DIN KI STUDY SUMMARY ── -->
-      <div class="scard" style="margin-bottom:10px">
-        <div class="sec">📅 7-Din Study Summary</div>
-        <div id="studyWeekSummary" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px"></div>
-        <div style="margin-top:10px">
-          <div class="sec" style="margin-bottom:8px;font-size:.55rem">📈 Subject-wise Time (Is Hafte)</div>
-          <div id="studySubjectBreakdown"></div>
+      <!-- ── 7 DIN SUMMARY ── -->
+      <div class="scard" style="margin-bottom:12px">
+        <div class="sec">📅 Hafte ka Overview</div>
+        <div id="studyWeekSummary" style="display:flex;gap:5px;padding-bottom:4px;align-items:flex-end;height:90px;margin-bottom:6px"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div style="text-align:center;flex:1">
+            <div style="font-size:1rem;font-weight:900;color:var(--ac)" id="weekTotalMins">0</div>
+            <div style="font-size:.52rem;color:var(--t2);font-weight:700">MIN THIS WEEK</div>
+          </div>
+          <div style="text-align:center;flex:1">
+            <div style="font-size:1rem;font-weight:900;color:var(--gr)" id="weekStreak">0</div>
+            <div style="font-size:.52rem;color:var(--t2);font-weight:700">STREAK DAYS</div>
+          </div>
+          <div style="text-align:center;flex:1">
+            <div style="font-size:1rem;font-weight:900;color:var(--in2)" id="weekAvgMins">0</div>
+            <div style="font-size:.52rem;color:var(--t2);font-weight:700">AVG/DAY MIN</div>
+          </div>
         </div>
+        <!-- Subject breakdown -->
+        <div style="font-size:.58rem;font-weight:800;color:var(--t2);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Subject-wise (Is Hafte)</div>
+        <div id="studySubjectBreakdown"></div>
       </div>
 
-      <div class="scard" style="margin-bottom:10px">
-        <div class="sec">📊 Subject-wise Weakness</div>
-        <div id="rpt-weakness"></div>
-      </div>
-      <div class="scard" style="margin-bottom:10px">
-        <div class="sec">📈 Mock Score Trend</div>
-        <div id="rpt-trend"></div>
-      </div>
-      <div class="scard" style="margin-bottom:10px">
-        <div class="sec">📚 Topic Coverage (RWA)</div>
-        <div id="rpt-coverage"></div>
-      </div>
+      <!-- ── PURANI HISTORY ── -->
       <div class="scard">
-        <div class="sec">📝 Mock History</div>
-        <div id="testHist"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec" style="margin:0">📆 Study History</div>
+          <select id="historyDateSel" onchange="renderStudyHistory()" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-family:inherit;font-size:.62rem;padding:5px 8px;outline:none"></select>
+        </div>
+        <div id="studyHistoryDetail"></div>
       </div>
+
     </div>
     <!-- SETTINGS -->
     <div class="tab" id="tab-chat">
@@ -1280,7 +1046,7 @@ display:none;
         <div class="sec">💾 Data</div>
         <div style="font-size:.69rem;color:var(--t2);margin-bottom:7px" id="dataInfo">Loading...</div>
         <button class="dbtn" onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}">🔄 Aaj Reset</button>
-        <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};S.mocks=[];save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
+        <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
       </div>
       <div class="scard">
         <div class="sec">🔐 Account</div>
@@ -1291,13 +1057,10 @@ display:none;
   </div>
   <div class="tabbar">
     <button class="tb on" onclick="sw('home')" id="tb-home"><span>🏠</span>Home</button>
-    
-    
     <button class="tb" onclick="sw('rwa')" id="tb-rwa"><span>📖</span>Topic</button>
     <button class="tb" onclick="sw('ca')" id="tb-ca"><span>📰</span>News</button>
     <button class="tb" onclick="sw('ask')" id="tb-ask"><span>🤖</span>AI</button>
-    <button class="tb" onclick="sw('mock')" id="tb-mock"><span>📝</span>Mock</button>
-    <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Report</button>
+    <button class="tb" onclick="sw('report')" id="tb-report"><span>📊</span>Log</button>
     <button class="tb" onclick="sw('chat')" id="tb-chat"><span>💬</span>Chat</button>
     <button class="tb" onclick="sw('settings')" id="tb-settings"><span>⚙️</span>Settings</button>
   </div>
@@ -1373,7 +1136,8 @@ function groqFetch(gkey, payload, cb, errcb){
     delete body._models;
     // Inject Hindi system instruction
     if(body.messages && body.messages[0] && body.messages[0].role==='system'){
-      if(body.messages[0].content.indexOf('Devanagari')===-1){
+      var hasDevanagari=/[\u0900-\u097F]/.test(body.messages[0].content);
+      if(!hasDevanagari && body.messages[0].content.indexOf('Devanagari')===-1){
         body.messages[0].content = HINDI_SYSTEM + '\n\n' + body.messages[0].content;
       }
     }
@@ -1383,7 +1147,6 @@ function groqFetch(gkey, payload, cb, errcb){
       body:JSON.stringify(body)
     }).then(function(r){return r.json();}).then(function(d){
       if(d.error){
-        console.warn('Model '+model+' failed:',d.error.message);
         tryNext();
       } else {
         cb(d, model);
@@ -1401,11 +1164,11 @@ function checkAdminNotification(){
     if(!doc.exists||!doc.data().active) return;
     var data=doc.data();
     var ts=data.timestamp?data.timestamp.toMillis():0;
-    var seen=localStorage.getItem(key)||0;
+    var seen=0;try{seen=localStorage.getItem(key)||0;}catch(e){}
     if(ts>parseInt(seen)){
       document.getElementById('adminNotifMsg').textContent=data.message||'';
       document.getElementById('adminNotif').classList.add('show');
-      localStorage.setItem(key,ts);
+      try{localStorage.setItem(key,ts);}catch(e){}
     }
   }).catch(function(){});
 }
@@ -3652,28 +3415,14 @@ QB.maths = QB.maths.concat([
 // ═══════════════════════════════════════════════
 
 // ── DATA ──
-var YOGA_STEPS=[
-  {name:"🙏 Pranayam Taiyari",desc:"Seedhe baitho. 3 gehri sansein lo.",dur:60,color:"#7c6fff"},
-  {name:"🫁 Anulom-Vilom",desc:"Daaya naak band (4s). Baaya se choddo (4s). 10 baar.",dur:120,color:"#60a5fa"},
-  {name:"🐝 Bhramari",desc:"Kaanon pe ungliyan. Hmm... 6 baar.",dur:90,color:"#c084fc"},
-  {name:"☀️ Surya Namaskar",desc:"3-4 rounds dheere dheere.",dur:150,color:"#fbbf24"},
-  {name:"🧘 Vajrasana",desc:"Ghutno pe baitho. 1 min raho.",dur:60,color:"#4ade80"},
-  {name:"🌊 Bhujangasana",desc:"Pet ke bal. Dheere upar. 3 baar.",dur:60,color:"#fb923c"},
-  {name:"💤 Shavasana",desc:"Pith ke bal. Sab dhila. Sirf saans.",dur:60,color:"#6b72a0"}
-];
-var LVLARR=['easy','moderate','hard','moderate','easy'];
-var LVLCLS={easy:'le',moderate:'lm',hard:'lh'};
-var LVLLBL={easy:'🟢 Easy',moderate:'🟡 Moderate',hard:'🟠 Hard'};
+
 
 // ── STATE ──
 var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[]};
 if(!S.examDates) S.examDates={};
 if(!S.customExams) S.customExams=[];
-var activeCat='all',curSubj=null,curLvl='all',curExam='ssc';
-var pracQs=[],pracAns={},pracC=0,pracT=0;
-var charts={w:null,s:null,m:null};
-var yIdx=0,yLeft=0,yRun=false,yInt=null;
-var _caTopics=[];
+
+
 var _caHistory={};
 var _rwaHistory={};  // topic-wise asked questions history
 
@@ -3688,25 +3437,33 @@ function save(){
   }catch(e){}
 }
 function load(){
-  var best=null,bestSize=0;
-  try{var a=localStorage.getItem('ps_v3');if(a&&a.length>bestSize){best=a;bestSize=a.length;}}catch(e){}
-  try{var b=sessionStorage.getItem('ps_v3');if(b&&b.length>bestSize){best=b;bestSize=b.length;}}catch(e){}
-  try{
-    document.cookie.split(';').forEach(function(c){
-      var t=c.trim();
-      if(t.indexOf('ps_v3=')===0){var cd=decodeURIComponent(t.substring(6));if(cd&&cd.length>bestSize){best=cd;bestSize=cd.length;}}
-    });
-  }catch(e){}
-  if(best){try{S=Object.assign({},S,JSON.parse(best));try{localStorage.setItem('ps_v3',best);}catch(e){}}catch(e){}}
+  // Fix #8: localStorage primary source, cookie fallback only
+  var best=null;
+  try{var a=localStorage.getItem('ps_v3');if(a)best=a;}catch(e){}
+  // Cookie fallback sirf tab jab localStorage nahi mila
+  if(!best){
+    try{
+      document.cookie.split(';').forEach(function(c){
+        var t=c.trim();
+        if(t.indexOf('ps_v3=')===0){var cd=decodeURIComponent(t.substring(6));if(cd)best=cd;}
+      });
+    }catch(e){}
+  }
+  if(best){
+    try{
+      S=Object.assign({},S,JSON.parse(best));
+      // Sync to localStorage as single source of truth
+      try{localStorage.setItem('ps_v3',best);}catch(e){}
+    }catch(e){}
+  }
 }
 function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function pad(n){return n<10?'0'+n:n;}
 function getLog(k){if(!S.log[k])S.log[k]={tasks:{},mood:'',water:0};return S.log[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function bold(s){var p=s.split('**'),o='';for(var i=0;i<p.length;i++)o+=i%2?'<strong>'+p[i]+'</strong>':p[i];return o;}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
-function sw(tab){
+function toggleTheme(){
   S.dark=!S.dark;
   var r=document.documentElement;
   if(S.dark){
@@ -3741,12 +3498,13 @@ function sw(tab){
 function sw(tab){
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('tb-'+tab).classList.add('on');
+  var tabEl=document.getElementById('tab-'+tab);
+  var tbEl=document.getElementById('tb-'+tab);
+  if(tabEl) tabEl.classList.add('active');
+  if(tbEl) tbEl.classList.add('on');
   document.querySelector('.content').scrollTop=0;
-  if(tab==='report') { initReport(); initStudyLog(); }
+  if(tab==='report'){initStudyLog();}
   if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
-  if(tab==='mock'){renderMockHistory();showV('mock-home','mock-result');showV('mock-home','mock-test');showV('mock-home','mock-setup');}
   if(tab==='chat'){initChat();}
   if(tab==='settings'){
     var gk2=document.getElementById('geminiKey');
@@ -3755,6 +3513,8 @@ function sw(tab){
     if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
     updateGKStatus();updateNewsDataStatus();
   }
+  // Fix #3: pushState for back button
+  try{history.pushState({tab:tab},'','#'+tab);}catch(e){}
 }
 function clearRWACache(){
   try{
@@ -3765,8 +3525,8 @@ function clearRWACache(){
   }catch(e){}
 }
 function showV(show,hide){
-  document.getElementById(show).style.display='block';
-  document.getElementById(hide).style.display='none';
+  var s=document.getElementById(show);if(s)s.style.display='block';
+  var h=document.getElementById(hide);if(h)h.style.display='none';
 }
 function getGKey(){
   var k=document.getElementById('geminiKey');
@@ -3823,6 +3583,7 @@ function calcMonthAvg(){
 var RWA_TOPICS = {"history":{"label":"📜 इतिहास","color":"rgba(255,165,0,.15)","subtopics":["प्राचीन भारत के इतिहास के प्रमुख स्रोत","पुरातात्विक एवं साहित्यिक स्रोत","प्रागैतिहासिक काल","सिन्धु घाटी सभ्यता (हड़प्पा)","वैदिक सभ्यता - ऋग्वैदिक काल","उत्तरवैदिक काल","सोलह महाजनपद तथा मगध साम्राज्य","प्राचीन भारत के प्रमुख धर्म एवं दर्शन","मौर्य काल","मौर्योत्तर काल","गुप्त काल","गुप्तोत्तर काल","पूर्व मध्यकाल","इस्लाम धर्म का उदय","अरब एवं तुर्क आक्रमण","महमूद गजनवी एवं मुहम्मद गौरी","दिल्ली सल्तनत - गुलाम/खिलजी/तुगलक/सैय्यद/लोदी वंश","दिल्ली सल्तनत की प्रशासनिक व्यवस्था","विजयनगर साम्राज्य","बहमनी साम्राज्य","सूफी एवं भक्ति आंदोलन","मुगल साम्राज्य - बाबर, हुमायूँ, शेरशाह","मुगल साम्राज्य - अकबर, जहाँगीर, शाहजहाँ, औरंगजेब","मराठा साम्राज्य","भारत में यूरोपियनों का आगमन","बंगाल और ब्रिटिश शासन","1857 की क्रांति","ब्रिटिशकालीन प्रमुख गवर्नर एवं गवर्नर जनरल","भारत के प्रमुख वायसराय","सामाजिक सुधार संस्थाएँ एवं आंदोलन","प्रमुख व्यक्तियों के उपनाम एवं नारे","भारतीय राष्ट्रीय कांग्रेस के प्रमुख अधिवेशन","प्रारंभिक राष्ट्रीय आंदोलन","राष्ट्रीय आंदोलन का अंतिम चरण","विश्व इतिहास - WWI, WWII, फ्रांस क्रांति, रूस क्रांति"]},"geography":{"label":"🌍 भूगोल","color":"rgba(0,200,100,.15)","subtopics":["भारत की भौगोलिक अवस्थिति एवं भूगर्भिक संरचना","भारत का भौतिक स्वरूप एवं प्रायद्वीपीय पठार","भारत के प्रमुख दर्रे एवं द्वीप","भारत की जलवायु, मृदा एवं प्राकृतिक वनस्पति","भारत के जैवमंडलीय आरक्षित क्षेत्र एवं नेशनल पार्क","भारत का अपवाह तंत्र एवं नदियाँ","भारत की प्रमुख बहुउद्देशीय परियोजनाएँ","भारत की प्रमुख झीलें एवं जलप्रपात","भारत में कृषि एवं पशु संसाधन","भारत के खनिज संसाधन एवं परिवहन","ब्रह्माण्ड, सौरमंडल एवं पृथ्वी की संरचना","अक्षांश-देशांतर, चट्टान, ज्वालामुखी, भूकम्प","पर्वत, पठार, मरुस्थल, घास के मैदान","वायुमंडल, वायुदाब, पवनें, चक्रवात","जलमंडल - महासागर, धाराएँ, गर्त","विश्व की प्रमुख नदियाँ, झीलें, नहरें","विश्व के प्रमुख दर्रे एवं जलडमरूमध्य","महाद्वीप - एशिया, अफ्रीका, यूरोप, अमेरिका","विश्व की प्रमुख जनजातियाँ एवं प्रजातियाँ","विश्व के प्रमुख बंदरगाह एवं खनिज संसाधन"]},"polity":{"label":"⚖️ राजनीति विज्ञान","color":"rgba(100,150,255,.15)","subtopics":["भारत का संवैधानिक विकास","संघ एवं राज्य क्षेत्र","भारतीय संविधान के स्रोत, अनुसूचियाँ एवं भाग","प्रस्तावना एवं नागरिकता","मौलिक अधिकार","राज्य के नीति-निदेशक सिद्धांत एवं मौलिक कर्तव्य","राष्ट्रपति एवं उप-राष्ट्रपति","प्रधानमंत्री एवं मंत्रिपरिषद","संसद - लोकसभा एवं राज्यसभा","संसद की वित्तीय समितियाँ","आपात उपबंध","राज्य की कार्यपालिका एवं विधायिका","भारतीय न्यायपालिका","स्थानीय स्वशासन एवं केंद्र-राज्य संबंध","निर्वाचन आयोग, राजभाषा, लोक सेवा आयोग","भारत की प्रमुख जाँच एजेंसियाँ","संविधान के महत्त्वपूर्ण अनुच्छेद एवं संशोधन"]},"economy":{"label":"💰 अर्थव्यवस्था","color":"rgba(255,215,0,.15)","subtopics":["अर्थशास्त्र एवं अर्थव्यवस्था का परिचय","राष्ट्रीय आय एवं आर्थिक संवृद्धि","आर्थिक नियोजन - पंचवर्षीय योजनाएँ","कृषि क्षेत्र","उद्योग क्षेत्र","सेवा क्षेत्र","गरीबी और बेरोजगारी","मुद्रास्फीति","मुद्रा बाजार एवं बैंकिंग प्रणाली","अंतर्राष्ट्रीय आर्थिक संगठन"]},"science":{"label":"🔬 विज्ञान","color":"rgba(0,200,200,.15)","subtopics":["भौतिक विज्ञान - इकाई एवं मापन","कार्य, ऊर्जा, शक्ति, बल एवं गति","गुरुत्वाकर्षण एवं द्रव्य के यांत्रिक गुण","तरंग गति एवं ध्वनि","ऊष्मा, ताप एवं ऊष्मागतिकी","प्रकाशिकी","विद्युत धारा और चुम्बकत्व","रसायन विज्ञान - द्रव्य एवं परमाणु संरचना","अम्ल, क्षारक, लवण, विलयन, गैसीय नियम","तत्त्वों का आवर्त वर्गीकरण","धातु, अधातु, मिश्रधातु एवं ईंधन","कार्बन और उसके यौगिक","मानव जीवन में रसायन एवं रासायनिक अभिक्रियाएँ","जीव विज्ञान - कोशिका, वर्गीकरण, वनस्पति","मानव तंत्र - पाचन, श्वसन, परिसंचरण","मानव तंत्र - अंतःस्रावी, प्रजनन, उत्सर्जन, कंकाल","तंत्रिका तंत्र, पोषक पदार्थ, मानव रोग","पर्यावरण - पारिस्थितिकी तंत्र एवं जैव विविधता","ओजोन, ग्लोबल वार्मिंग, प्रदूषण, जलवायु परिवर्तन","विज्ञान एवं प्रौद्योगिकी - अंतरिक्ष, नाभिकीय, AI, रोबोटिक्स"]},"computer":{"label":"💻 कम्प्यूटर","color":"rgba(150,100,255,.15)","subtopics":["कम्प्यूटर का विकास, पीढ़ियाँ एवं वर्गीकरण","हार्डवेयर, सॉफ्टवेयर, इनपुट एवं आउटपुट यूनिट","कम्प्यूटर मेमोरी एवं स्टोरेज","प्रोग्रामिंग भाषाएँ","इंटरनेट, WWW, ई-मेल, सोशल नेटवर्किंग","साइबर सुरक्षा एवं साइबर अपराध","ई-गवर्नेस एवं डिजिटल वित्तीय उपकरण","MS Office - Word, Excel, PowerPoint","कृत्रिम बुद्धिमत्ता, बिग डेटा, मशीन लर्निंग","इंटरनेट ऑफ थिंग्स एवं उभरती प्रौद्योगिकियाँ","महत्त्वपूर्ण शब्दावली एवं Full Forms"]},"static_gk":{"label":"🏛️ Static GK","color":"rgba(255,100,150,.15)","subtopics":["भारत में प्रथम, लंबा, ऊँचा एवं चौड़ा","केंद्र एवं राज्य सरकारों की प्रमुख योजनाएँ","प्रमुख राष्ट्रीय एवं अंतर्राष्ट्रीय पुरस्कार","प्रमुख उपाधि, प्राप्तकर्ता एवं प्रदाता","प्रमुख अंतर्राष्ट्रीय संगठन एवं मुख्यालय","भारतीय राज्य एवं केंद्रशासित प्रदेश","खेल एवं खिलाड़ी","पुस्तकें एवं लेखक","विश्व के महत्त्वपूर्ण स्मारक","भारत के प्रमुख मंदिर एवं संग्रहालय","भारत के प्रमुख बाघ अभयारण्य एवं राष्ट्रीय पार्क","भारतीय रामसर साइट्स एवं यूनेस्को हेरीटेज साइट्स","भारतीय संगीत, शास्त्रीय नृत्य, लोककला","त्योहार एवं उत्सव","महत्त्वपूर्ण नियामक संस्थाएँ","जनगणना 2011","वाणिज्य एवं व्यापार","अंतर्राष्ट्रीय सुरक्षा एवं आतंकवाद","मानवाधिकार संरक्षण अधिनियम 1993"]}};
 
 var rwaCurrentSubject=null, rwaCurrentTopicIdx=null, rwaLoading=false;
+var rwaAbortController=null;
 var rwaQuizState={qs:[],cur:0,score:0,answered:false,topic:'',cacheKey:''};
 
 function initRWA(){
@@ -3979,10 +3740,13 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     if(qc&&!qc.querySelector('.qcard')) qc.innerHTML='<div class="empty">🔑 Settings mein Groq key daalo!</div>';
     return;
   }
+  // Cancel previous request if any
+  if(rwaLoading&&rwaAbortController) rwaAbortController.abort();
   if(rwaLoading) return;
   rwaLoading=true;
-  // Auto-reset after 30s to prevent permanent block
-  var _rwaTimeout=setTimeout(function(){rwaLoading=false;},30000);
+  rwaAbortController=typeof AbortController!=='undefined'?new AbortController():null;
+  var signal=rwaAbortController?rwaAbortController.signal:null;
+  var _rwaTimeout=setTimeout(function(){rwaLoading=false;rwaAbortController=null;},30000);
   var subjectPrompts={
     history:'Tu SSC GD/Bihar Police History MCQ expert hai. NCERT Class 6-12 — Prachin (Cl.6), Madhyakalin (Cl.7), Aadhunik (Cl.8/10/12). Dates, rulers, battles sab accurate. SIRF Hindi Devanagari.',
     geography:'Tu SSC GD/Bihar Police Geography MCQ expert hai. NCERT Class 6-12 — India+World geo, rivers, mountains, climate. SIRF Hindi Devanagari.',
@@ -3993,7 +3757,6 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     static_gk:'Tu SSC GD/Bihar Police Static GK MCQ expert hai. Rashtriya pratik, puraskar, khel, pustak, sthal. SIRF Hindi Devanagari.'
   };
   var systemMsg=(subjectPrompts[key]||'Tu MCQ generator hai. SIRF valid JSON array. Hindi Devanagari.')+' OUTPUT SIRF valid JSON array — no markdown, no text.';
-  // Build avoid list from history
   var hist=_getRWAHistory(cacheKey);
   var avoidStr='';
   if(hist.length>0){
@@ -4019,8 +3782,10 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     +avoidStr
     +'\n\nOUTPUT (sirf JSON, kuch nahi):\n'
     +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation"}]';
-  groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.85},function(data,_m){
-    clearTimeout(_rwaTimeout);rwaLoading=false;
+  groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:2500,temperature:0.85},function(data,_m){
+    clearTimeout(_rwaTimeout);
+    if(signal&&signal.aborted){rwaLoading=false;rwaAbortController=null;return;}
+    rwaLoading=false;rwaAbortController=null;
     if(data.error){
       var errMsg=data.error.message||'Unknown error';
       var errCode=data.error.code||'';
@@ -4040,18 +3805,16 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
       return;
     }
     if(!aiQs||!aiQs.length){
-      var qc2=document.getElementById('rwa-quiz-content');
-      if(qc2&&!qc2.querySelector('.qcard')) qc2.innerHTML='<div class="empty">❌ AI ne questions nahi diye<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';
+      var qc3=document.getElementById('rwa-quiz-content');
+      if(qc3&&!qc3.querySelector('.qcard')) qc3.innerHTML='<div class="empty">❌ AI ne questions nahi diye<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';
       return;
     }
-    // Filter duplicate options
     aiQs=aiQs.filter(function(q){
       if(!q.opts||q.opts.length<4) return false;
       var clean=q.opts.map(function(o){return (o||'').replace(/^\([A-D]\)\s*/,'').trim().toLowerCase();});
       var unique=clean.filter(function(v,i,a){return v&&a.indexOf(v)===i;});
       return unique.length===4;
     });
-    // Shuffle options so correct ans is not always A
     aiQs=aiQs.map(function(q){
       var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
       var shuffled=q.opts.slice().sort(function(){return Math.random()-.5;});
@@ -4059,26 +3822,18 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
       var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
       return Object.assign({},q,{opts:shuffled,ans:newAns===-1?q.ans:newAns});
     });
-    // Save to history so next time different questions come
     _saveRWAHistory(cacheKey,aiQs);
-    // Cache and show all questions at once
     try{localStorage.setItem(cacheKey,JSON.stringify(aiQs));}catch(e){}
     if(rwaCurrentSubject===key && rwaCurrentTopicIdx===idx){
       rwaQuizState={qs:aiQs,cur:0,score:0,answered:false,topic:topic,cacheKey:cacheKey};
       renderRWAQuestion();
     }
-  }, function(e){clearTimeout(_rwaTimeout);rwaLoading=false;var qc=document.getElementById('rwa-quiz-content');if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';});
-}
-
-function getRWAQBQuestions(subjectKey,topic){
-  if(typeof QB==='undefined') return [];
-  var qbKey=subjectKey==='static_gk'?'gk':subjectKey;
-  if(!QB[qbKey]) return [];
-  var words=topic.toLowerCase().replace(/[^\u0900-\u097f\w\s]/g,'').split(/\s+/).filter(function(w){return w.length>3;});
-  return QB[qbKey].filter(function(q){
-    var t=(q.q||'').toLowerCase();
-    return words.some(function(w){return t.indexOf(w)>=0;});
-  }).slice(0,5);
+  }, function(e){
+    clearTimeout(_rwaTimeout);
+    rwaLoading=false;rwaAbortController=null;
+    var qc=document.getElementById('rwa-quiz-content');
+    if(qc&&!qc.querySelector('.qcard'))qc.innerHTML='<div class="empty">❌ Error: '+esc(e.message.substring(0,50))+'<br><button class="btn" style="margin-top:8px;font-size:.7rem" onclick="openRWATopic(rwaCurrentSubject,rwaCurrentTopicIdx)">🔄 Retry</button></div>';
+  });
 }
 
 function renderRWAQuestion(){
@@ -4174,14 +3929,7 @@ function checkRWAAnswer(i){
 }
 
 function autoSaveBookmarks(){
-  var uid=getUid();if(!uid)return;
-  try{localStorage.setItem('ps_v3',JSON.stringify(S));}catch(e){}
-  // Direct Firestore write — sirf bookmarks field update karo
-  db.collection('users').doc(uid).set({
-    bookmarks:S.bookmarks,
-    appData:JSON.stringify(S),
-    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-  },{merge:true}).catch(function(e){console.error('Bookmark save error:',e);});
+  save(); // save() already calls saveToFirestore via override
 }
 
 function saveRWABookmark(btn){
@@ -4190,9 +3938,9 @@ function saveRWABookmark(btn){
     if(!data){toast('❌ Data nahi mila','e');return;}
     if(!S.bookmarks) S.bookmarks=[];
     S.bookmarks.push(data);
-    autoSaveBookmarks();
-    btn.parentElement.innerHTML='<div style="font-size:.65rem;color:var(--gr);padding:4px">✅ Saved! ☁️ Firebase pe bhi!</div>';
-    toast('🔖 Saved to Firebase!','i');
+    save(); // save() already calls saveToFirestore
+    btn.parentElement.innerHTML='<div style="font-size:.65rem;color:var(--gr);padding:4px">✅ Saved! ☁️</div>';
+    toast('🔖 Saved!','i');
     renderRWASavedBtn();
   }catch(e){toast('❌ Save nahi hua','e');}
 }
@@ -4221,7 +3969,6 @@ function rwaBreadcrumbBack(level){
     openRWASubject(rwaCurrentSubject);
   }
 }
-
 
 
 var EXAM_LIST=[
@@ -4335,15 +4082,6 @@ function toggleCDFolder(){
   el.style.display=open?'none':'block';
   if(arr) arr.style.transform=open?'':'rotate(180deg)';
 }
-function toggleCatFolder(id){
-  var el=document.getElementById(id);
-  var arr=document.getElementById('arr-'+id);
-  if(!el) return;
-  var open=el.style.display==='block';
-  el.style.display=open?'none':'block';
-  if(arr) arr.style.transform=open?'':'rotate(90deg)';
-}
-
 // ── COMMUNITY CHAT ──
 var _chatUnsub=null;
 var _chatLoaded=false;
@@ -4449,10 +4187,6 @@ function _deleteOldChatMsgs(){
     }).catch(function(){});
 }
 
-function leaveChat(){
-  if(_chatUnsub){_chatUnsub();_chatUnsub=null;}
-}
-
 function initApp(){
   var fg=document.getElementById('fbGate');if(fg){fg.style.display='none';fg.style.visibility='hidden';fg.style.zIndex='-1';}
   // Note: load() is already called by loadFromFirestore before initApp
@@ -4484,8 +4218,6 @@ function initApp(){
   updateHeader();
   renderHome();
   renderCountdown();
-  renderSubjects();
-  initYoga();
   initCA();
   initRWA();
   var h=new Date().getHours();
@@ -4522,13 +4254,17 @@ function updateGKStatus(){
 }
 
 function saveName(){
-  var n=document.getElementById('nameInp').value.trim();
+  var ni=document.getElementById('nameInp');
+  if(!ni) return;
+  var n=ni.value.trim();
   if(!n){toast('Naam likho!','e');return;}
   S.name=n;save();updateHeader();toast('Saved! 😊');
 }
 
 function saveGKey(){
-  var k=document.getElementById('geminiKey').value.trim();
+  var ki=document.getElementById('geminiKey');
+  if(!ki) return;
+  var k=ki.value.trim();
   if(!k){toast('Key daalo!','e');return;}
   var st=document.getElementById('gkStatus');
   if(st){st.textContent='⏳ Testing...';st.style.color='var(--ye)';}
@@ -4603,26 +4339,72 @@ function renderTasks(){
   var show=S.tasks.filter(function(t){return activeCat==='all'||t.cat===activeCat;});
   var tl=document.getElementById('taskList');
   if(!tl) return;
-  if(!S.tasks.length){tl.innerHTML='<div class="empty">📋 Koi task nahi<br>Upar + button se add karo</div>';return;}
+
+  // Update count badge
+  var done_total=S.tasks.filter(function(t){return log.tasks[t.id]===true;}).length;
+  var badge=document.getElementById('taskCountBadge');
+  if(badge){
+    badge.textContent=done_total+' / '+S.tasks.length;
+    badge.style.color=done_total===S.tasks.length&&S.tasks.length>0?'var(--gr)':'var(--t2)';
+    if(done_total===S.tasks.length&&S.tasks.length>0) badge.style.borderColor='rgba(0,214,143,.3)';
+    else badge.style.borderColor='var(--br)';
+  }
+
+  if(!S.tasks.length){
+    tl.innerHTML='<div class="empty">📋 Koi task nahi hai<br><span style="font-size:.7rem">Upar ＋ button se nayi task add karo</span></div>';
+    return;
+  }
+  if(!show.length){
+    tl.innerHTML='<div class="empty" style="padding:20px">Is category mein koi task nahi</div>';
+    return;
+  }
+
   tl.innerHTML=show.map(function(t){
     var done=log.tasks[t.id]===true;
-    return '<div class="ti'+(done?' done':'')+'" data-c="'+t.cat+'">'
-      +'<button class="chk" onclick="toggleTask('+t.id+')">'+(done?'✓':'')+'</button>'
-      +'<div style="flex:1"><div class="tn">'+t.emoji+' '+esc(t.name)+'</div><div class="tm">'+t.time+'</div></div>'
-      +'<button class="tbtn" onclick="deleteTask('+t.id+')">🗑</button>'
+    var catColors={study:'var(--in2)',health:'var(--gr)',personal:'var(--pu)'};
+    var catColor=catColors[t.cat]||'var(--br2)';
+    return '<div class="ti'+(done?' done':'')+'" data-c="'+esc(t.cat||'')+'" style="'+(done?'opacity:.45':'')+';">'
+      +'<button class="chk" onclick="toggleTask('+t.id+')" style="border-color:'+catColor+'">'+(done?'<span style="font-size:.75rem">✓</span>':'')+'</button>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="tn">'+esc(t.emoji||'')+'&nbsp;'+esc(t.name)+'</div>'
+      +'<div class="tm">⏰ '+esc(t.time||'')+'</div>'
+      +'</div>'
+      +'<button class="tbtn" onclick="deleteTask('+t.id+')" title="Delete">🗑</button>'
       +'</div>';
   }).join('');
 }
 
+function selectEmoji(emoji, el){
+  document.getElementById('tEmoji').value = emoji;
+  document.querySelectorAll('.emoji-opt').forEach(function(b){ b.classList.remove('on'); });
+  if(el) el.classList.add('on');
+}
+
 function addTask(){
-  var name=document.getElementById('tName').value.trim();
+  var tName=document.getElementById('tName');
+  var tTime=document.getElementById('tTime');
+  var tCat=document.getElementById('tCat');
+  var tEmoji=document.getElementById('tEmoji');
+  var name=tName?tName.value.trim():'';
   if(!name){toast('Naam likho!','e');return;}
-  var t={id:Date.now(),name:name,time:document.getElementById('tTime').value||'06:00',cat:document.getElementById('tCat').value,emoji:document.getElementById('tEmoji').value};
+  var t={
+    id:Date.now(),
+    name:name,
+    time:(tTime&&tTime.value)||'06:00',
+    cat:(tCat&&tCat.value)||'study',
+    emoji:(tEmoji&&tEmoji.value)||'📚'
+  };
   S.tasks.push(t);
   S.tasks.sort(function(a,b){return a.time.localeCompare(b.time);});
   save();renderTasks();updateProgress();
-  document.getElementById('tName').value='';
-  document.getElementById('addForm').style.display='none';
+  if(tName) tName.value='';
+  // Reset emoji to default
+  document.querySelectorAll('.emoji-opt').forEach(function(b){ b.classList.remove('on'); });
+  var firstEmoji = document.querySelector('.emoji-opt');
+  if(firstEmoji){ firstEmoji.classList.add('on'); if(tEmoji) tEmoji.value='📚'; }
+  // Close form, reset toggle button
+  var af=document.getElementById('addForm');if(af)af.style.display='none';
+  var tb=document.getElementById('addTaskToggle');if(tb)tb.textContent='＋  Nayi Task Add Karo';
   toast('Task add! 🎯');
 }
 
@@ -4631,254 +4413,12 @@ function toggleTask(id){
   log.tasks[id]=log.tasks[id]===true?false:true;
   save();renderTasks();updateProgress();
   if(log.tasks[id]===true) toast('Done! 🎉');
-  // Firebase sync
-  saveStudyLogToFirestore(today(), log);
 }
 
 function deleteTask(id){
   if(!confirm('Delete?')) return;
   S.tasks=S.tasks.filter(function(t){return t.id!==id;});
   save();renderTasks();updateProgress();
-}
-
-// ── PRACTICE ──
-function setExam(e,el){
-  curExam=e;
-  document.querySelectorAll('#examC .chip').forEach(function(c){c.classList.remove('on');});
-  if(el) el.classList.add('on');
-  renderSubjects();
-}
-
-function renderSubjects(){
-  var grid=document.getElementById('subjGrid');
-  if(!grid) return;
-  var SUBJS=[
-    {id:'gk',name:'सामान्य ज्ञान',icon:'🌍',color:'#60a5fa',exam:['ssc','rrb','police','upsc']},
-    {id:'history',name:'इतिहास',icon:'🏛️',color:'#a78bfa',exam:['ssc','upsc','police']},
-    {id:'polity',name:'राजव्यवस्था',icon:'⚖️',color:'#34d399',exam:['ssc','upsc','police']},
-    {id:'geography',name:'भूगोल',icon:'🗺️',color:'#f59e0b',exam:['ssc','rrb','upsc']},
-    {id:'science',name:'विज्ञान',icon:'🔬',color:'#f87171',exam:['ssc','rrb','police']},
-    {id:'maths',name:'गणित',icon:'🔢',color:'#818cf8',exam:['ssc','rrb','police']},
-    {id:'english',name:'English',icon:'📝',color:'#4ade80',exam:['ssc','rrb']},
-    {id:'reasoning',name:'Reasoning',icon:'🧠',color:'#fb923c',exam:['ssc','rrb','police']}
-  ];
-  var show=SUBJS.filter(function(s){return s.exam.indexOf(curExam)!==-1;});
-  grid.innerHTML=show.map(function(s){
-    var stats=S.sStats[s.id]||{d:0,t:0};
-    var pct=stats.t?Math.round(stats.d/stats.t*100):0;
-    return '<div class="sc" onclick="openSubject('+JSON.stringify(s).replace(/"/g,'&quot;')+')" style="border-top:3px solid '+s.color+'">'
-      +'<div style="font-size:1.8rem">'+s.icon+'</div>'
-      +'<div style="font-size:.75rem;font-weight:800;margin-top:4px">'+s.name+'</div>'
-      +'<div class="sc-bar"><div class="sc-fill" style="width:'+pct+'%;background:'+s.color+'"></div></div>'
-      +'<div style="font-size:.55rem;color:var(--t2);margin-top:3px">'+pct+'% accuracy</div>'
-      +'</div>';
-  }).join('');
-}
-
-function openSubject(s){
-  curSubj=s;
-  var ct=document.getElementById('chTitle');if(ct)ct.textContent=s.icon+' '+s.name;
-  showV('pv2','pv1');
-  renderChapters();
-}
-
-function setLvl(l,el){
-  curLvl=l;
-  document.querySelectorAll('#lvlC .chip').forEach(function(c){c.classList.remove('on');});
-  if(el) el.classList.add('on');
-  renderChapters();
-}
-
-function renderChapters(){
-  var cl=document.getElementById('chList');
-  if(!cl||!curSubj) return;
-  var qs=(QB[curSubj.id]||[]).filter(function(q){return curLvl==='all'||q.level===curLvl;});
-  var chs={};
-  qs.forEach(function(q){if(!chs[q.ch])chs[q.ch]=[];chs[q.ch].push(q);});
-  var chKeys=Object.keys(chs);
-  var html='';
-  if(chKeys.length){
-    html=chKeys.map(function(ch){
-      var cqs=chs[ch];
-      var stats=S.sStats[curSubj.id]&&S.sStats[curSubj.id].chs&&S.sStats[curSubj.id].chs[ch]?S.sStats[curSubj.id].chs[ch]:{d:0,t:0};
-      var lvl=LVLARR[Math.floor(Math.random()*LVLARR.length)];
-      return '<div class="chi" onclick="openChapter(\''+esc(ch)+'\',\''+lvl+'\')">'+''
-        +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+esc(ch)+'</div>'
-        +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">'+cqs.length+' Q · '+(stats.t?Math.round(stats.d/stats.t*100):0)+'% acc</div></div>'
-        +'<span class="lbg '+LVLCLS[lvl]+'">'+LVLLBL[lvl]+'</span><span style="font-size:.7rem;color:var(--t2)">▶</span>'
-        +'</div>';
-    }).join('');
-  }
-  // Always show AI Practice button at bottom
-  html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--br)">'
-    +'<div style="font-size:.65rem;color:var(--t2);margin-bottom:8px;font-weight:700">🤖 AI Practice (Custom Questions)</div>'
-    +'<div onclick="openAIPractice()" style="background:linear-gradient(135deg,var(--ac),var(--pu));border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;">'
-    +'<div style="font-size:1.5rem">🤖</div>'
-    +'<div><div style="font-size:.8rem;font-weight:800;color:#fff">'+curSubj.name+' — AI Questions</div>'
-    +'<div style="font-size:.62rem;color:rgba(255,255,255,.75);margin-top:2px">AI se fresh 10 questions — koi bhi topic</div></div>'
-    +'</div></div>';
-  if(!chKeys.length) html='<div class="empty" style="margin-bottom:12px">QB questions nahi hain</div>'+html;
-  cl.innerHTML=html;
-}
-
-function openAIPractice(){
-  if(!curSubj) return;
-  var gkey=getGKey();
-  if(!gkey){toast('🔑 Settings mein Groq key daalo!');return;}
-  showV('pv3','pv2');
-  var pt=document.getElementById('pTitle');
-  if(pt) pt.textContent=curSubj.icon+' '+curSubj.name+' — AI Practice';
-  var ql=document.getElementById('qList');
-  if(ql) ql.innerHTML='<div style="text-align:center;padding:40px 20px"><div style="font-size:2rem;margin-bottom:12px">🤖</div><div style="font-size:.85rem;font-weight:700;color:var(--tx);margin-bottom:6px">AI questions bana raha hai...</div><div style="display:flex;gap:6px;justify-content:center;margin-top:12px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div><div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div><div style="width:8px;height:8px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div></div></div>';
-  pracAns={};pracC=0;pracT=0;
-  var subjectNames={gk:'सामान्य ज्ञान',history:'भारतीय इतिहास',polity:'राजव्यवस्था',geography:'भूगोल',science:'विज्ञान',maths:'गणित',english:'English Grammar',reasoning:'Reasoning'};
-  var subName=subjectNames[curSubj.id]||curSubj.name;
-  var systemMsg='Tu MCQ generator hai. SIRF valid JSON array output kar. Koi bhi explanation ya markdown mat likho.';
-  var prompt='Subject: "'+subName+'" ke 10 SSC/Bihar Police exam style MCQ banao.\n\nRULES:\n- Varied topics cover karo is subject ke andar\n- 4 options: ek sahi, teen galat (realistic)\n- ans: 0/1/2/3 equally vary karo\n- Hindi mein (English grammar ke liye English)\n- sol: ek line explanation\n\nFORMAT:\n[{"q":"question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation","ch":"chapter name"}]';
-  groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4000,temperature:0.7},function(data,_m){
-    if(data.error){if(ql)ql.innerHTML='<div class="empty">❌ '+data.error.message.substring(0,60)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
-    var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-    var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
-    var aiQs;
-    try{aiQs=JSON.parse(txt.substring(s,e));}catch(ex){if(ql)ql.innerHTML='<div class="empty">❌ Parse error<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
-    if(!aiQs||!aiQs.length){if(ql)ql.innerHTML='<div class="empty">❌ Questions nahi aaye<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';return;}
-    // Shuffle options
-    aiQs=aiQs.map(function(q){
-      if(!q.opts||q.opts.length<4) return q;
-      var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
-      var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
-      var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
-      return Object.assign({},q,{_sopts:sh,_sans:na===-1?q.ans:na});
-    });
-    pracQs=aiQs;
-    renderPracQs();
-  }, function(e){if(ql)ql.innerHTML='<div class="empty">❌ Error: '+e.message.substring(0,50)+'<br><button class="btn" onclick="openAIPractice()">🔄 Retry</button></div>';});
-}
-
-function openChapter(ch,lvl){
-  var allQs=(QB[curSubj.id]||[]).filter(function(q){return q.ch===ch&&(curLvl==='all'||q.level===curLvl);});
-  // Shuffle question order AND options within each question
-  pracQs=shuffle(allQs).slice(0,20).map(function(q){
-    var correctText=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
-    var shOpts=shuffle(q.opts.slice()).map(function(o,si){
-      return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');
-    });
-    var shAns=shOpts.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText;});
-    return Object.assign({},q,{_sopts:shOpts,_sans:shAns===-1?q.ans:shAns});
-  });
-  pracAns={};pracC=0;pracT=0;
-  var pt=document.getElementById('pTitle');
-  if(pt) pt.textContent=curSubj.icon+' '+ch+' ('+pracQs.length+'Q)';
-  var ps=document.getElementById('pScore');
-  if(ps){ps.style.display='flex';}
-  var psn=document.getElementById('pScoreN');
-  if(psn) psn.textContent='0/0';
-  showV('pv3','pv2');
-  renderPracQs();
-}
-
-function renderPracQs(){
-  var ql=document.getElementById('qList');
-  if(!ql) return;
-  var ps=document.getElementById('pScoreN');
-  if(ps) ps.textContent=pracC+'/'+pracT;
-  ql.innerHTML=pracQs.map(function(q,i){
-    var an=pracAns[i];
-    // Use pre-shuffled opts/ans if available, else use original
-    var opts=q._sopts||q.opts;
-    var correctIdx=q._sans!==undefined?q._sans:q.ans;
-    return '<div class="qcard">'
-      +'<div class="qtxt">Q'+(i+1)+'. '+esc(q.q)+'</div>'
-      +opts.map(function(o,j){
-        var cls='opt'+(an!==undefined?(j===correctIdx?' c':j===an?' w':''):'');
-        return '<button class="'+cls+'" onclick="ansP('+i+','+j+')" '+(an!==undefined?'disabled':'')+'>'+esc(o)+'</button>';
-      }).join('')
-      +(an!==undefined?'<div class="sol"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+esc(q.sol||'')+'</div></div>':'')
-      +'</div>';
-  }).join('');
-}
-
-function ansP(qi,oi){
-  if(pracAns[qi]!==undefined) return;
-  var q=pracQs[qi];
-  var correctIdx=q._sans!==undefined?q._sans:q.ans;
-  var ok=oi===correctIdx;
-  pracAns[qi]=oi;
-  if(ok){pracC++;}pracT++;
-  if(!S.sStats[curSubj.id]) S.sStats[curSubj.id]={d:0,t:0,chs:{}};
-  S.sStats[curSubj.id].t++;
-  if(ok) S.sStats[curSubj.id].d++;
-  // Chapter-wise stats bhi update karo
-  if(q.ch){
-    if(!S.sStats[curSubj.id].chs) S.sStats[curSubj.id].chs={};
-    if(!S.sStats[curSubj.id].chs[q.ch]) S.sStats[curSubj.id].chs[q.ch]={d:0,t:0};
-    S.sStats[curSubj.id].chs[q.ch].t++;
-    if(ok) S.sStats[curSubj.id].chs[q.ch].d++;
-  }
-  save();
-  toast(ok?'✅ Sahi!':'❌ Galat!',ok?'':'e');
-  renderPracQs();
-}
-
-// ── YOGA ──
-function yogaReset(){
-  clearInterval(yInt);yInt=null;
-  yIdx=0;yLeft=YOGA_STEPS[0].dur;yRun=false;
-  renderYogaUI();
-}
-
-function initYoga(){yogaReset();}
-
-function drawYogaSVG(poseName){
-  var svg=document.getElementById('yogaSVG');
-  if(!svg) return;
-  // Simple stick figure poses
-  var poses={
-    default:'<circle cx="150" cy="25" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="39" x2="150" y2="85" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="120" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="180" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="85" x2="125" y2="115" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="85" x2="175" y2="115" stroke="var(--ac)" stroke-width="3"/>',
-    stretch:'<circle cx="150" cy="20" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="34" x2="150" y2="80" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="50" x2="105" y2="35" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="50" x2="195" y2="35" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="80" x2="125" y2="115" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="80" x2="175" y2="115" stroke="var(--ac)" stroke-width="3"/>',
-    sit:'<circle cx="150" cy="30" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="44" x2="150" y2="75" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="120" y2="70" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="55" x2="180" y2="70" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="75" x2="110" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="110" y1="90" x2="85" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="150" y1="75" x2="190" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="190" y1="90" x2="215" y2="90" stroke="var(--ac)" stroke-width="3"/>',
-    lie:'<circle cx="60" cy="65" r="14" fill="none" stroke="var(--ac)" stroke-width="3"/><line x1="74" y1="65" x2="200" y2="65" stroke="var(--ac)" stroke-width="3"/><line x1="140" y1="65" x2="130" y2="45" stroke="var(--ac)" stroke-width="3"/><line x1="140" y1="65" x2="150" y2="45" stroke="var(--ac)" stroke-width="3"/><line x1="175" y1="65" x2="165" y2="90" stroke="var(--ac)" stroke-width="3"/><line x1="175" y1="65" x2="185" y2="90" stroke="var(--ac)" stroke-width="3"/>'
-  };
-  var n=(poseName||'').toLowerCase();
-  var key='default';
-  if(n.includes('बैठ')||n.includes('वज्र')||n.includes('पद्म')||n.includes('सुख')) key='sit';
-  else if(n.includes('लेट')||n.includes('शव')||n.includes('भुज')) key='lie';
-  else if(n.includes('ताड़')||n.includes('वृक्ष')||n.includes('त्रिकोण')) key='stretch';
-  svg.innerHTML=poses[key];
-}
-
-function renderYogaUI(){
-  var step=YOGA_STEPS[Math.min(yIdx,YOGA_STEPS.length-1)];
-  var m=Math.floor(yLeft/60),s=yLeft%60;
-  var yn=document.getElementById('yogaNum');if(yn)yn.textContent=m+':'+(s<10?'0':'')+s;
-  var ysn=document.getElementById('yStepName');if(ysn)ysn.textContent=step.name;
-  drawYogaSVG(step.name);
-  var ysd=document.getElementById('yStepDesc');if(ysd)ysd.textContent=step.desc;
-  var yb=document.getElementById('yBtn');if(yb)yb.textContent=yRun?'⏸ Pause':'▶ Start';
-  var total=YOGA_STEPS[yIdx].dur;
-  var ring=document.getElementById('yogaRing');
-  if(ring) ring.style.strokeDashoffset=194.8*(yLeft/total);
-  var yl=document.getElementById('yStepList');
-  if(yl) yl.innerHTML=YOGA_STEPS.map(function(s,i){
-    var cls='ysc'+(i===yIdx&&yRun?' cur':i<yIdx?' done':'');
-    return '<div class="'+cls+'"><div style="font-size:1.1rem">'+s.name.split(' ')[0]+'</div>'
-      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+s.name.split(' ').slice(1).join(' ')+'</div>'
-      +'<div style="font-size:.62rem;color:var(--t2)">'+s.desc+'</div></div>'
-      +'<div style="font-size:.64rem;font-weight:800;color:var(--ac)">'+Math.ceil(s.dur/60)+'m</div></div>';
-  }).join('');
-}
-
-function yogaToggle(){
-  if(yRun){clearInterval(yInt);yInt=null;yRun=false;renderYogaUI();return;}
-  yRun=true;renderYogaUI();
-  yInt=setInterval(function(){
-    yLeft--;
-    if(yLeft<=0){
-      if(yIdx<YOGA_STEPS.length-1){yIdx++;yLeft=YOGA_STEPS[yIdx].dur;toast('✅ '+YOGA_STEPS[yIdx].name,'i');}
-      else{clearInterval(yInt);yInt=null;yRun=false;toast('🎉 Yoga complete!','i');}
-    }
-    renderYogaUI();
-  },1000);
 }
 
 // ── CURRENT AFFAIRS ──
@@ -5017,7 +4557,7 @@ function loadCAQuestions(id,name,more){
         {role:'system',content:'JSON array generator. Return ONLY valid JSON array. Hindi Devanagari. No markdown.'},
         {role:'user',content:qprompt}
       ],
-      max_tokens:5000,temperature:0.3
+      max_tokens:2500,temperature:0.3
     },function(data){
       try{
         var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
@@ -5209,11 +4749,13 @@ function loadDailyCA(force){
     +'\n\nRULES:\n1. 4 options BILKUL ALAG, realistic\n2. ans index 0/1/2/3 vary karo\n3. Hindi only\n4. Headline mein poora fact likho'
     +'\n\nJSON format:\n{"items":[{"cat":"नियुक्ति","headline":"पूरा तथ्य","mcq":{"q":"प्रश्न?","opts":["(A) सही","(B) गलत1","(C) गलत2","(D) गलत3"],"ans":1,"sol":"व्याख्या"}}]}'
     +'\n\nSIRF valid JSON. No markdown.';
-  groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:3000,temperature:0.3},function(data,_m){
+  groqFetch(key,{_models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],messages:[{role:'system',content:'Tu JSON generator hai. Hindi only. No markdown. Sirf real facts.'},{role:'user',content:prompt}],max_tokens:2500,temperature:0.3},function(data,_m){
     var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
     var s=txt.indexOf('{'),e=txt.lastIndexOf('}')+1;
     if(s===-1||e===0){throw new Error('Invalid JSON response');}
-    var parsed=JSON.parse(txt.substring(s,e));
+    var parsed;
+    try{parsed=JSON.parse(txt.substring(s,e));}
+    catch(ex){throw new Error('JSON parse failed: '+ex.message);}
     // AI said no news today
     if(parsed.noNews){
       try{localStorage.setItem(cacheKey,JSON.stringify({noNews:true}));}catch(ex){}
@@ -5340,126 +4882,43 @@ function askQ(msg){
 
 function askQWithImg(msg,imgDataUrl){
   addChatMsg(msg,'u');
+  // Trim history same as askQ
+  if(window._chatHistory.length>20) window._chatHistory=window._chatHistory.slice(-20);
   var typing=showTyping();
   var key=getGKey();
   if(!key){if(typing)typing.remove();addChatMsg('🔑 Groq key daalo!','a');return;}
+  // Check image size > 4MB
+  var b64len=imgDataUrl.length-imgDataUrl.indexOf(',')-1;
+  if(Math.ceil(b64len*3/4)>4*1024*1024){
+    if(typing)typing.remove();
+    addChatMsg('❌ Image 4MB se badi hai. Chhoti image use karo.','a');
+    clearImg();return;
+  }
   var base64=imgDataUrl.split(',')[1];
   var mimeType=imgDataUrl.split(';')[0].split(':')[1];
   fetch('https://api.groq.com/openai/v1/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
-      model:'llama-3.3-70b-versatile',
+      model:'llama-3.2-11b-vision-preview',
       messages:[{role:'user',content:[
-        {type:'image_url',image_url:{url:'data:'+mimeType+';base64,'+base64}},
-        {type:'text',text:msg||'Is image mein jo bhi question, text, ya problem hai use dhyan se dekho aur Hindi mein solve karo. Agar MCQ hai to sahi answer bata aur explain karo. Agar math/reasoning problem hai to step-by-step solve karo. Agar koi map/diagram/chart hai to explain karo. Exam point of view se jawab do.'}
+        {type:'text',text:msg||'Is image mein jo bhi question ya problem hai use Hindi mein solve karo. Exam point of view se jawab do.'},
+        {type:'image_url',image_url:{url:imgDataUrl}}
       ]}],
       max_tokens:1000
     })
   })
   .then(function(r){return r.json();})
   .then(function(data){
-    if(typing) typing.remove();
-    if(data.error) throw new Error(data.error.message);
+    if(typing)typing.remove();
+    if(data.error)throw new Error(data.error.message);
     addChatMsg(data.choices[0].message.content,'a');
     clearImg();
   })
-  .catch(function(e){if(typing)typing.remove();addChatMsg('❌ Error: '+e.message,'a');});
+  .catch(function(e){if(typing)typing.remove();addChatMsg('❌ Error: '+e.message.substring(0,100),'a');});
 }
 
 // ── REPORT ──
-
-function buildHeatmap(){
-  var grid=document.getElementById('hmGrid');
-  if(!grid) return;
-  var cells='';
-  for(var i=89;i>=0;i--){
-    var d=new Date();d.setDate(d.getDate()-i);
-    var k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-    var log=S.log[k];
-    var lvl=0;
-    if(log&&log.tasks&&S.tasks.length){
-      var done=Object.values(log.tasks).filter(function(v){return v===true;}).length;
-      var pct=done/S.tasks.length;
-      if(pct>0) lvl=1;
-      if(pct>=0.33) lvl=2;
-      if(pct>=0.66) lvl=3;
-      if(pct>=1) lvl=4;
-    }
-    cells+='<div class="hmc'+(lvl?' l'+lvl:'')+'" title="'+k+'"></div>';
-  }
-  grid.innerHTML=cells;
-}
-
-function initReport(){
-  var subjects={history:'📜 इतिहास',geography:'🌍 भूगोल',polity:'⚖️ राजनीति',economy:'💰 अर्थव्यवस्था',science:'🔬 विज्ञान',computer:'💻 Computer',static_gk:'🏛️ Static GK'};
-  // Subject Weakness
-  var el=document.getElementById('rpt-weakness');
-  if(el){
-    var html=''; var hasData=false;
-    Object.keys(subjects).forEach(function(key){
-      var st=(S.sStats&&S.sStats[key])||{d:0,t:0};
-      if(!st.t) return; hasData=true;
-      var pct=Math.round(st.d/st.t*100);
-      var color=pct>=70?'var(--gr)':pct>=50?'#ffd700':'#ff6b35';
-      html+='<div style="margin-bottom:8px">'
-        +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px">'
-        +'<span style="font-weight:700">'+subjects[key]+'</span><span style="color:'+color+';font-weight:900">'+pct+'%</span></div>'
-        +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
-        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px"></div></div>'
-        +'<div style="font-size:.58rem;color:var(--t2);margin-top:2px">'+st.d+'/'+st.t+' sahi</div></div>';
-    });
-    el.innerHTML=hasData?html:'<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Practice karo — data aayega 📖</div>';
-  }
-  // Mock Trend
-  var tel=document.getElementById('rpt-trend');
-  if(tel){
-    var mocks=S.mocks&&S.mocks.length?S.mocks.slice(-10):[];
-    if(!mocks.length){tel.innerHTML='<div style="color:var(--t2);padding:8px 0;font-size:.72rem">Koi mock nahi diya 📝</div>';}
-    else{
-      var h=80;
-      tel.innerHTML='<div style="display:flex;gap:4px;align-items:flex-end;padding:4px 0">'
-        +mocks.map(function(m){
-          var p=m.pct||0; var bh=Math.round(p/100*h);
-          var col=p>=60?'var(--gr)':p>=40?'#ffd700':'#ff6b35';
-          return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">'
-            +'<div style="font-size:.55rem;font-weight:900;color:'+col+'">'+p+'%</div>'
-            +'<div style="width:100%;display:flex;align-items:flex-end;height:'+h+'px">'
-            +'<div style="width:100%;height:'+bh+'px;background:'+col+';border-radius:4px 4px 0 0"></div></div>'
-            +'<div style="font-size:.48rem;color:var(--t2)">'+(m.name||'Mock').substring(0,6)+'</div></div>';
-        }).join('')
-        +'</div><div style="font-size:.6rem;color:var(--t2);margin-top:4px;text-align:center">Pichle '+mocks.length+' mocks</div>';
-    }
-  }
-  // Topic Coverage
-  var cel=document.getElementById('rpt-coverage');
-  if(cel&&typeof RWA_TOPICS!=='undefined'){
-    var chtml='';
-    Object.keys(RWA_TOPICS).forEach(function(key){
-      var subj=RWA_TOPICS[key]; var total=subj.subtopics.length; var opened=0;
-      subj.subtopics.forEach(function(_,idx){try{if(localStorage.getItem('rwa_h_rwa_'+key+'_'+idx)) opened++;}catch(e){}});
-      var pct=total?Math.round(opened/total*100):0;
-      var color=pct>=70?'var(--gr)':pct>=30?'#ffd700':'var(--t2)';
-      chtml+='<div style="margin-bottom:8px">'
-        +'<div style="display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:3px">'
-        +'<span style="font-weight:700">'+(subjects[key]||key)+'</span><span style="color:'+color+';font-weight:900">'+opened+'/'+total+'</span></div>'
-        +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
-        +'<div style="width:'+pct+'%;background:'+color+';border-radius:6px;height:7px"></div></div></div>';
-    });
-    cel.innerHTML=chtml;
-  }
-  // Mock History
-  var th=document.getElementById('testHist');
-  if(th){
-    if(!S.mocks||!S.mocks.length){th.innerHTML='<div class="empty" style="padding:16px">Abhi koi mock nahi diya</div>';}
-    else{th.innerHTML=S.mocks.slice().reverse().map(function(m){
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--br)">'
-        +'<div><div style="font-size:.78rem;font-weight:700">'+esc(m.name||'Mock Test')+'</div>'
-        +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+'</div></div>'
-        +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+( m.pct||0)+'%</div></div>';
-    }).join('');}
-  }
-}
 
 // ══════════════════════════════════════
 // STUDY LOG & TIMER SYSTEM
@@ -5468,29 +4927,41 @@ function initReport(){
 var _studyTimer = {
   running: false,
   startTime: null,
-  elapsed: 0,       // seconds already counted before current start
+  elapsed: 0,
   interval: null,
-  subject: 'GK/GS'
+  subject: 'GK/GS',
+  sessionStart: null  // clock time when session started
 };
+
+function selectStudySubject(subj, el){
+  _studyTimer.subject = subj;
+  document.querySelectorAll('.stpill').forEach(function(p){ p.classList.remove('on'); });
+  if(el) el.classList.add('on');
+  var sub = document.getElementById('studyTimerSubject');
+  if(sub) sub.textContent = _studyTimer.running ? '📖 ' + subj + ' padh rahe ho...' : subj + ' selected';
+}
 
 function toggleStudyTimer(){
   var btn = document.getElementById('studyTimerBtn');
   if(_studyTimer.running){
-    // PAUSE
     clearInterval(_studyTimer.interval);
     _studyTimer.interval = null;
     _studyTimer.elapsed += Math.floor((Date.now() - _studyTimer.startTime) / 1000);
     _studyTimer.running = false;
     if(btn){ btn.textContent = '▶ Resume'; btn.style.background = 'linear-gradient(135deg,var(--ac),#e8940d)'; }
+    var sub = document.getElementById('studyTimerSubject');
+    if(sub) sub.textContent = '⏸ Paused — ' + _studyTimer.subject;
   } else {
-    // START / RESUME
-    _studyTimer.subject = document.getElementById('studySubjectSel').value;
+    if(!_studyTimer.sessionStart){
+      var now2 = new Date();
+      _studyTimer.sessionStart = (now2.getHours()<10?'0':'')+now2.getHours()+':'+(now2.getMinutes()<10?'0':'')+now2.getMinutes();
+    }
     _studyTimer.startTime = Date.now();
     _studyTimer.running = true;
-    if(btn){ btn.textContent = '⏸ Pause'; btn.style.background = 'linear-gradient(135deg,var(--a2),#cc0000)'; }
+    if(btn){ btn.textContent = '⏸ Pause'; btn.style.background = 'linear-gradient(135deg,#ff4d6d,#cc0000)'; }
+    var sub2 = document.getElementById('studyTimerSubject');
+    if(sub2) sub2.textContent = '📖 ' + _studyTimer.subject + ' padh rahe ho...';
     _studyTimer.interval = setInterval(_studyTimerTick, 1000);
-    var sub = document.getElementById('studyTimerSubject');
-    if(sub) sub.textContent = '📖 ' + _studyTimer.subject + ' padh rahe ho...';
   }
 }
 
@@ -5501,7 +4972,6 @@ function _studyTimerTick(){
   var s = total % 60;
   var disp = document.getElementById('studyTimerDisplay');
   if(disp) disp.textContent = (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
-  // Auto-save every 60 seconds
   if(total > 0 && total % 60 === 0) _saveCurrentSession(false);
 }
 
@@ -5510,28 +4980,25 @@ function resetStudyTimer(){
     clearInterval(_studyTimer.interval);
     _studyTimer.interval = null;
   }
-  // Save current session before reset
-  if(_studyTimer.elapsed > 30 || (_studyTimer.running && Math.floor((Date.now()-_studyTimer.startTime)/1000) > 30)){
-    _saveCurrentSession(true);
-  }
+  var totalSec = _studyTimer.elapsed + (_studyTimer.running && _studyTimer.startTime ? Math.floor((Date.now()-_studyTimer.startTime)/1000) : 0);
+  if(totalSec > 30) _saveCurrentSession(true);
   _studyTimer.running = false;
   _studyTimer.elapsed = 0;
   _studyTimer.startTime = null;
+  _studyTimer.sessionStart = null;
   var disp = document.getElementById('studyTimerDisplay');
   if(disp) disp.textContent = '00:00:00';
   var btn = document.getElementById('studyTimerBtn');
   if(btn){ btn.textContent = '▶ Start'; btn.style.background = 'linear-gradient(135deg,var(--gr),var(--tl))'; }
   var sub = document.getElementById('studyTimerSubject');
-  if(sub) sub.textContent = 'Koi subject select nahi';
+  if(sub) sub.textContent = _studyTimer.subject + ' selected';
   renderStudyLogToday();
 }
 
 function _saveCurrentSession(final){
   var total = _studyTimer.elapsed;
-  if(_studyTimer.running && _studyTimer.startTime){
-    total += Math.floor((Date.now() - _studyTimer.startTime) / 1000);
-  }
-  var mins = Math.round(total / 60);
+  if(_studyTimer.running && _studyTimer.startTime) total += Math.floor((Date.now()-_studyTimer.startTime)/1000);
+  var mins = Math.round(total/60);
   if(mins < 1) return;
 
   var todayKey = today();
@@ -5539,27 +5006,21 @@ function _saveCurrentSession(final){
   if(!log.studySessions) log.studySessions = [];
 
   var now = new Date();
-  var timeStr = (now.getHours()<10?'0':'')+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  var endTime = (now.getHours()<10?'0':'')+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  var startTime = _studyTimer.sessionStart || endTime;
 
-  // Check if last session is same subject within 2 min — update it
-  var lastS = log.studySessions[log.studySessions.length - 1];
-  if(lastS && lastS.subject === _studyTimer.subject && !final){
-    lastS.mins = mins;
-    lastS.endTime = timeStr;
-  } else if(final || !lastS || lastS.subject !== _studyTimer.subject){
-    if(final && lastS && lastS.subject === _studyTimer.subject){
-      lastS.mins = mins;
-      lastS.endTime = timeStr;
-    } else {
-      log.studySessions.push({
-        subject: _studyTimer.subject,
-        mins: mins,
-        startTime: timeStr,
-        endTime: timeStr,
-        ts: Date.now()
-      });
-    }
-  }
+  // Fix #12: Always push new session — no merging on pause/resume
+  log.studySessions.push({
+    subject: _studyTimer.subject,
+    mins: mins,
+    startTime: startTime,
+    endTime: endTime,
+    ts: Date.now()
+  });
+
+  // Reset elapsed so next session starts fresh
+  _studyTimer.elapsed = 0;
+  _studyTimer.sessionStart = null;
 
   save();
   saveStudyLogToFirestore(todayKey, log);
@@ -5570,54 +5031,61 @@ function saveStudyLogToFirestore(dateKey, logData){
   var uid = getUid();
   if(!uid || !db) return;
   var update = {};
-  update['studyLog.' + dateKey] = {
+  update['studyLog.'+dateKey] = {
     sessions: logData.studySessions || [],
     tasks: logData.tasks || {},
     mood: logData.mood || '',
     water: logData.water || 0,
     savedAt: Date.now()
   };
-  db.collection('users').doc(uid).set(update, {merge:true})
-    .catch(function(e){ console.error('StudyLog save error:', e); });
+  db.collection('users').doc(uid).set(update,{merge:true})
+    .catch(function(e){ console.error('StudyLog save error:',e); });
 }
 
 function renderStudyLogToday(){
-  var todayKey = today();
-  var log = S.log[todayKey] || {};
-  var sessions = log.studySessions || [];
-
-  // Date label
-  var dl = document.getElementById('studyLogDate');
   var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var d = new Date();
+  var dl = document.getElementById('studyLogDate');
   if(dl) dl.textContent = d.getDate()+' '+mn[d.getMonth()]+' '+d.getFullYear();
 
+  var log = S.log[today()] || {};
+  var sessions = log.studySessions || [];
   var el = document.getElementById('studyLogToday');
   if(!el) return;
 
+  var totalMins = sessions.reduce(function(sum,s){ return sum+(s.mins||0); },0);
+
+  // Update timer total display
+  var tt = document.getElementById('studyTodayTotal');
+  if(tt) tt.textContent = totalMins >= 60 ? Math.floor(totalMins/60)+'h '+( totalMins%60)+'m' : totalMins+' min';
+
+  var totalRow = document.getElementById('studyLogTotalRow');
+  var totalEl = document.getElementById('studyLogTotalMin');
+
   if(!sessions.length){
-    el.innerHTML = '<div style="text-align:center;padding:16px;font-size:.72rem;color:var(--t2)">⏱️ Timer start karo — session automatically save hoga</div>';
-  } else {
-    var totalMins = sessions.reduce(function(sum, s){ return sum + (s.mins||0); }, 0);
-    el.innerHTML = sessions.map(function(s, i){
-      var color = ['var(--in2)','var(--ac)','var(--gr)','var(--pu)','var(--or)','var(--tl)'][i % 6];
-      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)">'
-        + '<div style="width:3px;height:32px;background:'+color+';border-radius:2px;flex-shrink:0"></div>'
-        + '<div style="flex:1">'
-        + '<div style="font-size:.78rem;font-weight:700">'+esc(s.subject)+'</div>'
-        + '<div style="font-size:.58rem;color:var(--t2);margin-top:1px">'+esc(s.startTime||'')+(s.endTime&&s.endTime!==s.startTime?' → '+esc(s.endTime):'')+'</div>'
-        + '</div>'
-        + '<div style="text-align:right">'
-        + '<div style="font-size:.88rem;font-weight:900;color:'+color+'">'+s.mins+'<span style="font-size:.55rem;font-weight:600"> min</span></div>'
-        + '</div>'
-        + '</div>';
-    }).join('');
-    // Update totals
-    var tl = document.getElementById('studyLogTotalMin');
-    if(tl) tl.textContent = totalMins + ' min';
-    var tt = document.getElementById('studyTodayTotal');
-    if(tt) tt.textContent = 'Aaj ka total: ' + totalMins + ' min (' + (totalMins>=60?Math.floor(totalMins/60)+'h '+(totalMins%60)+'m':totalMins+'m') + ')';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t2);font-size:.72rem">⏱️ Timer start karo — log yahan dikhega</div>';
+    if(totalRow) totalRow.style.display='none';
+    return;
   }
+
+  var colors = ['var(--in2)','var(--ac)','var(--gr)','var(--pu)','var(--or)','var(--tl)'];
+  el.innerHTML = sessions.map(function(s,i){
+    var col = colors[i%6];
+    var st = s.startTime || '';
+    var et = s.endTime || '';
+    var timeLabel = st ? st+(et&&et!==st?' → '+et:'') : '';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--br)">'
+      +'<div style="width:3px;height:34px;background:'+col+';border-radius:2px;flex-shrink:0"></div>'
+      +'<div style="flex:1">'
+      +'<div style="font-size:.8rem;font-weight:700">'+esc(s.subject||'Unknown')+'</div>'
+      +(timeLabel?'<div style="font-size:.58rem;color:var(--t2);margin-top:2px">🕐 '+esc(timeLabel)+'</div>':'')
+      +'</div>'
+      +'<div style="font-size:.95rem;font-weight:900;color:'+col+'">'+(s.mins||0)+'<span style="font-size:.52rem;font-weight:600;color:var(--t2)"> min</span></div>'
+      +'</div>';
+  }).join('');
+
+  if(totalRow) totalRow.style.display='flex';
+  if(totalEl) totalEl.textContent = (totalMins>=60?Math.floor(totalMins/60)+'h '+(totalMins%60)+'m':totalMins+' min');
 }
 
 function renderTaskLog(){
@@ -5625,33 +5093,32 @@ function renderTaskLog(){
   var dateKey = sel ? sel.value : today();
   var log = S.log[dateKey] || {};
   var tasksDone = log.tasks || {};
-
   var el = document.getElementById('taskLogList');
   if(!el) return;
 
   if(!S.tasks.length){
-    el.innerHTML = '<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Koi task nahi hai — pehle tasks add karo</div>';
+    el.innerHTML='<div style="font-size:.72rem;color:var(--t2);padding:8px 0">Koi task nahi — pehle add karo</div>';
     return;
   }
-
   var doneCount = S.tasks.filter(function(t){ return tasksDone[t.id]===true; }).length;
-  var pct = Math.round(doneCount / S.tasks.length * 100);
-  var barColor = pct>=80?'var(--gr)':pct>=50?'var(--ac)':'var(--or)';
+  var pct = Math.round(doneCount/S.tasks.length*100);
+  var barCol = pct>=80?'var(--gr)':pct>=50?'var(--ac)':'var(--or)';
 
-  var html = '<div style="margin-bottom:10px">'
-    + '<div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:4px">'
-    + '<span style="color:var(--t2);font-weight:700">Completion</span>'
-    + '<span style="font-weight:900;color:'+barColor+'">'+doneCount+'/'+S.tasks.length+' ('+pct+'%)</span></div>'
-    + '<div style="background:var(--cd2);border-radius:4px;height:6px"><div style="width:'+pct+'%;height:6px;background:'+barColor+';border-radius:4px;transition:width .4s"></div></div>'
-    + '</div>';
+  var html = '<div style="margin-bottom:12px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:5px">'
+    +'<span style="font-weight:700;color:var(--t2)">Completion</span>'
+    +'<span style="font-weight:900;color:'+barCol+'">'+doneCount+'/'+S.tasks.length+' · '+pct+'%</span></div>'
+    +'<div style="background:var(--cd2);border-radius:6px;height:7px">'
+    +'<div style="width:'+pct+'%;height:7px;background:'+barCol+';border-radius:6px;transition:width .5s"></div></div>'
+    +'</div>';
 
   html += S.tasks.map(function(t){
-    var done = tasksDone[t.id] === true;
-    return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--br)">'
-      + '<div style="width:20px;height:20px;border-radius:50%;background:'+(done?'var(--gr)':'var(--cd2)')+';border:2px solid '+(done?'var(--gr)':'var(--br2)')+';display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0">'+(done?'✓':'')+'</div>'
-      + '<div style="flex:1;font-size:.75rem;font-weight:600;'+(done?'text-decoration:line-through;opacity:.55':'')+'">'+(t.emoji||'')+ ' '+esc(t.name)+'</div>'
-      + '<div style="font-size:.6rem;color:var(--t2)">'+esc(t.time||'')+'</div>'
-      + '</div>';
+    var done = tasksDone[t.id]===true;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)">'
+      +'<div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;background:'+(done?'var(--gr)':'transparent')+';border:2px solid '+(done?'var(--gr)':'var(--br2)')+';">'+(done?'✓':'')+'</div>'
+      +'<div style="flex:1;font-size:.77rem;font-weight:600;'+(done?'opacity:.45;text-decoration:line-through':'')+'">'+(t.emoji||'')+' '+esc(t.name)+'</div>'
+      +'<div style="font-size:.6rem;color:var(--t2)">'+esc(t.time||'')+'</div>'
+      +'</div>';
   }).join('');
 
   el.innerHTML = html;
@@ -5659,66 +5126,103 @@ function renderTaskLog(){
 
 function renderTaskLogDateOptions(){
   var sel = document.getElementById('taskLogDateSel');
-  if(!sel) return;
-  var opts = '';
+  var sel2 = document.getElementById('historyDateSel');
   var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  for(var i = 0; i < 7; i++){
-    var d = new Date(); d.setDate(d.getDate() - i);
-    var k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-    var label = i===0?'Aaj':i===1?'Kal':d.getDate()+' '+mn[d.getMonth()];
-    opts += '<option value="'+k+'">' + label + '</option>';
+  var opts = '';
+  for(var i=0;i<14;i++){
+    var d=new Date(); d.setDate(d.getDate()-i);
+    var k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    var label=i===0?'Aaj':i===1?'Kal':d.getDate()+' '+mn[d.getMonth()];
+    opts+='<option value="'+k+'">'+label+'</option>';
   }
-  sel.innerHTML = opts;
+  if(sel) sel.innerHTML=opts;
+  if(sel2) sel2.innerHTML=opts;
+}
+
+function renderStudyHistory(){
+  var sel = document.getElementById('historyDateSel');
+  var dateKey = sel ? sel.value : today();
+  var log = S.log[dateKey] || {};
+  var sessions = log.studySessions || [];
+  var el = document.getElementById('studyHistoryDetail');
+  if(!el) return;
+
+  if(!sessions.length){
+    el.innerHTML='<div style="text-align:center;padding:16px;font-size:.72rem;color:var(--t2)">Is din koi study session nahi mili</div>';
+    return;
+  }
+  var totalMins = sessions.reduce(function(sum,s){ return sum+(s.mins||0); },0);
+  var colors=['var(--in2)','var(--ac)','var(--gr)','var(--pu)','var(--or)','var(--tl)'];
+  var html = '<div style="display:flex;justify-content:space-between;margin-bottom:10px;padding:8px;background:var(--cd2);border-radius:10px">'
+    +'<span style="font-size:.72rem;color:var(--t2);font-weight:700">Total Study Time</span>'
+    +'<span style="font-size:.82rem;font-weight:900;color:var(--ac)">'+(totalMins>=60?Math.floor(totalMins/60)+'h '+(totalMins%60)+'m':totalMins+' min')+'</span>'
+    +'</div>';
+  html += sessions.map(function(s,i){
+    var col=colors[i%6];
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--br)">'
+      +'<div style="width:3px;height:32px;background:'+col+';border-radius:2px;flex-shrink:0"></div>'
+      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+esc(s.subject)+'</div>'
+      +(s.startTime?'<div style="font-size:.58rem;color:var(--t2)">🕐 '+esc(s.startTime)+(s.endTime&&s.endTime!==s.startTime?' → '+esc(s.endTime):'')+'</div>':'')
+      +'</div>'
+      +'<div style="font-size:.9rem;font-weight:900;color:'+col+'">'+s.mins+' min</div>'
+      +'</div>';
+  }).join('');
+  el.innerHTML=html;
 }
 
 function renderStudyWeekSummary(){
-  var el = document.getElementById('studyWeekSummary');
-  var subEl = document.getElementById('studySubjectBreakdown');
+  var el=document.getElementById('studyWeekSummary');
+  var subEl=document.getElementById('studySubjectBreakdown');
   if(!el) return;
 
-  var mn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  var subjectTotals = {};
-  var html = '';
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var subjectTotals={};
+  var weekTotal=0; var studiedDays=0;
+  var maxH=60; var html='';
 
-  for(var i = 6; i >= 0; i--){
-    var d = new Date(); d.setDate(d.getDate() - i);
-    var k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-    var log = S.log[k] || {};
-    var sessions = log.studySessions || [];
-    var mins = sessions.reduce(function(sum, s){ return sum + (s.mins||0); }, 0);
-    // Collect subject totals
-    sessions.forEach(function(s){
-      subjectTotals[s.subject] = (subjectTotals[s.subject]||0) + s.mins;
-    });
-    var maxH = 60;
-    var barH = Math.min(Math.round(mins/120*maxH), maxH);
-    var col = mins>=120?'var(--gr)':mins>=60?'var(--ac)':mins>0?'var(--in2)':'var(--cd2)';
-    var isToday = i===0;
-    html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:36px">'
-      + '<div style="font-size:.62rem;font-weight:800;color:'+col+'">'+(mins?mins+'m':'')+'</div>'
-      + '<div style="width:100%;height:'+maxH+'px;display:flex;align-items:flex-end">'
-      + '<div style="width:100%;height:'+(barH||3)+'px;background:'+col+';border-radius:4px 4px 0 0;'+(isToday?'box-shadow:0 0 8px '+col:'')+'"></div></div>'
-      + '<div style="font-size:.55rem;color:'+(isToday?'var(--ac)':'var(--t2)')+';font-weight:'+(isToday?'900':'600')+'">'+mn[d.getDay()]+'</div>'
-      + '</div>';
+  for(var i=6;i>=0;i--){
+    var d=new Date(); d.setDate(d.getDate()-i);
+    var k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    var log=S.log[k]||{};
+    var sessions=log.studySessions||[];
+    var mins=sessions.reduce(function(sum,s){ return sum+(s.mins||0); },0);
+    weekTotal+=mins;
+    if(mins>0) studiedDays++;
+    sessions.forEach(function(s){ subjectTotals[s.subject]=(subjectTotals[s.subject]||0)+s.mins; });
+    var barH=Math.min(Math.round(mins/120*maxH),maxH);
+    var col=mins>=120?'var(--gr)':mins>=60?'var(--ac)':mins>0?'var(--in2)':'rgba(255,255,255,.06)';
+    var isToday=i===0;
+    html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">'
+      +'<div style="font-size:.6rem;font-weight:800;color:'+col+';min-height:14px">'+(mins?mins+'m':'')+'</div>'
+      +'<div style="width:100%;flex:1;display:flex;align-items:flex-end">'
+      +'<div style="width:100%;height:'+(barH||3)+'px;background:'+col+';border-radius:4px 4px 0 0;'+(isToday?'box-shadow:0 0 10px '+col+',0 0 20px '+col:'')+'"></div></div>'
+      +'<div style="font-size:.55rem;font-weight:'+(isToday?'900':'600')+';color:'+(isToday?'var(--ac)':'var(--t2)')+'">'+days[d.getDay()]+'</div>'
+      +'</div>';
   }
-  el.innerHTML = html;
+  el.innerHTML=html;
+
+  // Week stats
+  var wt=document.getElementById('weekTotalMins'); if(wt) wt.textContent=weekTotal;
+  var ws=document.getElementById('weekStreak'); if(ws) ws.textContent=studiedDays;
+  var wa=document.getElementById('weekAvgMins'); if(wa) wa.textContent=studiedDays?Math.round(weekTotal/studiedDays):0;
 
   // Subject breakdown
   if(subEl){
-    var keys = Object.keys(subjectTotals).sort(function(a,b){ return subjectTotals[b]-subjectTotals[a]; });
+    var keys=Object.keys(subjectTotals).sort(function(a,b){ return subjectTotals[b]-subjectTotals[a]; });
     if(!keys.length){
-      subEl.innerHTML = '<div style="font-size:.68rem;color:var(--t2)">Koi study session nahi</div>';
+      subEl.innerHTML='<div style="font-size:.68rem;color:var(--t2)">Is hafte koi session nahi</div>';
     } else {
-      var maxM = Math.max.apply(null, keys.map(function(k){ return subjectTotals[k]; }));
-      subEl.innerHTML = keys.map(function(k){
-        var m = subjectTotals[k];
-        var pct = Math.round(m/maxM*100);
-        return '<div style="margin-bottom:6px">'
-          + '<div style="display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:2px">'
-          + '<span style="font-weight:700">'+esc(k)+'</span>'
-          + '<span style="color:var(--ac);font-weight:800">'+(m>=60?Math.floor(m/60)+'h '+(m%60)+'m':m+'m')+'</span></div>'
-          + '<div style="background:var(--cd2);border-radius:4px;height:5px"><div style="width:'+pct+'%;height:5px;background:var(--ac);border-radius:4px"></div></div>'
-          + '</div>';
+      var maxM=Math.max.apply(null,keys.map(function(k){ return subjectTotals[k]; }));
+      subEl.innerHTML=keys.map(function(subj){
+        var m=subjectTotals[subj];
+        var pct=Math.round(m/maxM*100);
+        return '<div style="margin-bottom:8px">'
+          +'<div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:3px">'
+          +'<span style="font-weight:700">'+esc(subj)+'</span>'
+          +'<span style="color:var(--ac);font-weight:800">'+(m>=60?Math.floor(m/60)+'h '+(m%60)+'m':m+' min')+'</span></div>'
+          +'<div style="background:var(--cd2);border-radius:4px;height:6px">'
+          +'<div style="width:'+pct+'%;height:6px;background:linear-gradient(90deg,var(--ac),var(--in2));border-radius:4px"></div></div>'
+          +'</div>';
       }).join('');
     }
   }
@@ -5729,300 +5233,7 @@ function initStudyLog(){
   renderTaskLogDateOptions();
   renderTaskLog();
   renderStudyWeekSummary();
-}
-
-function drawCharts(){
-  var days=[];var vals=[];
-  for(var i=6;i>=0;i--){
-    var d=new Date();d.setDate(d.getDate()-i);
-    var k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-    var log=S.log[k];
-    var pct=0;
-    if(log&&log.tasks&&S.tasks.length){
-      var done=Object.values(log.tasks).filter(function(v){return v===true;}).length;
-      pct=Math.round(done/S.tasks.length*100);
-    }
-    days.push(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]);
-    vals.push(pct);
-  }
-  var wc=document.getElementById('weekChart');
-  if(wc){
-    if(charts.w) charts.w.destroy();
-    charts.w=new Chart(wc,{type:'bar',data:{labels:days,datasets:[{data:vals,backgroundColor:'rgba(245,166,35,.7)',borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{max:100,ticks:{color:'#5c6580',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#5c6580',font:{size:10}},grid:{display:false}}}}});
-  }
-  // Subject accuracy chart
-  var sc=document.getElementById('subjChart');
-  if(sc&&S.sStats&&Object.keys(S.sStats).length){
-    var sLabels=[],sVals=[],sColors=[];
-    var cmap={gk:'rgba(92,106,240,.7)',math:'rgba(245,166,35,.7)',reasoning:'rgba(0,214,143,.7)',hindi:'rgba(176,106,245,.7)',science:'rgba(255,112,67,.7)',english:'rgba(0,200,200,.7)'};
-    Object.keys(S.sStats).forEach(function(k){
-      var st=S.sStats[k];
-      if(st.t){sLabels.push(k.toUpperCase());sVals.push(Math.round(st.d/st.t*100));sColors.push(cmap[k]||'rgba(255,255,255,.4)');}
-    });
-    if(charts.s) charts.s.destroy();
-    charts.s=new Chart(sc,{type:'bar',data:{labels:sLabels,datasets:[{data:sVals,backgroundColor:sColors,borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{max:100,ticks:{color:'#5c6580',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#5c6580',font:{size:10}},grid:{display:false}}}}});
-  } else if(sc){
-    if(charts.s) charts.s.destroy();
-    sc.parentElement.innerHTML+='<div style="text-align:center;font-size:.65rem;color:var(--t2);padding:8px">Practice karo — accuracy chart yahan dikhega</div>';
-  }
-  // Mock scores chart
-  var mc=document.getElementById('mockChart');
-  if(mc&&S.mocks&&S.mocks.length){
-    var mLabels=S.mocks.map(function(m,i){return 'M'+(i+1);});
-    var mVals=S.mocks.map(function(m){return m.pct||0;});
-    if(charts.m) charts.m.destroy();
-    charts.m=new Chart(mc,{type:'line',data:{labels:mLabels,datasets:[{data:mVals,borderColor:'#7b87ff',backgroundColor:'rgba(123,135,255,.15)',borderWidth:2,pointBackgroundColor:'#7b87ff',fill:true,tension:.3}]},options:{plugins:{legend:{display:false}},scales:{y:{max:100,min:0,ticks:{color:'#5c6580',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#5c6580',font:{size:10}},grid:{display:false}}}}});
-  } else if(mc){
-    if(charts.m) charts.m.destroy();
-    mc.parentElement.innerHTML+='<div style="text-align:center;font-size:.65rem;color:var(--t2);padding:8px">Abhi koi mock data nahi</div>';
-  }
-}
-
-
-// ══════════════════════════════════════
-// MOCK TEST
-// ══════════════════════════════════════
-var mockState={qs:[],cur:0,ans:{},timeLeft:0,timer:null,name:'',totalTime:0};
-var mockOpts={qcount:25,time:30,subjects:['gk','reasoning','maths','hindi']};
-
-function startMock(type){
-  if(type==='custom'){showV('mock-setup','mock-home');renderMockHistory();return;}
-  var configs={
-    ssc_gd:      {name:'SSC GD Constable',       qcount:80, time:60,  subjects:['gk','reasoning','maths','hindi']},
-    bihar_police:{name:'Bihar Police Sipahi',     qcount:100,time:120, subjects:['gk','hindi','maths','science']},
-    ssc_cgl:     {name:'SSC CGL Tier-1',          qcount:100,time:60,  subjects:['gk','reasoning','maths','english']},
-    ssc_chsl:    {name:'SSC CHSL Tier-1',         qcount:100,time:60,  subjects:['gk','reasoning','maths','english']},
-    rrb_ntpc:    {name:'RRB NTPC',                qcount:100,time:90,  subjects:['gk','maths','reasoning']},
-    rrb_group_d: {name:'RRB Group D',             qcount:100,time:90,  subjects:['gk','maths','reasoning','science']},
-    bssc:        {name:'BSSC Inter Level',        qcount:150,time:135, subjects:['gk','hindi','maths','science']},
-    bpsc:        {name:'BPSC Prelims',            qcount:150,time:120, subjects:['gk','history','polity','geography']}
-  };
-  var cfg=configs[type];
-  if(!cfg){toast('Exam nahi mila!');return;}
-  mockOpts={qcount:cfg.qcount,time:cfg.time,subjects:cfg.subjects};
-  launchMockWithConfig(cfg.name);
-}
-
-function setMockOpt(key,val,el){
-  mockOpts[key]=val;
-  if(el){
-    var parent=el.parentElement;
-    parent.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
-    el.classList.add('on');
-  }
-}
-
-function toggleMockSubj(s,el){
-  var i=mockOpts.subjects.indexOf(s);
-  if(i===-1){mockOpts.subjects.push(s);el.classList.add('on');}
-  else{mockOpts.subjects.splice(i,1);el.classList.remove('on');}
-}
-
-function launchCustomMock(){
-  if(!mockOpts.subjects.length){toast('Kam se kam ek subject chunao!');return;}
-  launchMockWithConfig('Custom Mock');
-}
-
-function launchMockWithConfig(name){
-  var gkey=getGKey();
-  if(!gkey){toast('🔑 Settings mein Groq key daalo!');return;}
-  showV('mock-test','mock-home');
-  showV('mock-test','mock-setup');
-  mockState={qs:[],cur:0,ans:{},timeLeft:mockOpts.time*60,timer:null,name:name,totalTime:mockOpts.time*60};
-  document.getElementById('mock-question').innerHTML=
-    '<div style="text-align:center;padding:40px 20px">'
-    +'<div style="font-size:2.5rem">🤖</div>'
-    +'<div style="font-size:.88rem;font-weight:800;color:var(--ac);margin:10px 0">Mock paper ban raha hai...</div>'
-    +'<div style="font-size:.68rem;color:var(--t2);margin-bottom:16px">'+name+' · '+mockOpts.qcount+' Qs · '+mockOpts.time+' min</div>'
-    +'<div style="display:flex;gap:8px;justify-content:center">'
-    +'<div style="width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pulse 1.2s infinite"></div>'
-    +'<div style="width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .4s infinite"></div>'
-    +'<div style="width:9px;height:9px;border-radius:50%;background:var(--ac);animation:pulse 1.2s .8s infinite"></div>'
-    +'</div></div>';
-  document.getElementById('mock-timer').textContent=mockOpts.time+':00';
-  // Split questions across subjects - smaller batches to avoid timeout
-  var subjNames={
-    gk:'सामान्य ज्ञान (GK)',reasoning:'रीजनिंग (Reasoning)',
-    maths:'गणित (Maths)',hindi:'हिंदी व्याकरण',
-    english:'English Grammar',science:'सामान्य विज्ञान',
-    history:'इतिहास (History)',polity:'राजव्यवस्था (Polity)',
-    geography:'भूगोल (Geography)'
-  };
-  // Fetch 25 questions at a time to avoid timeout
-  var batchSize=10;
-  var totalNeeded=Math.min(mockOpts.qcount,100); // cap at 100 for speed
-  var allQs=[];
-  var fetchCount=Math.ceil(totalNeeded/batchSize);
-  var fetched=0;
-  function fetchBatch(batchIdx){
-    var batchSubjs=mockOpts.subjects.map(function(s){return subjNames[s]||s;});
-    var systemMsg='Tu SIRF Hindi mein MCQ generator hai. SIRF valid JSON array output kar. Koi markdown nahi. SABHI questions aur options HINDI (Devanagari) mein honge.';
-    var prompt=name+' exam ke liye '+batchSize+' MCQ banao.\n'
-      +'Subjects (equally distribute): '+batchSubjs.join(', ')+'.\n\n'
-      +'⚠️ SABHI questions aur options HINDI (Devanagari script) mein likhne hain.\n'
-      +'Sirf English Grammar subject ke options English mein ho sakte hain.\n\n'
-      +'RULES:\n'
-      +'- ans index 0/1/2/3 equally vary karo (0,1,2,3 roughly equal)\n'
-      +'- Realistic galat options jo confuse kare\n'
-      +'- Exam level: '+name+'\n\n'
-      +'FORMAT (SIRF JSON, kuch nahi):\n'
-      +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"व्याख्या","subj":"subject"}]';
-    groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:4500,temperature:0.6},function(data,_m){
-      if(data.error) throw new Error(data.error.message);
-      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=txt.indexOf('['),e=txt.lastIndexOf(']')+1;
-      if(s<0||e<=0) throw new Error('JSON mein [ ] nahi mila');
-      var raw=txt.substring(s,e);
-      // Auto-repair truncated JSON
-      var batch;
-      try{
-        batch=JSON.parse(raw);
-      }catch(parseErr){
-        // Try to salvage complete objects
-        var fixed=raw;
-        // Remove last incomplete object
-        var lastComplete=fixed.lastIndexOf('},{');
-        if(lastComplete>0) fixed=fixed.substring(0,lastComplete+1)+']}';
-        else {
-          lastComplete=fixed.lastIndexOf('{');
-          fixed=fixed.substring(0,lastComplete)+']';
-        }
-        try{ batch=JSON.parse(fixed); }
-        catch(e2){ throw new Error('Questions parse nahi hue — Retry karo'); }
-      }
-      // Shuffle options
-      batch=batch.map(function(q){
-        if(!q.opts||q.opts.length<4) return q;
-        var ct=(q.opts[q.ans]||'').replace(/^\([A-D]\)\s*/,'');
-        var sh=shuffle(q.opts.slice()).map(function(o,si){return '('+'ABCD'[si]+') '+o.replace(/^\([A-D]\)\s*/,'');});
-        var na=sh.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===ct;});
-        return Object.assign({},q,{opts:sh,ans:na===-1?q.ans:na});
-      });
-      allQs=allQs.concat(batch);
-      fetched++;
-      // Update loader
-      var pct=Math.round(fetched/fetchCount*100);
-      var ldr=document.getElementById('mock-loader-pct');
-      if(ldr) ldr.textContent=pct+'%';
-      if(fetched>=fetchCount){
-        mockState.qs=allQs.slice(0,totalNeeded);
-        renderMockQ();
-        startMockTimer();
-      } else {
-        fetchBatch(batchIdx+1);
-      }
-    }, function(e){
-      document.getElementById('mock-question').innerHTML='<div class="empty">❌ '+esc(e.message.substring(0,80))+'<br><button class="btn" onclick="sw(\'mock\')" >← Back</button> <button class="btn" onclick="launchMockWithConfig(mockState.name)">🔄 Retry</button></div>';
-    });
-  }
-  // Add loader pct element
-  document.getElementById('mock-question').innerHTML+=
-    '<div id="mock-loader-pct" style="font-size:1rem;font-weight:900;color:var(--ac);margin-top:8px;text-align:center">0%</div>';
-  fetchBatch(0);
-}
-
-
-function renderMockQ(){
-  var s=mockState;
-  var q=s.qs[s.cur];
-  if(!q) return;
-  var total=s.qs.length;
-  document.getElementById('mock-qnum').textContent='Q '+(s.cur+1)+'/'+total;
-  document.getElementById('mock-progress').style.width=((s.cur+1)/total*100)+'%';
-  var sel=s.ans[s.cur];
-  var html='<div style="font-size:.83rem;font-weight:700;line-height:1.5;margin-bottom:14px">'+esc(q.q)+'</div>';
-  html+='<div>';
-  (q.opts||[]).forEach(function(opt,i){
-    var picked=sel===i;
-    var bg=picked?'rgba(92,106,240,.2)':'var(--cd2)';
-    var border=picked?'var(--ac)':'var(--br2)';
-    html+='<div onclick="pickMockAns('+i+')" style="background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;font-size:.78rem;transition:all .2s">'+esc(opt)+'</div>';
-  });
-  html+='</div>';
-  if(q.subj) html+='<div style="font-size:.58rem;color:var(--t2);margin-top:6px">Subject: '+esc(q.subj)+'</div>';
-  document.getElementById('mock-question').innerHTML=html;
-}
-
-function pickMockAns(i){
-  mockState.ans[mockState.cur]=i;
-  renderMockQ();
-}
-
-function mockNav(dir){
-  var newIdx=mockState.cur+dir;
-  if(newIdx<0||newIdx>=mockState.qs.length) return;
-  mockState.cur=newIdx;
-  renderMockQ();
-}
-
-function startMockTimer(){
-  if(mockState.timer) clearInterval(mockState.timer);
-  mockState.timer=setInterval(function(){
-    mockState.timeLeft--;
-    var m=Math.floor(mockState.timeLeft/60),s=mockState.timeLeft%60;
-    var el=document.getElementById('mock-timer');
-    if(el) el.textContent=m+':'+(s<10?'0':'')+s;
-    if(mockState.timeLeft<=300&&el) el.style.color='var(--a2)';
-    if(mockState.timeLeft<=0){clearInterval(mockState.timer);submitMock();}
-  },1000);
-}
-
-function submitMock(){
-  if(mockState.timer) clearInterval(mockState.timer);
-  var qs=mockState.qs,ans=mockState.ans;
-  var correct=0,wrong=0,skip=0;
-  qs.forEach(function(q,i){
-    if(ans[i]===undefined) skip++;
-    else if(ans[i]===q.ans) correct++;
-    else wrong++;
-  });
-  var total=qs.length;
-  var pct=Math.round(correct/total*100);
-  // Save to S.mocks
-  var mockRecord={name:mockState.name,date:new Date().toLocaleDateString('hi-IN'),pct:pct,correct:correct,wrong:wrong,skip:skip,total:total,time:Math.round((mockState.totalTime-mockState.timeLeft)/60)+' min'};
-  if(!S.mocks) S.mocks=[];
-  S.mocks.push(mockRecord);
-  save();
-  // Show result
-  showV('mock-result','mock-test');
-  document.getElementById('mock-res-pct').textContent=pct+'%';
-  document.getElementById('mock-res-detail').textContent=correct+'/'+total+' sahi';
-  document.getElementById('mock-res-correct').textContent=correct;
-  document.getElementById('mock-res-wrong').textContent=wrong;
-  document.getElementById('mock-res-skip').textContent=skip;
-  var emoji=pct>=80?'🏆':pct>=60?'🎯':pct>=40?'📚':'💪';
-  var grade=pct>=80?'Excellent!':pct>=60?'Good':pct>=40?'Average':'Keep Practicing';
-  var gradeColor=pct>=80?'var(--gr)':pct>=60?'var(--ac)':pct>=40?'var(--or)':'var(--a2)';
-  document.getElementById('mock-res-emoji').textContent=emoji;
-  var gradeEl=document.getElementById('mock-res-grade');
-  gradeEl.textContent=grade;gradeEl.style.background=gradeColor;gradeEl.style.color='#fff';
-  // Solutions
-  var solHtml=qs.map(function(q,i){
-    var ua=ans[i],ca=q.ans;
-    var status=ua===undefined?'⬜ Skip':ua===ca?'✅ Sahi':'❌ Galat';
-    var color=ua===undefined?'var(--t2)':ua===ca?'var(--gr)':'var(--a2)';
-    return '<div style="padding:10px;border-bottom:1px solid var(--br);font-size:.72rem">'
-      +'<div style="display:flex;justify-content:space-between"><span style="font-weight:700">Q'+(i+1)+'.</span><span style="color:'+color+';font-weight:800">'+status+'</span></div>'
-      +'<div style="margin:4px 0;line-height:1.4">'+esc(q.q)+'</div>'
-      +(ua!==undefined&&ua!==ca?'<div style="color:var(--a2)">Tumhara: '+esc((q.opts[ua]||''))+'</div>':'')
-      +'<div style="color:var(--gr)">Sahi: '+esc((q.opts[ca]||''))+'</div>'
-      +(q.sol?'<div style="color:var(--t2);margin-top:3px">💡 '+esc(q.sol)+'</div>':'')
-      +'</div>';
-  }).join('');
-  document.getElementById('mock-solutions').innerHTML=solHtml;
-}
-
-function renderMockHistory(){
-  var el=document.getElementById('mock-history-list');
-  if(!el) return;
-  if(!S.mocks||!S.mocks.length){el.innerHTML='<div class="empty" style="font-size:.7rem">Abhi koi mock nahi diya</div>';return;}
-  el.innerHTML=S.mocks.slice().reverse().slice(0,5).map(function(m){
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--cd2);border-radius:10px;margin-bottom:6px">'
-      +'<div><div style="font-size:.72rem;font-weight:700">'+esc(m.name||'Mock')+'</div>'
-      +'<div style="font-size:.58rem;color:var(--t2)">'+esc(m.date||'')+' · '+esc(String(m.correct||0))+'/'+esc(String(m.total||0))+' · '+esc(m.time||'')+'</div></div>'
-      +'<div style="font-size:1rem;font-weight:900;color:'+(m.pct>=60?'var(--gr)':m.pct>=40?'var(--ac)':'var(--a2)')+'">'+m.pct+'%</div>'
-      +'</div>';
-  }).join('');
+  renderStudyHistory();
 }
 
 // ── FIREBASE ──
@@ -6127,16 +5338,29 @@ function loadFromFirestore(cb){
           var p=JSON.parse(doc.data().appData);
           S=Object.assign({},S,p);
           if(doc.data().examDates) S.examDates=Object.assign({},S.examDates||{},doc.data().examDates);
-          // Merge studyLog sessions from Firestore
+          // Fix #5: Proper merge - don't overwrite local sessions
           if(doc.data().studyLog){
             var fsl=doc.data().studyLog;
             Object.keys(fsl).forEach(function(dateKey){
               if(!S.log[dateKey]) S.log[dateKey]={tasks:{},mood:'',water:0};
-              if(fsl[dateKey].sessions) S.log[dateKey].studySessions=fsl[dateKey].sessions;
-              if(fsl[dateKey].tasks) S.log[dateKey].tasks=Object.assign({},S.log[dateKey].tasks,fsl[dateKey].tasks);
+              // Merge sessions - avoid duplicates by timestamp
+              if(fsl[dateKey].sessions){
+                if(!S.log[dateKey].studySessions) S.log[dateKey].studySessions=[];
+                var existingTs={};
+                S.log[dateKey].studySessions.forEach(function(s){if(s.ts)existingTs[s.ts]=true;});
+                fsl[dateKey].sessions.forEach(function(s){
+                  if(!s.ts||!existingTs[s.ts]) S.log[dateKey].studySessions.push(s);
+                });
+              }
+              // Merge tasks - local takes priority
+              if(fsl[dateKey].tasks){
+                S.log[dateKey].tasks=Object.assign({},fsl[dateKey].tasks,S.log[dateKey].tasks);
+              }
+              if(fsl[dateKey].mood&&!S.log[dateKey].mood) S.log[dateKey].mood=fsl[dateKey].mood;
+              if(fsl[dateKey].water&&!S.log[dateKey].water) S.log[dateKey].water=fsl[dateKey].water;
             });
           }
-        }catch(e){}
+        }catch(e){console.error('Parse error:',e);}
       } else {load();}
       if(cb)cb();
       saveToFirestore();
@@ -6162,45 +5386,28 @@ var _localSave=save;
 save=function(){_localSave();saveToFirestore();};
 
 
-
 // ── START ──
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
 
 </script>
-<script>if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(r){console.log('SW registered');})
-      .catch(function(e){console.log('SW error:',e);});
-  });
-}
-</script>
+
 
 <script>
 function appGoBack(){
-    if(window.history.length > 1){
-        history.back();
-    }else{
-        const home = document.getElementById("home");
-        if(home){
-            document.querySelectorAll(".tab").forEach(p=>p.style.display="none");
-            home.style.display="block";
-        }
-    }
+  if(window.history.length>1){
+    history.back();
+  }else{
+    sw('home');
+  }
 }
-
-function updateBackVisibility(){
-    const btn=document.getElementById("globalBackBtn");
-    if(!btn) return;
-    if(window.history.length<=1){
-        btn.style.display="none";
-    }else{
-        btn.style.display="block";
-    }
-}
-
-window.addEventListener("popstate",updateBackVisibility);
-document.addEventListener("DOMContentLoaded",updateBackVisibility);
+// popstate - browser back button
+window.addEventListener('popstate',function(event){
+  var tab=event.state&&event.state.tab?event.state.tab:'home';
+  sw(tab);
+  // Hide globalBackBtn on home tab
+  var btn=document.getElementById('globalBackBtn');
+  if(btn) btn.style.display=(tab==='home'?'none':'none'); // always hidden, handled by sw()
+});
 </script>
 
 </body>
