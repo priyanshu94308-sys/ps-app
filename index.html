@@ -944,8 +944,8 @@ display:none;
       <div class="scard">
         <div class="sec">💾 Data</div>
         <div style="font-size:.69rem;color:var(--t2);margin-bottom:7px" id="dataInfo">Loading...</div>
-        <button class="dbtn" onclick="if(confirm('Aaj reset?')){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset!')}">🔄 Aaj Reset</button>
-        <button class="dbtn" onclick="if(confirm('Sab delete?')){S.tasks=[];S.log={};S.sStats={};save();renderHome();toast('Done!')}">🗑️ Sab Delete</button>
+        <button class="dbtn" onclick="showConfirm('Aaj ka task data reset karo?',function(){var k=today();if(S.log[k])S.log[k].tasks={};save();renderHome();toast('Reset! ✅');},'Reset','linear-gradient(135deg,var(--or),#e64a19)')">🔄 Aaj Reset</button>
+        <button class="dbtn" onclick="showConfirm('Sab data delete ho jaayega!',function(){S.tasks=[];S.log={};S.sStats={};save();renderHome();toast('Deleted!');},'Delete','linear-gradient(135deg,var(--a2),#cc0000)')">🗑️ Sab Delete</button>
       </div>
       <div class="scard">
         <div class="sec">🔐 Account</div>
@@ -3382,6 +3382,24 @@ function getLog(k){if(!S.log[k])S.log[k]={tasks:{}};return S.log[k];}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 function toast(msg,t){var el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(t==='e'?' e':t==='i'?' i':'');clearTimeout(el._t);el._t=setTimeout(function(){el.className='toast';},2400);}
+
+function showConfirm(msg, onYes, yesLabel, yesColor){
+  yesLabel = yesLabel || 'Haan';
+  yesColor = yesColor || 'linear-gradient(135deg,var(--in),var(--in2))';
+  var ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99990;display:flex;align-items:center;justify-content:center;padding:24px';
+  ov.innerHTML='<div style="background:var(--card);border-radius:20px;padding:24px 20px;width:100%;max-width:300px;border:1px solid var(--br2);text-align:center">'
+    +'<div style="font-size:1rem;font-weight:800;margin-bottom:8px;color:var(--tx)">'+msg+'</div>'
+    +'<div style="display:flex;gap:10px;margin-top:18px">'
+    +'<button id="_cNo" style="flex:1;background:var(--cd2);border:1px solid var(--br2);border-radius:12px;color:var(--t2);font-family:inherit;font-size:.82rem;font-weight:700;padding:12px;cursor:pointer">Nahi</button>'
+    +'<button id="_cYes" style="flex:1.2;background:'+yesColor+';border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:.82rem;font-weight:800;padding:12px;cursor:pointer">'+yesLabel+'</button>'
+    +'</div></div>';
+  document.body.appendChild(ov);
+  function _close(){document.body.removeChild(ov);}
+  document.getElementById('_cNo').onclick=_close;
+  ov.addEventListener('click',function(e){if(e.target===ov)_close();});
+  document.getElementById('_cYes').onclick=function(){_close();onYes();};
+}
 function toggleTheme(){
   S.dark=!S.dark;
   var r=document.documentElement;
@@ -4360,12 +4378,13 @@ function toggleTask(id){
 }
 
 function deleteTask(id){
-  if(!confirm('Delete?')) return;
-  S.tasks=S.tasks.filter(function(t){return t.id!==id;});
-  var log=getLog(today());
-  if(log.tasks) delete log.tasks[String(id)];
-  _saveTaskSnapshot();
-  save();renderTasks();updateProgress();
+  showConfirm('Yeh task delete karo?', function(){
+    S.tasks=S.tasks.filter(function(t){return t.id!==id;});
+    var log=getLog(today());
+    if(log.tasks) delete log.tasks[String(id)];
+    _saveTaskSnapshot();
+    save();renderTasks();updateProgress();
+  }, 'Delete', 'linear-gradient(135deg,var(--a2),#cc0000)');
 }
 
 // ── CURRENT AFFAIRS ──
@@ -5323,14 +5342,15 @@ function signInWithGoogle(){
 }
 
 function signOutUser(){
-  if(!confirm('Logout karna chahte ho?')) return;
-  if(auth) auth.signOut().then(function(){
-    var card=document.getElementById('settingsUserCard');
-    if(card) card.style.display='none';
-    _showLoginScreen();
-    currentUser=null;
-    S={dark:S.dark,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:{},customExams:[]};
-  });
+  showConfirm('Logout karna chahte ho?', function(){
+    if(auth) auth.signOut().then(function(){
+      var card=document.getElementById('settingsUserCard');
+      if(card) card.style.display='none';
+      _showLoginScreen();
+      currentUser=null;
+      S={dark:S.dark,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],examDates:{},customExams:[]};
+    });
+  }, '🚪 Logout', 'linear-gradient(135deg,#ff4b4b,#cc0000)');
 }
 
 function showUserPill(user){
