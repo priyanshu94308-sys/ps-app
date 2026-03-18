@@ -315,40 +315,18 @@ body::before{
 .m4b:nth-child(4) .m4n{color:var(--tl);}
 .m4l{font-size:.44rem;color:var(--t2);font-weight:700;margin-top:3px;letter-spacing:.5px;text-transform:uppercase;}
 
-/* ═══════════════════════════════
-   MOOD
-═══════════════════════════════ */
-.mb{
-  flex:1;background:var(--cd2);
-  border:1.5px solid var(--br2);border-radius:14px;
-  padding:10px 2px;cursor:pointer;text-align:center;
-  font-size:1.1rem;transition:all .18s;
-}
+
 .mb.sel{
   border-color:rgba(245,166,35,.5);
   background:rgba(245,166,35,.1);
   box-shadow:0 0 0 3px rgba(245,166,35,.1);
 }
-.ml{font-size:.43rem;color:var(--t2);font-weight:700;margin-top:3px;letter-spacing:.2px;}
+
 
 /* ═══════════════════════════════
    WATER
 ═══════════════════════════════ */
-.wrow{
-  display:flex;align-items:center;gap:11px;
-  background:rgba(0,200,200,.05);
-  border-radius:14px;
-  padding:13px 15px;
-  border:1px solid rgba(0,200,200,.15);
-}
-.wbtn{
-  background:var(--card);border:1px solid var(--br2);
-  border-radius:9px;color:var(--tx);
-  width:30px;height:30px;cursor:pointer;font-weight:900;
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.1rem;transition:all .15s;
-}
-.wbtn:active{background:rgba(0,200,200,.15);transform:scale(.9);}
+
 
 /* ═══════════════════════════════
    TASK ITEMS
@@ -680,25 +658,6 @@ display:none;
         <div class="m4b" style="border-top:3px solid var(--pu)"><div class="m4n" style="color:var(--pu)" id="m4a">0%</div><div class="m4l">MONTH %</div></div>
         <div class="m4b" style="border-top:3px solid var(--gr)"><div class="m4n" style="color:var(--gr)" id="m4t">0</div><div class="m4l">✅ Tasks</div></div>
         <div class="m4b" style="border-top:3px solid var(--teal)"><div class="m4n" style="color:var(--teal)" id="m4w">0</div><div class="m4l">WATER</div></div>
-      </div>
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:.72rem;font-weight:800;color:var(--tx)">😊 Aaj ka Mood</span></div>
-        <div class="mood-row">
-          <button class="mb" id="mb-great" onclick="setMood('great')"><div>😄</div><div class="ml">Great</div></button>
-          <button class="mb" id="mb-good" onclick="setMood('good')"><div>🙂</div><div class="ml">Good</div></button>
-          <button class="mb" id="mb-okay" onclick="setMood('okay')"><div>😐</div><div class="ml">Okay</div></button>
-          <button class="mb" id="mb-sad" onclick="setMood('sad')"><div>😢</div><div class="ml">Sad</div></button>
-          <button class="mb" id="mb-tired" onclick="setMood('tired')"><div>😴</div><div class="ml">Tired</div></button>
-        </div>
-        <div class="wrow">
-          <span style="font-size:1.2rem">💧</span>
-          <div style="flex:1"><div style="font-size:.75rem;font-weight:800">Paani Tracker</div><div style="font-size:.6rem;color:var(--t2);margin-top:1px" id="wlbl">0 / 8 glass</div></div>
-          <div style="display:flex;gap:5px;align-items:center">
-            <button class="wbtn" onclick="chgW(-1)">−</button>
-            <span style="font-size:.88rem;font-weight:800;min-width:14px;text-align:center" id="wcnt">0</span>
-            <button class="wbtn" onclick="chgW(1)">+</button>
-          </div>
-        </div>
       </div>
       <!-- ── TASK SECTION ── -->
       <div style="margin-bottom:8px">
@@ -3365,6 +3324,7 @@ if(!S.customExams) S.customExams=[];
 
 var _caHistory={};
 var _rwaHistory={};  // topic-wise asked questions history
+var activeCat='all'; // task filter
 
 // ── UTILS ──
 function save(){
@@ -3444,8 +3404,10 @@ function sw(tab){
   if(tbEl) tbEl.classList.add('on');
   document.querySelector('.content').scrollTop=0;
   if(tab==='report'){initStudyLog();}
-  if(tab==='ca'){var k=getGKey();if(k) loadDailyCA(false);}
+  if(tab==='rwa'){initRWA();}
+  if(tab==='ca'){initCA();var k=getGKey();if(k) loadDailyCA(false);}
   if(tab==='chat'){initChat();}
+  if(tab==='home'){renderHome();}
   if(tab==='settings'){
     var gk2=document.getElementById('geminiKey');
     if(gk2){try{var gv=localStorage.getItem('ps_gkey');if(gv)gk2.value=gv;}catch(e){}}
@@ -4227,7 +4189,7 @@ function saveGKey(){
 }
 
 // ── HOME ──
-function renderHome(){renderTasks();updateProgress();renderMood();renderWater();updateHeader();}
+function renderHome(){renderTasks();updateProgress();updateHeader();}
 
 function updateProgress(){
   var log=getLog(today());
@@ -4242,29 +4204,6 @@ function updateProgress(){
   var motivs=['🌅 Chalo shuru karte hain!','💪 Badiya chal raha hai!','🔥 Mast progress!','⭐ Almost done!','🎉 Sab complete!'];
   var hm=document.getElementById('heroMotiv');
   if(hm) hm.textContent=motivs[Math.min(Math.floor(pct/25),4)];
-}
-
-function renderMood(){
-  var log=getLog(today());
-  ['great','good','okay','sad','tired'].forEach(function(m){
-    var b=document.getElementById('mb-'+m);
-    if(b) b.classList.toggle('sel',log.mood===m);
-  });
-}
-
-function setMood(m){getLog(today()).mood=m;save();renderMood();toast({great:'😄 Great!',good:'🙂 Good!',okay:'😐 Okay',sad:'😢',tired:'😴 Tired!'}[m]);}
-
-function renderWater(){
-  var log=getLog(today());var w=log.water||0;
-  var wl=document.getElementById('wlbl');if(wl)wl.textContent=w+' / 8 glass';
-  var wc=document.getElementById('wcnt');if(wc)wc.textContent=w;
-}
-
-function chgW(d){
-  var log=getLog(today());
-  log.water=Math.max(0,Math.min(12,(log.water||0)+d));
-  save();renderWater();updateHeader();
-  if(d>0&&log.water>=8) toast('💧 8 glasses!');
 }
 
 function toggleAddForm(){
