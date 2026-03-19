@@ -619,7 +619,13 @@ display:none;
 <div id="app" style="display:block;height:100vh;">
   <div class="hdr">
     <div style="display:flex;align-items:center;gap:10px">
-      <div class="ps-logo"><span style="font-size:.9rem">PS STUDY</span></div>
+      <!-- Avatar -->
+      <div onclick="sw('settings')" style="position:relative;cursor:pointer;flex-shrink:0">
+        <img id="headerAvatar" src="" alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--ac);display:none">
+        <div id="headerAvatarFallback" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),#ff6b00);display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;color:#000" id="headerInitial">P</div>
+        <!-- Level badge -->
+        <div id="headerLevelBadge" style="position:absolute;bottom:-4px;right:-4px;font-size:.55rem;font-weight:900;background:var(--bg);border:1px solid var(--ac);border-radius:20px;padding:1px 5px;color:var(--ac)">🥉</div>
+      </div>
       <div>
         <div style="font-size:.58rem;color:var(--t2);font-weight:500;letter-spacing:.3px" id="greet">Good morning!</div>
         <div style="font-size:.85rem;font-weight:700;letter-spacing:.2px" id="uname">Student</div>
@@ -4449,6 +4455,30 @@ function updateHeader(){
   var un=document.getElementById('uname');if(un)un.textContent=S.name;
   var sp=document.getElementById('streakPill');if(sp)sp.textContent='🔥 '+calcStreak()+' days';
   var hxp=document.getElementById('header-xp');if(hxp)hxp.textContent='⚡'+(S.xp||0)+'XP';
+  // Avatar
+  var av=document.getElementById('headerAvatar');
+  var avFb=document.getElementById('headerAvatarFallback');
+  if(currentUser&&currentUser.photoURL){
+    if(av){av.src=currentUser.photoURL;av.style.display='block';}
+    if(avFb) avFb.style.display='none';
+  } else {
+    if(av) av.style.display='none';
+    if(avFb){
+      avFb.style.display='flex';
+      var initEl=avFb;
+      var name=S.name||'S';
+      initEl.textContent=name[0].toUpperCase();
+    }
+  }
+  // Level badge
+  var lvlBadge=document.getElementById('headerLevelBadge');
+  if(lvlBadge){
+    var lvl=getLevel();
+    lvlBadge.textContent=lvl.icon;
+    var colors={Bronze:'#cd7f32',Silver:'#c0c0c0',Gold:'#ffd700',Diamond:'#a0e8ff'};
+    lvlBadge.style.color=colors[lvl.name]||'var(--ac)';
+    lvlBadge.style.borderColor=colors[lvl.name]||'var(--ac)';
+  }
   var m4s=document.getElementById('m4s');if(m4s)m4s.textContent=calcStreak();
   var m4a=document.getElementById('m4a');if(m4a)m4a.textContent=calcMonthAvg()+'%';
   var total=0;
