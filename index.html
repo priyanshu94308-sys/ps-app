@@ -994,6 +994,27 @@ display:none;
         <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:0;background:linear-gradient(135deg,#25D366,#128C7E)">📢 PS Channel Join Karo</a>
       </div>
       <div class="scard">
+        <div class="sec">🤝 Refer &amp; Earn</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:10px;line-height:1.6">Dost ko refer karo — dono ko <b style="color:var(--ac)">+50 XP</b>, <b style="color:var(--ac)">🤝 Badge</b> aur <b style="color:var(--ac)">Streak Protection</b> milega!</div>
+        <div style="background:var(--cd2);border:1px solid var(--br);border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:.6rem;color:var(--t2);margin-bottom:2px">Tera Referral Code</div>
+            <div style="font-size:.9rem;font-weight:900;letter-spacing:2px;color:var(--ac)" id="myRefCode">Loading...</div>
+          </div>
+          <button onclick="copyRefLink()" style="background:linear-gradient(135deg,var(--ac),#ff6b00);border:none;border-radius:8px;color:#000;font-size:.7rem;font-weight:800;padding:7px 12px;cursor:pointer">📋 Copy Link</button>
+        </div>
+        <button onclick="shareRefWhatsApp()" style="width:100%;background:linear-gradient(135deg,#25D366,#128C7E);border:none;border-radius:10px;color:#fff;font-size:.78rem;font-weight:800;padding:10px;cursor:pointer">📲 WhatsApp pe Share Karo</button>
+        <div style="margin-top:10px;font-size:.65rem;color:var(--t2)">Total Referrals: <b style="color:var(--t1)" id="refCount">0</b></div>
+        <div style="margin-top:6px">
+          <div style="font-size:.63rem;color:var(--t2);margin-bottom:4px">Referral Code Daalo (agar kisi ne refer kiya ho):</div>
+          <div style="display:flex;gap:6px">
+            <input type="text" class="fi" id="refInput" placeholder="Code daalo..." maxlength="8" style="text-transform:uppercase">
+            <button onclick="submitRefCode()" style="background:var(--ac);border:none;border-radius:10px;color:#000;font-size:.72rem;font-weight:800;padding:8px 14px;cursor:pointer;flex-shrink:0">Apply</button>
+          </div>
+          <div id="refStatus" style="font-size:.63rem;margin-top:5px"></div>
+        </div>
+      </div>
+      <div class="scard">
         <div class="sec">📲 Download App (APK)</div>
         <div style="font-size:.69rem;color:var(--t2);margin-bottom:10px">Phone mein install karo — bina browser ke use karo!</div>
         <a href="https://www.mediafire.com/file/muke2yzrrxmnjk9/PS+Study.apk/file" target="_blank" style="display:block;background:linear-gradient(135deg,#00b09b,#96c93d);border:none;border-radius:10px;color:#fff;font-size:.82rem;font-weight:800;padding:12px;text-align:center;text-decoration:none">📥 PS Study APK Download Karo</a>
@@ -3392,7 +3413,7 @@ QB.maths = QB.maths.concat([
 
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],xp:0,badges:[]};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],xp:0,badges:[],streakProtection:false,referrals:0};
 if(!S.examDates) S.examDates={};
 if(!S.customExams) S.customExams=[];
 
@@ -3508,6 +3529,7 @@ function sw(tab){
     var ndk2=document.getElementById('newsdataKey');
     if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
     updateGKStatus();updateNewsDataStatus();renderCountdown();
+    initReferral();
   }
   // Fix #3: pushState for back button
   try{history.pushState({tab:tab},'','#'+tab);}catch(e){}
@@ -4157,7 +4179,7 @@ function initChat(){
 }
 
 var XP_LEVELS=[{name:'Bronze',icon:'🥉',min:0,max:500},{name:'Silver',icon:'🥈',min:500,max:1500},{name:'Gold',icon:'🥇',min:1500,max:3500},{name:'Diamond',icon:'💎',min:3500,max:99999}];
-var ALL_BADGES=[{id:'streak7',icon:'🔥',name:'7 Din Streak'},{id:'streak30',icon:'🏆',name:'30 Din Warrior'},{id:'q50',icon:'🎯',name:'50 Questions'},{id:'q100',icon:'💯',name:'100 Questions'},{id:'q500',icon:'⭐',name:'500 Questions'}];
+var ALL_BADGES=[{id:'streak7',icon:'🔥',name:'7 Din Streak'},{id:'streak30',icon:'🏆',name:'30 Din Warrior'},{id:'q50',icon:'🎯',name:'50 Questions'},{id:'q100',icon:'💯',name:'100 Questions'},{id:'q500',icon:'⭐',name:'500 Questions'},{id:'ref1',icon:'🤝',name:'Pehla Referral'},{id:'ref5',icon:'🌟',name:'5 Referrals'}];
 function addXP(amount){if(!S.xp)S.xp=0;S.xp+=amount;checkBadges();save();updateXPDisplay();if(amount>=10)toast('+'+amount+' XP! ⚡','i');}
 function getLevel(){var xp=S.xp||0;for(var i=XP_LEVELS.length-1;i>=0;i--){if(xp>=XP_LEVELS[i].min)return XP_LEVELS[i];}return XP_LEVELS[0];}
 function checkBadges(){if(!S.badges)S.badges=[];var streak=calcStreak();var nb=[];if(streak>=7&&S.badges.indexOf('streak7')<0)nb.push('streak7');if(streak>=30&&S.badges.indexOf('streak30')<0)nb.push('streak30');var correct=0;Object.values(S.sStats||{}).forEach(function(v){correct+=(v.correct||0);});if(correct>=50&&S.badges.indexOf('q50')<0)nb.push('q50');if(correct>=100&&S.badges.indexOf('q100')<0)nb.push('q100');if(correct>=500&&S.badges.indexOf('q500')<0)nb.push('q500');nb.forEach(function(bid){S.badges.push(bid);var b=ALL_BADGES.find(function(x){return x.id===bid;});if(b)toast('🏅 New Badge: '+b.name,'i');});if(nb.length)save();}
@@ -4178,6 +4200,126 @@ function ocrAction(type){
     if(type==='quiz'){try{var s=txt.indexOf('['),e=txt.lastIndexOf(']');var arr=JSON.parse(txt.substring(s,e+1));var html='<b style="color:var(--ac);font-size:.72rem">Quiz Ready!</b><br>';arr.forEach(function(q,i){html+='<div style="margin-top:8px;padding:8px;background:var(--cd2);border-radius:8px"><b>Q'+(i+1)+'. '+esc(q.q)+'</b>';q.opts.forEach(function(o){html+='<div style="font-size:.7rem">'+esc(o)+'</div>';});html+='<div style="color:var(--gr);font-size:.65rem">✅ '+esc(q.opts[q.ans])+'</div></div>';});output.innerHTML=html;addXP(15);}catch(ex){output.innerHTML='<div style="font-size:.72rem">'+esc(txt)+'</div>';}}
     else{output.innerHTML='<div style="font-size:.75rem;line-height:1.8">'+esc(txt).split('\n').join('<br>')+'</div>';addXP(5);}
   },function(e){output.innerHTML='<div style="color:var(--a2)">Error: '+esc(String(e))+'</div>';});}
+// ── REFERRAL SYSTEM ──
+function getRefCode(){
+  var uid=getUid();
+  if(!uid) return '';
+  // Generate 6-char code from UID
+  var code='';
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  for(var i=0;i<6;i++) code+=chars[uid.charCodeAt(i%uid.length)%chars.length];
+  return code;
+}
+
+function initReferral(){
+  var uid=getUid();if(!uid)return;
+  var code=getRefCode();
+  var el=document.getElementById('myRefCode');
+  if(el) el.textContent=code;
+  var rc=document.getElementById('refCount');
+  if(rc) rc.textContent=S.referrals||0;
+  // Check if streak protection active
+  updateStreakProtectionUI();
+  // Check URL for ref param (new user opening ref link)
+  var urlParams=new URLSearchParams(window.location.search);
+  var refParam=urlParams.get('ref');
+  if(refParam){
+    var inp=document.getElementById('refInput');
+    if(inp) inp.value=refParam.toUpperCase();
+    var st=document.getElementById('refStatus');
+    if(st){st.textContent='Referral code detect hua!';st.style.color='var(--ac)';}
+  }
+}
+
+function copyRefLink(){
+  var code=getRefCode();
+  if(!code){toast('Pehle login karo','w');return;}
+  var link='https://ps-app-rho.vercel.app?ref='+code;
+  try{
+    navigator.clipboard.writeText(link).then(function(){toast('🔗 Link copied!','i');});
+  }catch(e){
+    var ta=document.createElement('textarea');
+    ta.value=link;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    toast('🔗 Link copied!','i');
+  }
+}
+
+function shareRefWhatsApp(){
+  var code=getRefCode();
+  if(!code){toast('Pehle login karo','w');return;}
+  var link='https://ps-app-rho.vercel.app?ref='+code;
+  var msg='Yaar PS Study app try karo — SSC GD/Bihar Police prep ka best app!%0A%0AMere referral se join karo:%0A'+encodeURIComponent(link)+'%0A%0ACode: '+code;
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+
+function submitRefCode(){
+  var inp=document.getElementById('refInput');
+  var code=(inp?inp.value:'').trim().toUpperCase();
+  var st=document.getElementById('refStatus');
+  if(!code||code.length<6){if(st){st.textContent='Valid code daalo (6 characters)';st.style.color='var(--a2)';}return;}
+  var myCode=getRefCode();
+  if(code===myCode){if(st){st.textContent='Apna khud ka code use nahi kar sakte!';st.style.color='var(--a2)';}return;}
+  // Check if already used referral
+  if(S.refUsed){if(st){st.textContent='Tum pehle se ek code use kar chuke ho!';st.style.color='var(--a2)';}return;}
+  // Save that we used a referral
+  S.refUsed=code;
+  addXP(50);
+  // Add streak protection
+  S.streakProtection=true;
+  // Add badge
+  if(S.badges.indexOf('ref1')<0) S.badges.push('ref1');
+  save();
+  // Credit the referrer in Firestore
+  creditReferrer(code);
+  if(st){st.textContent='✅ +50 XP + 🤝 Badge + Streak Protection mili!';st.style.color='var(--gr)';}
+  updateStreakProtectionUI();
+  toast('🎉 Referral apply hua! +50 XP','i');
+  if(inp) inp.value='';
+}
+
+function creditReferrer(theirCode){
+  // Find user with this ref code and credit them
+  db.collection('users').get().then(function(snap){
+    snap.docs.forEach(function(doc){
+      var uid=doc.id;
+      var generatedCode='';
+      var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      for(var i=0;i<6;i++) generatedCode+=chars[uid.charCodeAt(i%uid.length)%chars.length];
+      if(generatedCode===theirCode){
+        // Found referrer - give them XP
+        var data=doc.data();var appData={};
+        try{appData=data.appData?JSON.parse(data.appData):{};}catch(e){}
+        appData.xp=(appData.xp||0)+50;
+        appData.referrals=(appData.referrals||0)+1;
+        if(!appData.badges) appData.badges=[];
+        if(appData.badges.indexOf('ref1')<0) appData.badges.push('ref1');
+        if(appData.referrals>=5&&appData.badges.indexOf('ref5')<0) appData.badges.push('ref5');
+        appData.streakProtection=true;
+        db.collection('users').doc(uid).update({appData:JSON.stringify(appData)});
+      }
+    });
+  });
+}
+
+function updateStreakProtectionUI(){
+  var streakEl=document.getElementById('streakPill');
+  if(streakEl&&S.streakProtection){
+    streakEl.title='Streak Protection Active!';
+    streakEl.style.border='1px solid var(--ac)';
+  }
+}
+
+function useStreakProtection(){
+  if(S.streakProtection){
+    S.streakProtection=false;
+    save();
+    toast('🛡 Streak Protection use hua!','i');
+    return true;
+  }
+  return false;
+}
+
+
 function switchRoom(room){_currentRoom=room;document.querySelectorAll('.room-btn').forEach(function(b){b.classList.remove('active-room');});var rb=document.getElementById('room-'+room);if(rb)rb.classList.add('active-room');var el=document.getElementById('chat-messages');if(el)el.innerHTML='<div style="text-align:center;padding:20px;color:var(--t2);font-size:.72rem">Loading...</div>';if(_chatUnsub){_chatUnsub();_chatUnsub=null;}initChat();}
 function upvoteMsg(docId){if(!currentUser){toast('Login karo','w');return;}var uid=currentUser.uid;var ref=db.collection('community_chat').doc(docId);ref.get().then(function(doc){if(!doc.exists)return;var data=doc.data();var upvotedBy=data.upvotedBy||[];var idx=upvotedBy.indexOf(uid);if(idx>-1){upvotedBy.splice(idx,1);ref.update({upvotes:Math.max(0,(data.upvotes||0)-1),upvotedBy:upvotedBy});}else{upvotedBy.push(uid);ref.update({upvotes:(data.upvotes||0)+1,upvotedBy:upvotedBy});addXP(2);}});}
 
@@ -4295,6 +4437,7 @@ function initApp(){
   updateGKStatus();
   // Save today's task snapshot so Log tab shows correct tasks
   if(S.tasks && S.tasks.length) _saveTaskSnapshot();
+  setTimeout(initReferral, 500);
   var todayXP='xp_'+today();
   if(!localStorage.getItem(todayXP)){try{localStorage.setItem(todayXP,'1');}catch(e){}setTimeout(function(){addXP(5);},2000);}
 }
@@ -5377,7 +5520,7 @@ function initFirebase(){
           loadFromFirestore(function(){initApp();checkAdminNotification();});
         } else {
           currentUser=null;
-          document.getElementById('fbGate').style.display='flex';
+          _showLoginScreen();
           var card2=document.getElementById('settingsUserCard');
           if(card2) card2.style.display='none';
         }
@@ -5393,7 +5536,7 @@ function initFirebase(){
           loadFromFirestore(function(){initApp();checkAdminNotification();});
         } else {
           currentUser=null;
-          document.getElementById('fbGate').style.display='flex';
+          _showLoginScreen();
           var card2=document.getElementById('settingsUserCard');
           if(card2) card2.style.display='none';
         }
