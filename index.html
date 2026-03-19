@@ -592,6 +592,12 @@ body::before{
   border-color:rgba(245,166,35,.5);
   color:var(--ac);font-weight:800;
 }
+.room-btn{flex-shrink:0;background:var(--cd2);border:1px solid var(--br);border-radius:20px;color:var(--t2);font-size:.62rem;font-weight:700;padding:5px 12px;cursor:pointer;white-space:nowrap;}
+.room-btn.active-room{background:rgba(245,166,35,.2);border-color:rgba(245,166,35,.5);color:var(--ac);}
+.msg-bubble{background:var(--cd2);border:1px solid var(--br);border-radius:12px;padding:9px 12px;}
+.msg-bubble .upvote-btn{background:none;border:none;color:var(--t2);font-size:.65rem;cursor:pointer;padding:2px 6px;border-radius:6px;}
+.msg-bubble .upvote-btn.liked{color:var(--ac);}
+.ocr-loading{text-align:center;padding:16px;color:var(--t2);font-size:.72rem;}
 </style>
 </head>
 <body>
@@ -624,6 +630,7 @@ display:none;
     </div>
     <div style="display:flex;align-items:center;gap:6px">
       <div class="streak" id="streakPill">🔥 0 days</div>
+      <div style="font-size:.58rem;font-weight:800;background:rgba(92,106,240,.2);border:1px solid rgba(92,106,240,.3);border-radius:20px;padding:3px 8px;color:#7b87ff" id="header-xp">⚡0XP</div>
       <button class="ibtn" id="themeBtn" onclick="toggleTheme()" style="font-size:.8rem">☀️</button>
     </div>
   </div>
@@ -886,6 +893,14 @@ display:none;
           </div>
           <div style="font-size:.58rem;color:var(--t2);text-align:right">Messages 12h baad<br>auto-delete hote hain</div>
         </div>
+        <!-- Room Tabs -->
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none">
+          <button onclick="switchRoom('general')" id="room-general" class="room-btn active-room">💬 General</button>
+          <button onclick="switchRoom('doubt')" id="room-doubt" class="room-btn">❓ Doubt</button>
+          <button onclick="switchRoom('gk')" id="room-gk" class="room-btn">📚 GK</button>
+          <button onclick="switchRoom('maths')" id="room-maths" class="room-btn">🔢 Maths</button>
+          <button onclick="switchRoom('motivation')" id="room-motivation" class="room-btn">🔥 Motivation</button>
+        </div>
         <!-- Messages -->
         <div id="chat-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-bottom:8px">
           <div style="text-align:center;color:var(--t2);font-size:.72rem;padding:20px">Loading messages...</div>
@@ -932,6 +947,70 @@ display:none;
         <a href="https://newsdata.io/register" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE NewsData Key Lo</a>
       </div>
       </div>
+      <!-- GAMIFICATION -->
+      <div class="scard">
+        <div onclick="toggleGamFolder()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0">
+          <div class="sec" style="margin:0">🎮 Gamification</div>
+          <div id="gam-arrow" style="font-size:.8rem;color:var(--ac);transition:transform .3s">▼</div>
+        </div>
+        <div id="gam-folder" style="display:none;margin-top:12px">
+          <div id="xp-card" style="background:linear-gradient(135deg,rgba(245,166,35,.15),rgba(255,107,0,.1));border:1px solid rgba(245,166,35,.3);border-radius:12px;padding:14px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div>
+                <div style="font-size:.78rem;font-weight:800" id="xp-level-label">🥉 Bronze</div>
+                <div style="font-size:.62rem;color:var(--t2)" id="xp-val-label">0 XP</div>
+              </div>
+              <div style="font-size:1.8rem" id="xp-level-icon">🥉</div>
+            </div>
+            <div style="background:rgba(255,255,255,.08);border-radius:99px;height:6px;overflow:hidden">
+              <div id="xp-bar" style="height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ac),#ff6b00);width:0%;transition:width .5s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--t2);margin-top:4px">
+              <span>0</span><span id="xp-next-label">500 XP to Silver</span>
+            </div>
+          </div>
+          <div style="font-size:.65rem;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏅 Badges</div>
+          <div id="badges-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+          <div style="font-size:.63rem;color:var(--t2);line-height:1.8">
+            <div>✅ Sahi answer → <b style="color:var(--ac)">+10 XP</b></div>
+            <div>📰 CA question → <b style="color:var(--ac)">+15 XP</b></div>
+            <div>🔥 Daily login → <b style="color:var(--ac)">+5 XP</b></div>
+            <div>🏅 7 din streak → <b style="color:var(--ac)">Bronze Badge</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HANDWRITING OCR -->
+      <div class="scard">
+        <div onclick="toggleOCRFolder()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0">
+          <div class="sec" style="margin:0">✍️ Handwriting OCR</div>
+          <div id="ocr-arrow" style="font-size:.8rem;color:var(--ac);transition:transform .3s">▼</div>
+        </div>
+        <div id="ocr-folder" style="display:none;margin-top:12px">
+          <div style="font-size:.69rem;color:var(--t2);margin-bottom:10px">Handwritten notes ki photo lo → AI text extract karega → Quiz/Summary banao!</div>
+          <div id="ocr-preview" style="display:none;background:var(--cd2);border-radius:10px;margin-bottom:8px;overflow:hidden">
+            <img id="ocr-img" style="width:100%;max-height:200px;object-fit:cover" src="" alt="">
+          </div>
+          <div id="ocr-result" style="display:none;background:var(--cd2);border:1px solid var(--br);border-radius:10px;padding:12px;font-size:.72rem;line-height:1.7;margin-bottom:8px;max-height:150px;overflow-y:auto"></div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <label style="flex:1;background:linear-gradient(135deg,#5c6af0,#7c3aed);border-radius:10px;color:#fff;font-size:.75rem;font-weight:800;padding:10px;text-align:center;cursor:pointer">
+              📷 Photo Lo
+              <input type="file" accept="image/*" capture="camera" style="display:none" onchange="handleOCR(this)">
+            </label>
+            <label style="flex:1;background:var(--cd2);border:1px solid var(--br);border-radius:10px;color:var(--tx);font-size:.75rem;font-weight:800;padding:10px;text-align:center;cursor:pointer">
+              🖼 Gallery
+              <input type="file" accept="image/*" style="display:none" onchange="handleOCR(this)">
+            </label>
+          </div>
+          <div id="ocr-actions" style="display:none;display:flex;gap:6px;flex-wrap:wrap">
+            <button onclick="ocrAction('quiz')" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);border-radius:8px;color:var(--ac);font-size:.7rem;font-weight:700;padding:7px 12px;cursor:pointer">🎯 Quiz Banao</button>
+            <button onclick="ocrAction('summary')" style="background:rgba(92,106,240,.15);border:1px solid rgba(92,106,240,.3);border-radius:8px;color:#7b87ff;font-size:.7rem;font-weight:700;padding:7px 12px;cursor:pointer">📋 Summary</button>
+            <button onclick="ocrAction('explain')" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;color:var(--gr);font-size:.7rem;font-weight:700;padding:7px 12px;cursor:pointer">💡 Explain</button>
+          </div>
+          <div id="ocr-output" style="display:none;margin-top:8px;background:var(--cd2);border:1px solid var(--br);border-radius:10px;padding:12px;font-size:.72rem;line-height:1.7"></div>
+        </div>
+      </div>
+
       <div class="scard">
         <div class="sec">📢 WhatsApp Channel</div>
         <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:0;background:linear-gradient(135deg,#25D366,#128C7E)">📢 PS Channel Join Karo</a>
@@ -1083,7 +1162,10 @@ function checkAdminNotification(){
     var ts=data.timestamp?data.timestamp.toMillis():0;
     var seen=0;try{seen=localStorage.getItem(key)||0;}catch(e){}
     if(ts>parseInt(seen)){
-      document.getElementById('adminNotifMsg').textContent=data.message||'';
+      var title=data.title||'Admin ka Message';
+      var msg=data.message||'';
+      var el=document.getElementById('adminNotifMsg');
+      if(el) el.innerHTML='<b style="color:var(--ac)">'+title+'</b><br>'+msg;
       document.getElementById('adminNotif').classList.add('show');
       try{localStorage.setItem(key,ts);}catch(e){}
     }
@@ -3335,7 +3417,7 @@ QB.maths = QB.maths.concat([
 
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[]};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],xp:0,level:'bronze',badges:[]};
 if(!S.examDates) S.examDates={};
 if(!S.customExams) S.customExams=[];
 
@@ -3450,7 +3532,13 @@ function sw(tab){
     if(gk2){try{var gv=localStorage.getItem('ps_gkey');if(gv)gk2.value=gv;}catch(e){}}
     var ndk2=document.getElementById('newsdataKey');
     if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
-    updateGKStatus();updateNewsDataStatus();renderCountdown();
+    updateGKStatus();
+  // Daily login XP
+  var todayXP='xp_'+today();
+  if(!localStorage.getItem(todayXP)){
+    try{localStorage.setItem(todayXP,'1');}catch(e){}
+    setTimeout(function(){addXP(5);},2000);
+  }updateNewsDataStatus();renderCountdown();
   }
   // Fix #3: pushState for back button
   try{history.pushState({tab:tab},'','#'+tab);}catch(e){}
@@ -3839,7 +3927,7 @@ function checkRWAAnswer(i){
     if(j===correct) opts[j].style.background='rgba(0,200,100,.25)';
     else if(j===i&&i!==correct) opts[j].style.background='rgba(255,80,80,.25)';
   }
-  if(i===correct) s.score++;
+  if(i===correct){s.score++;addXP(10);}
   var sol=q.sol||q.solution||q.explanation||'';
   if(sol){
     document.getElementById('rwa-sol').style.display='block';
@@ -4063,6 +4151,8 @@ function toggleCDFolder(){
 }
 // ── COMMUNITY CHAT ──
 var _chatUnsub=null;
+var _currentRoom='general';
+var _ocrText='';
 var _chatLoaded=false;
 
 function initChat(){
@@ -4097,37 +4187,263 @@ function initChat(){
     });
 }
 
+// ── COMMUNITY ROOMS ──
+function switchRoom(room){
+  _currentRoom=room;
+  document.querySelectorAll('.room-btn').forEach(function(b){b.classList.remove('active-room');});
+  var rb=document.getElementById('room-'+room);
+  if(rb) rb.classList.add('active-room');
+  // Re-render with filter
+  var el=document.getElementById('chat-messages');
+  if(el) el.innerHTML='<div style="text-align:center;padding:20px;color:var(--t2);font-size:.72rem">Loading...</div>';
+  initChat();
+}
+
+function upvoteMsg(docId){
+  if(!currentUser){toast('Login karo pehle','w');return;}
+  var uid=currentUser.uid;
+  var ref=db.collection('community_chat').doc(docId);
+  ref.get().then(function(doc){
+    if(!doc.exists)return;
+    var data=doc.data();
+    var upvotedBy=data.upvotedBy||[];
+    var idx=upvotedBy.indexOf(uid);
+    if(idx>-1){
+      upvotedBy.splice(idx,1);
+      ref.update({upvotes:Math.max(0,(data.upvotes||0)-1),upvotedBy:upvotedBy});
+    } else {
+      upvotedBy.push(uid);
+      ref.update({upvotes:(data.upvotes||0)+1,upvotedBy:upvotedBy});
+      addXP(2);
+    }
+  });
+}
+
+// ── GAMIFICATION ──
+var XP_LEVELS=[
+  {name:'Bronze',icon:'🥉',min:0,max:500},
+  {name:'Silver',icon:'🥈',min:500,max:1500},
+  {name:'Gold',icon:'🥇',min:1500,max:3500},
+  {name:'Diamond',icon:'💎',min:3500,max:99999}
+];
+var ALL_BADGES=[
+  {id:'streak7',icon:'🔥',name:'7 Din Streak',desc:'7 din lagaataar'},
+  {id:'streak30',icon:'🏆',name:'30 Din Warrior',desc:'30 din streak'},
+  {id:'q50',icon:'🎯',name:'50 Questions',desc:'50 sahi jawab'},
+  {id:'q100',icon:'💯',name:'100 Questions',desc:'100 sahi jawab'},
+  {id:'q500',icon:'⭐',name:'500 Questions',desc:'500 sahi jawab'},
+  {id:'login7',icon:'📅',name:'7 Din Active',desc:'7 din login'},
+  {id:'ca10',icon:'📰',name:'CA Master',desc:'10 CA questions'},
+];
+
+function addXP(amount,type){
+  if(!S.xp) S.xp=0;
+  S.xp+=amount;
+  checkBadges();
+  save();
+  updateXPDisplay();
+  // Small toast for big XP
+  if(amount>=10) toast('+'+amount+' XP! ⚡','i');
+}
+
+function getLevel(){
+  var xp=S.xp||0;
+  for(var i=XP_LEVELS.length-1;i>=0;i--){
+    if(xp>=XP_LEVELS[i].min) return XP_LEVELS[i];
+  }
+  return XP_LEVELS[0];
+}
+
+function checkBadges(){
+  if(!S.badges) S.badges=[];
+  var streak=calcStreak();
+  var xp=S.xp||0;
+  var newBadges=[];
+  if(streak>=7&&S.badges.indexOf('streak7')<0){newBadges.push('streak7');}
+  if(streak>=30&&S.badges.indexOf('streak30')<0){newBadges.push('streak30');}
+  // Count correct answers from sStats
+  var correct=0;
+  Object.values(S.sStats||{}).forEach(function(v){correct+=(v.correct||0);});
+  if(correct>=50&&S.badges.indexOf('q50')<0){newBadges.push('q50');}
+  if(correct>=100&&S.badges.indexOf('q100')<0){newBadges.push('q100');}
+  if(correct>=500&&S.badges.indexOf('q500')<0){newBadges.push('q500');}
+  newBadges.forEach(function(bid){
+    S.badges.push(bid);
+    var b=ALL_BADGES.find(function(x){return x.id===bid;});
+    if(b) toast('🏅 New Badge: '+b.name,'i');
+  });
+  if(newBadges.length) save();
+}
+
+function updateXPDisplay(){
+  var lvl=getLevel();
+  var xp=S.xp||0;
+  var nextLvl=XP_LEVELS[Math.min(XP_LEVELS.indexOf(lvl)+1,XP_LEVELS.length-1)];
+  var pct=Math.min(100,Math.round((xp-lvl.min)/(nextLvl.min-lvl.min)*100))||0;
+  var lbl=document.getElementById('xp-level-label');if(lbl)lbl.textContent=lvl.icon+' '+lvl.name;
+  var val=document.getElementById('xp-val-label');if(val)val.textContent=xp+' XP';
+  var icon=document.getElementById('xp-level-icon');if(icon)icon.textContent=lvl.icon;
+  var bar=document.getElementById('xp-bar');if(bar)bar.style.width=pct+'%';
+  var next=document.getElementById('xp-next-label');
+  if(next)next.textContent=nextLvl.min>xp?(nextLvl.min-xp)+' XP to '+nextLvl.name:'Max Level!';
+  // Badges
+  var bl=document.getElementById('badges-list');
+  if(bl){
+    if(!(S.badges&&S.badges.length)){
+      bl.innerHTML='<div style="font-size:.65rem;color:var(--t2)">Koi badge nahi abhi — questions solve karo!</div>';
+    } else {
+      bl.innerHTML=S.badges.map(function(bid){
+        var b=ALL_BADGES.find(function(x){return x.id===bid;})||{icon:'🏅',name:bid};
+        return '<div style="background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);border-radius:8px;padding:6px 10px;font-size:.65rem;text-align:center;cursor:pointer" title="'+b.name+'">'+b.icon+'<br><span style="font-size:.55rem;color:var(--t2)">'+b.name+'</span></div>';
+      }).join('');
+    }
+  }
+  // Header XP
+  var hxp=document.getElementById('header-xp');
+  if(hxp)hxp.textContent='⚡'+xp+'XP';
+}
+
+function toggleGamFolder(){
+  var f=document.getElementById('gam-folder');
+  var a=document.getElementById('gam-arrow');
+  if(!f)return;
+  var open=f.style.display==='block';
+  f.style.display=open?'none':'block';
+  if(a)a.style.transform=open?'':'rotate(180deg)';
+  if(!open) updateXPDisplay();
+}
+
+// ── HANDWRITING OCR ──
+function toggleOCRFolder(){
+  var f=document.getElementById('ocr-folder');
+  var a=document.getElementById('ocr-arrow');
+  if(!f)return;
+  var open=f.style.display==='block';
+  f.style.display=open?'none':'block';
+  if(a)a.style.transform=open?'':'rotate(180deg)';
+}
+
+function handleOCR(input){
+  var file=input.files[0];if(!file)return;
+  var key=getGKey();if(!key){toast('Groq key chahiye!','w');return;}
+  var preview=document.getElementById('ocr-preview');
+  var img=document.getElementById('ocr-img');
+  var result=document.getElementById('ocr-result');
+  var actions=document.getElementById('ocr-actions');
+  var output=document.getElementById('ocr-output');
+  if(preview)preview.style.display='block';
+  if(result)result.style.display='none';
+  if(actions)actions.style.display='none';
+  if(output)output.style.display='none';
+  _ocrText='';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    if(img)img.src=e.target.result;
+    var base64=e.target.result.split(',')[1];
+    if(result){result.style.display='block';result.innerHTML='<div class="ocr-loading">🔍 Text extract ho raha hai...</div>';}
+    // Call Groq vision API
+    fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({
+        model:'meta-llama/llama-4-scout-17b-16e-instruct',
+        max_tokens:2000,
+        messages:[{role:'user',content:[
+          {type:'image_url',image_url:{url:'data:image/jpeg;base64,'+base64}},
+          {type:'text',text:'Is handwritten notes ki image se exact text extract karo. Sirf text return karo, koi explanation nahi. Hindi ya English jo bhi likha ho.'}
+        ]}]
+      })
+    }).then(function(r){return r.json();})
+    .then(function(data){
+      if(data.error) throw new Error(data.error.message);
+      _ocrText=data.choices[0].message.content;
+      if(result){result.innerHTML='<b style="font-size:.65rem;color:var(--ac)">📝 Extracted Text:</b><br><br>'+esc(_ocrText);}
+      if(actions){actions.style.display='flex';}
+      addXP(5);
+    }).catch(function(e){
+      if(result)result.innerHTML='<div style="color:var(--a2);font-size:.72rem">❌ '+esc(e.message)+'</div>';
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function ocrAction(type){
+  if(!_ocrText){toast('Pehle photo lo','w');return;}
+  var key=getGKey();if(!key){toast('Groq key chahiye','w');return;}
+  var output=document.getElementById('ocr-output');
+  if(!output)return;
+  output.style.display='block';
+  output.innerHTML='<div class="ocr-loading">🤖 AI kaam kar raha hai...</div>';
+  var prompts={
+    quiz:'Neeche diye text se 5 MCQ banao Bihar Police/SSC pattern mein. Hindi mein. JSON array return karo: [{"q":"...","opts":["A)","B)","C)","D)"],"ans":0,"sol":"..."}]
+
+Text:
+'+_ocrText,
+    summary:'Neeche diye text ka 5-7 line ka summary banao. Hindi mein. Simple language.
+
+Text:
+'+_ocrText,
+    explain:'Neeche diye text ko detail mein explain karo. Examples do. Hindi mein.
+
+Text:
+'+_ocrText
+  };
+  groqFetch(key,{
+    _models:['llama-3.3-70b-versatile','llama3-70b-8192'],
+    messages:[{role:'user',content:prompts[type]}],
+    max_tokens:2000,temperature:0.3
+  },function(data){
+    var txt=data.choices[0].message.content;
+    if(type==='quiz'){
+      try{
+        var s=txt.indexOf('['),e=txt.lastIndexOf(']');
+        var arr=JSON.parse(txt.substring(s,e+1));
+        var html='<div style="font-size:.72rem;font-weight:800;color:var(--ac);margin-bottom:10px">🎯 Quiz Ready!</div>';
+        arr.forEach(function(q,i){
+          html+='<div style="margin-bottom:12px;padding:10px;background:var(--cd2);border-radius:10px"><b>Q'+(i+1)+'. '+esc(q.q)+'</b><br>';
+          q.opts.forEach(function(o){html+='<div style="margin-top:4px;font-size:.7rem">'+esc(o)+'</div>';});
+          html+='<div style="margin-top:6px;font-size:.65rem;color:var(--gr)">✅ '+esc(q.opts[q.ans])+'</div>';
+          html+='<div style="font-size:.63rem;color:var(--t2)">💡 '+esc(q.sol)+'</div></div>';
+        });
+        output.innerHTML=html;
+        addXP(15);
+      }catch(e){output.innerHTML='<div style="font-size:.72rem">'+esc(txt)+'</div>';}
+    } else {
+      output.innerHTML='<div style="font-size:.75rem;line-height:1.8">'+esc(txt).replace(/
+/g,'<br>')+'</div>';
+      addXP(5);
+    }
+  },function(e){output.innerHTML='<div style="color:var(--a2)">❌ '+esc(e.message||String(e))+'</div>';});
+}
+
+
 function _renderChatMsgs(docs){
   var el=document.getElementById('chat-messages');
   if(!el) return;
   var uid=currentUser?currentUser.uid:'';
-  if(!docs.length){
-    el.innerHTML='<div style="text-align:center;padding:30px;font-size:.75rem;color:var(--t2)">Koi message nahi — pehla message tum bhejo! 🚀</div>';
+  var filtered=docs.filter(function(doc){return (doc.data().room||'general')===_currentRoom;});
+  if(!filtered.length){
+    el.innerHTML='<div style="text-align:center;padding:30px;font-size:.75rem;color:var(--t2)">Is room mein koi message nahi 🚀</div>';
     return;
   }
-  var html='';
-  var now=Date.now();
-  docs.forEach(function(doc){
-    var d=doc.data();
-    var isMe=d.uid===uid;
+  var html='';var now=Date.now();
+  filtered.forEach(function(doc){
+    var d=doc.data();var docId=doc.id;var isMe=d.uid===uid;
     var age=now-d.ts;
-    var timeStr=age<60000?'Abhi'
-      :age<3600000?Math.round(age/60000)+'m pehle'
-      :Math.round(age/3600000)+'h pehle';
+    var timeStr=age<60000?'Abhi':age<3600000?Math.round(age/60000)+'m pehle':Math.round(age/3600000)+'h pehle';
     var expires=Math.round((12*3600000-age)/3600000);
-    html+='<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+'">'
+    var upvotes=d.upvotes||0;var liked=(d.upvotedBy||[]).indexOf(uid)>-1;
+    html+='<div style="display:flex;flex-direction:column;align-items:'+(isMe?'flex-end':'flex-start')+';margin-bottom:8px">'
       +'<div style="font-size:.57rem;color:var(--t2);margin-bottom:2px;'+(isMe?'text-align:right':'')+'">'
-      +(isMe?'':('<span style="font-weight:800;color:var(--ac)">'+esc(d.name||'User')+'</span> · '))
-      +timeStr+(expires<=1?' · 🕐 '+expires+'h bachi':'')
-      +(isMe?' · Tu':'')
-      +'</div>'
-      +'<div style="max-width:80%;padding:8px 11px;border-radius:'+(isMe?'12px 12px 3px 12px':'12px 12px 12px 3px')+';background:'+(isMe?'var(--ac)':'var(--cd2)')+';color:'+(isMe?'#fff':'var(--tx)')+';font-size:.78rem;line-height:1.4;word-break:break-word">'
-      +esc(d.text)+'</div></div>';
+      +(isMe?'':'<span style="font-weight:800;color:var(--ac)">'+esc(d.name||'User')+'</span> · ')
+      +timeStr+(expires<=1?' · 🕐'+expires+'h':'')+( isMe?' · Tu':'')+'</div>'
+      +'<div style="max-width:82%;padding:8px 11px;border-radius:'+(isMe?'12px 12px 3px 12px':'12px 12px 12px 3px')+';background:'+(isMe?'var(--ac)':'var(--cd2)')+';color:'+(isMe?'#000':'var(--tx)')+';font-size:.78rem;line-height:1.4;word-break:break-word">'+esc(d.text)+'</div>'
+      +'<button onclick="upvoteMsg(''+docId+'')" style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:2px 8px;font-size:.6rem;cursor:pointer;color:'+(liked?'var(--ac)':'var(--t2)')+';margin-top:2px">👍 '+upvotes+'</button>'
+      +'</div>';
   });
-  el.innerHTML=html;
-  // Scroll to bottom
-  el.scrollTop=el.scrollHeight;
+  el.innerHTML=html;el.scrollTop=el.scrollHeight;
 }
+
 
 function sendChatMsg(){
   if(!currentUser){toast('Pehle login karo','w');return;}
@@ -4143,6 +4459,9 @@ function sendChatMsg(){
     name:S.name||currentUser.displayName||'Student',
     uid:currentUser.uid,
     ts:Date.now(),
+    room:_currentRoom,
+    upvotes:0,
+    upvotedBy:[],
     expires:Date.now()+(12*60*60*1000)
   }).then(function(){
     inp.disabled=false;
@@ -4215,6 +4534,7 @@ function updateHeader(){
   var gr=document.getElementById('greet');if(gr)gr.textContent=g;
   var un=document.getElementById('uname');if(un)un.textContent=S.name;
   var sp=document.getElementById('streakPill');if(sp)sp.textContent='🔥 '+calcStreak()+' days';
+  var hxp=document.getElementById('header-xp');if(hxp)hxp.textContent='⚡'+(S.xp||0)+'XP';
   var m4s=document.getElementById('m4s');if(m4s)m4s.textContent=calcStreak();
   var m4a=document.getElementById('m4a');if(m4a)m4a.textContent=calcMonthAvg()+'%';
   var total=0;
@@ -4866,7 +5186,7 @@ function askQWithImg(msg,imgDataUrl){
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
     body:JSON.stringify({
-      model:'llama-3.2-11b-vision-preview',
+      model:'meta-llama/llama-4-scout-17b-16e-instruct',
       messages:[{role:'user',content:[
         {type:'text',text:msg||'Is image mein jo bhi question ya problem hai use Hindi mein solve karo. Exam point of view se jawab do.'},
         {type:'image_url',image_url:{url:imgDataUrl}}
@@ -5407,6 +5727,13 @@ function loadFromFirestore(cb){
 
           // examDates merge
           if(doc.data().examDates) S.examDates=Object.assign({},S.examDates||{},doc.data().examDates);
+
+          // bookmarks restore — Firestore se
+          if(doc.data().bookmarks&&doc.data().bookmarks.length){
+            S.bookmarks=doc.data().bookmarks;
+          } else if(p.bookmarks&&p.bookmarks.length){
+            S.bookmarks=p.bookmarks;
+          }
 
           // studyLog field merge (separate Firestore field for sessions)
           if(doc.data().studyLog){
