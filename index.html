@@ -3532,13 +3532,7 @@ function sw(tab){
     if(gk2){try{var gv=localStorage.getItem('ps_gkey');if(gv)gk2.value=gv;}catch(e){}}
     var ndk2=document.getElementById('newsdataKey');
     if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
-    updateGKStatus();
-  // Daily login XP
-  var todayXP='xp_'+today();
-  if(!localStorage.getItem(todayXP)){
-    try{localStorage.setItem(todayXP,'1');}catch(e){}
-    setTimeout(function(){addXP(5);},2000);
-  }updateNewsDataStatus();renderCountdown();
+    updateGKStatus();updateNewsDataStatus();
   }
   // Fix #3: pushState for back button
   try{history.pushState({tab:tab},'','#'+tab);}catch(e){}
@@ -4278,7 +4272,8 @@ function checkBadges(){
 function updateXPDisplay(){
   var lvl=getLevel();
   var xp=S.xp||0;
-  var nextLvl=XP_LEVELS[Math.min(XP_LEVELS.indexOf(lvl)+1,XP_LEVELS.length-1)];
+  var lvlIdx=XP_LEVELS.findIndex(function(l){return l.name===lvl.name;});
+  var nextLvl=XP_LEVELS[Math.min(lvlIdx+1,XP_LEVELS.length-1)];
   var pct=Math.min(100,Math.round((xp-lvl.min)/(nextLvl.min-lvl.min)*100))||0;
   var lbl=document.getElementById('xp-level-label');if(lbl)lbl.textContent=lvl.icon+' '+lvl.name;
   var val=document.getElementById('xp-val-label');if(val)val.textContent=xp+' XP';
@@ -4526,6 +4521,12 @@ function initApp(){
   updateGKStatus();
   // Save today's task snapshot so Log tab shows correct tasks
   if(S.tasks && S.tasks.length) _saveTaskSnapshot();
+  // Daily login XP
+  var todayXP='xp_'+today();
+  if(!localStorage.getItem(todayXP)){
+    try{localStorage.setItem(todayXP,'1');}catch(e){}
+    setTimeout(function(){addXP(5);},2000);
+  }
 }
 
 function updateHeader(){
