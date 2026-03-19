@@ -594,17 +594,6 @@ body::before{
 .room-btn.active-room{background:rgba(245,166,35,.2);border-color:rgba(245,166,35,.5);color:var(--ac);}
 .ocr-loading{text-align:center;padding:16px;color:var(--t2);font-size:.72rem;}
 </style>
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "9c300333-1e3c-4e15-a248-33473d972b5d",
-      notifyButton: { enable: false },
-      serviceWorkerParam: { scope: "/" }
-    });
-  });
-</script>
 </head>
 <body>
 <button id="globalBackBtn" onclick="appGoBack()" style="
@@ -5752,11 +5741,6 @@ function saveToFirestore(){
 }
 
 // ── START ──
-function initFCM(){
-  // OneSignal handles notifications - nothing needed here
-  console.log('OneSignal active');
-}
-
 
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
 
