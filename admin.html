@@ -532,13 +532,12 @@ function showPage(id,el){
   if(id==='analytics')loadAnalytics();
   if(id==='leaderboard')loadLeaderboard('streak');
   if(id==='apimonitor')loadAPIMonitor();
-  if(id==='broadcast'){loadBcHistory();if(typeof loadOSKey==='function')loadOSKey();}
+  if(id==='broadcast')loadBcHistory();
   if(id==='referrals')loadReferrals();
   if(id==='errors')loadErrors();
   if(id==='directmsg')loadDmHistory();
   if(id==='examstats')loadExamStats();
   if(id==='userprofile'){var ps=document.getElementById('profileSearch');if(ps)ps.focus();}
-  if(id==='users')loadUsers&&loadUsers();
 }
 
 // ── DASHBOARD ──
@@ -903,7 +902,11 @@ function searchUserProfile(){
       snap.docs.forEach(function(doc){
         var d=doc.data();var ap={};
         try{ap=d.appData?JSON.parse(d.appData):{};}catch(e){}
-        html+='<div onclick="renderUserProfile(''+doc.id+'',this.dataset.d)" data-d=''+JSON.stringify(d).replace(/'/g,"&#39;")+'' style="cursor:pointer;padding:10px;background:var(--bg2);border-radius:8px;margin-bottom:6px">'+esc(d.name||'?')+' — '+doc.id.substring(0,12)+'...</div>';
+        var btn=document.createElement('div');
+        btn.style.cssText='cursor:pointer;padding:10px;background:var(--bg2);border-radius:8px;margin-bottom:6px';
+        btn.textContent=(d.name||'?')+' — '+doc.id.substring(0,12)+'...';
+        btn.onclick=(function(id,dat){return function(){renderUserProfile(id,dat);};})(doc.id,d);
+        cont.appendChild(btn);
       });
       cont.innerHTML=html;
     }
@@ -938,10 +941,21 @@ function renderUserProfile(uid, data){
     +'<div style="font-size:.68rem;margin-bottom:12px"><b>🛡 Streak Protection:</b> '+(ap.streakProtection?'✅ Active':'❌ Inactive')+'</div>'
     +'<div style="font-size:.7rem;font-weight:700;margin-bottom:6px">📊 Subject-wise Performance:</div>'
     +renderSubjectStats(ap.sStats||{})
-    +'<div style="display:flex;gap:8px;margin-top:12px">'
-    +'<button class="btn btn-primary btn-sm" onclick="openDirectMsgFor(''+uid+'',''+esc(data.name||'User')+'')">✉️ Message Bhejo</button>'
-    +'<button class="btn btn-danger btn-sm" onclick="confirmAction('User ban karna hai?',''+esc(data.name||'User')+' ko ban karoge?',function(){banUser(''+uid+'')})">🚫 Ban</button>'
-    +'</div></div>';
+    +'<div style="display:flex;gap:8px;margin-top:12px" id="prof-btns-'+uid+'"></div></div>';
+  // Add buttons safely
+  setTimeout(function(){
+    var btnsDiv=document.getElementById('prof-btns-'+uid);
+    if(!btnsDiv)return;
+    var msgBtn=document.createElement('button');
+    msgBtn.className='btn btn-primary btn-sm';
+    msgBtn.textContent='✉️ Message Bhejo';
+    msgBtn.onclick=function(){openDirectMsgFor(uid,data.name||'User');};
+    var banBtn=document.createElement('button');
+    banBtn.className='btn btn-danger btn-sm';
+    banBtn.textContent='🚫 Ban';
+    banBtn.onclick=function(){confirmAction('User ban karna hai?',(data.name||'User')+' ko ban karoge?',function(){banUser(uid);});};
+    btnsDiv.appendChild(msgBtn);btnsDiv.appendChild(banBtn);
+  },100);
 }
 
 function renderSubjectStats(sStats){
@@ -1046,16 +1060,23 @@ function loadQBank(){
 
 function renderQBank(sub){
   var list=document.getElementById('qbankList');
+  list.innerHTML='';
   if(!_qbankData.length){list.innerHTML='<div style="color:var(--t2);font-size:.72rem;text-align:center;padding:20px">Koi question nahi — Add karo!</div>';return;}
-  var html='';
   _qbankData.forEach(function(q,i){
-    html+='<div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">'
-      +'<div style="font-size:.72rem;font-weight:700;margin-bottom:6px">Q'+(i+1)+'. '+esc(q.q)+'</div>'
-      +'<div style="font-size:.65rem;color:var(--t2)">'+(q.opts||[]).map(function(o,j){return '<span style="color:'+(j===q.ans?'var(--gr)':'var(--t2)')+'">'+esc(o)+'</span>';}).join(' | ')+'</div>'
-      +'<button onclick="deleteQuestion('+i+',''+sub+'')" style="background:none;border:none;color:var(--rd);font-size:.65rem;cursor:pointer;margin-top:4px">🗑 Delete</button>'
-      +'</div>';
+    var card=document.createElement('div');
+    card.style.cssText='background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px';
+    var optsHtml=(q.opts||[]).map(function(o,j){
+      return '<span style="color:'+(j===q.ans?'var(--gr)':'var(--t2)')+'">'+esc(o)+'</span>';
+    }).join(' | ');
+    card.innerHTML='<div style="font-size:.72rem;font-weight:700;margin-bottom:6px">Q'+(i+1)+'. '+esc(q.q)+'</div>'
+      +'<div style="font-size:.65rem;color:var(--t2)">'+optsHtml+'</div>';
+    var delBtn=document.createElement('button');
+    delBtn.textContent='🗑 Delete';
+    delBtn.style.cssText='background:none;border:none;color:var(--rd);font-size:.65rem;cursor:pointer;margin-top:4px';
+    delBtn.onclick=(function(idx){return function(){deleteQuestion(idx,sub);};})(i);
+    card.appendChild(delBtn);
+    list.appendChild(card);
   });
-  list.innerHTML=html;
 }
 
 function showAddQuestion(){
