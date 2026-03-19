@@ -154,10 +154,16 @@ select.inp{cursor:pointer;}
     <div class="tab active" onclick="showPage('dashboard',this)">📊 Dashboard</div>
     <div class="tab" onclick="showPage('analytics',this)">📈 Analytics</div>
     <div class="tab" onclick="showPage('users',this)">👥 Users</div>
+    <div class="tab" onclick="showPage('userprofile',this)">👤 Profile</div>
+    <div class="tab" onclick="showPage('referrals',this)">🤝 Referrals</div>
     <div class="tab" onclick="showPage('leaderboard',this)">🏆 Leaderboard</div>
     <div class="tab" onclick="showPage('broadcast',this)">📢 Broadcast</div>
+    <div class="tab" onclick="showPage('directmsg',this)">✉️ Direct Msg</div>
+    <div class="tab" onclick="showPage('qbank',this)">📚 Q.Bank</div>
+    <div class="tab" onclick="showPage('examstats',this)">🎯 Exam Stats</div>
     <div class="tab" onclick="showPage('apimonitor',this)">🔑 API Monitor</div>
     <div class="tab" onclick="showPage('chat',this)">💬 Chat</div>
+    <div class="tab" onclick="showPage('errors',this)">🐛 Errors</div>
     <div class="tab" onclick="showPage('actions',this)">⚡ Actions</div>
     <div class="tab" onclick="showPage('logs',this)">📋 Logs</div>
   </div>
@@ -247,13 +253,7 @@ select.inp{cursor:pointer;}
   <div id="page-broadcast" class="page">
     <div class="card">
       <div class="card-title">📢 Sabhi Users ko Message Bhejo</div>
-      <div class="card-desc">Yeh message sab users ko <b>push notification</b> + app popup mein jaayega</div>
-      <div style="background:rgba(255,165,0,.1);border:1px solid rgba(255,165,0,.3);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.72rem">
-        ⚙️ OneSignal REST Key:
-        <input type="password" id="osRestKey" placeholder="Daalo..." style="background:var(--bg2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:4px 8px;font-size:.7rem;width:100%;margin-top:4px">
-        <button onclick="saveOSKey()" style="background:var(--ac);border:none;border-radius:6px;color:#000;padding:4px 10px;font-size:.68rem;font-weight:700;cursor:pointer;margin-top:4px">Save</button>
-        <span id="osKeyStatus" style="font-size:.65rem;color:var(--gr);margin-left:6px"></span>
-      </div>
+      <div class="card-desc">Yeh message sab users ko app kholne pe popup mein dikhega</div>
       <input class="inp" id="bcTitle" placeholder="📌 Title (e.g. 🎉 Naya Feature!)" maxlength="60">
       <textarea class="admin-ta" id="bcMsg" placeholder="Message likho... (max 300 char)" maxlength="300" oninput="updateBcPreview()"></textarea>
       <div style="font-size:.6rem;color:var(--t2);margin-bottom:6px">👁 Preview:</div>
@@ -380,6 +380,119 @@ select.inp{cursor:pointer;}
     </div>
   </div>
 </div>
+
+<!-- USER PROFILE PAGE -->
+<div id="page-userprofile" class="page">
+  <div class="card">
+    <div class="card-title">👤 User Detail Profile</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="inp" id="profileSearch" placeholder="UID ya naam search karo..." style="flex:1">
+      <button class="btn btn-primary btn-sm" onclick="searchUserProfile()">🔍 Search</button>
+    </div>
+    <div id="profileResult">
+      <div style="color:var(--t2);font-size:.72rem;text-align:center;padding:20px">User search karo upar 👆</div>
+    </div>
+  </div>
+</div>
+
+<!-- REFERRALS PAGE -->
+<div id="page-referrals" class="page">
+  <div class="card">
+    <div class="card-title">🤝 Referral Tracking</div>
+    <button class="btn btn-primary btn-sm" onclick="loadReferrals()" style="margin-bottom:12px">🔄 Load Referrals</button>
+    <div id="referralStats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="stat-card"><div class="stat-val" id="ref-total">—</div><div class="stat-label">Total Referrals</div></div>
+      <div class="stat-card"><div class="stat-val" id="ref-today" style="color:var(--gr)">—</div><div class="stat-label">Aaj Ke</div></div>
+      <div class="stat-card"><div class="stat-val" id="ref-top" style="color:var(--or)">—</div><div class="stat-label">Top Referrer</div></div>
+    </div>
+    <div id="referralList"></div>
+  </div>
+</div>
+
+<!-- DIRECT MESSAGE PAGE -->
+<div id="page-directmsg" class="page">
+  <div class="card">
+    <div class="card-title">✉️ Individual User ko Message</div>
+    <div class="card-desc">Kisi ek user ko personal message bhejo — unke app mein notification aayega</div>
+    <input class="inp" id="dmUid" placeholder="User UID daalo...">
+    <input class="inp" id="dmTitle" placeholder="Title..." maxlength="60">
+    <textarea class="admin-ta" id="dmMsg" placeholder="Message..." maxlength="300"></textarea>
+    <button class="btn btn-primary" onclick="sendDirectMsg()">📨 Send Message</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Recent Direct Messages</div>
+    <div id="dmHistory"></div>
+  </div>
+</div>
+
+<!-- QUESTION BANK PAGE -->
+<div id="page-qbank" class="page">
+  <div class="card">
+    <div class="card-title">📚 Question Bank Manager</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <select class="inp" id="qbSubject" style="width:auto;margin:0">
+        <option value="gk">GK/GS</option>
+        <option value="maths">Maths</option>
+        <option value="reasoning">Reasoning</option>
+        <option value="hindi">Hindi</option>
+        <option value="english">English</option>
+        <option value="science">Science</option>
+        <option value="history">History</option>
+        <option value="polity">Polity</option>
+        <option value="geography">Geography</option>
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="loadQBank()">📖 Load Questions</button>
+      <button class="btn btn-sm btn-orange" onclick="showAddQuestion()">➕ Add Question</button>
+    </div>
+    <div id="qbankStats" style="font-size:.7rem;color:var(--t2);margin-bottom:8px"></div>
+    <div id="addQForm" style="display:none;background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px">
+      <div style="font-size:.75rem;font-weight:700;margin-bottom:8px">➕ Naya Question Add Karo</div>
+      <textarea class="admin-ta" id="newQ" placeholder="Question..." style="margin-bottom:6px"></textarea>
+      <input class="inp" id="newOpt0" placeholder="Option A..." style="margin-bottom:4px">
+      <input class="inp" id="newOpt1" placeholder="Option B..." style="margin-bottom:4px">
+      <input class="inp" id="newOpt2" placeholder="Option C..." style="margin-bottom:4px">
+      <input class="inp" id="newOpt3" placeholder="Option D..." style="margin-bottom:4px">
+      <select class="inp" id="newAns" style="margin-bottom:6px">
+        <option value="0">A sahi hai</option>
+        <option value="1">B sahi hai</option>
+        <option value="2">C sahi hai</option>
+        <option value="3">D sahi hai</option>
+      </select>
+      <input class="inp" id="newSol" placeholder="Solution/Explanation...">
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-primary btn-sm" onclick="addQuestion()">✅ Save</button>
+        <button class="btn btn-sm" onclick="document.getElementById('addQForm').style.display='none'" style="background:var(--bg3)">Cancel</button>
+      </div>
+    </div>
+    <div id="qbankList"></div>
+  </div>
+</div>
+
+<!-- EXAM STATS PAGE -->
+<div id="page-examstats" class="page">
+  <div class="card">
+    <div class="card-title">🎯 Exam-wise User Count</div>
+    <button class="btn btn-primary btn-sm" onclick="loadExamStats()" style="margin-bottom:12px">🔄 Load Stats</button>
+    <div id="examStatsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-title">📊 Subject Performance</div>
+    <div id="subjectPerf"></div>
+  </div>
+</div>
+
+<!-- ERRORS PAGE -->
+<div id="page-errors" class="page">
+  <div class="card">
+    <div class="card-title">🐛 App Errors & Crashes</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn btn-primary btn-sm" onclick="loadErrors()">🔄 Refresh</button>
+      <button class="btn btn-danger btn-sm" onclick="clearErrors()">🗑 Clear All</button>
+    </div>
+    <div id="errorsList"><div style="color:var(--t2);font-size:.72rem;text-align:center;padding:20px">Load karo errors dekhe ke liye</div></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -633,75 +746,23 @@ function updateBcPreview(){
 }
 
 function sendBroadcast(){
-  var title=(document.getElementById('bcTitle').value||'').trim()||'PS Study';
+  var title=(document.getElementById('bcTitle').value||'').trim()||'Admin ka Message';
   var msg=(document.getElementById('bcMsg').value||'').trim();
   if(!msg){toast('❌ Message likho!');return;}
-
-  // 1. Save to Firestore (in-app notification)
   var data={message:msg,title:title,timestamp:firebase.firestore.FieldValue.serverTimestamp(),active:true,type:'broadcast'};
   db.collection('admin').doc('notification').set(data).then(function(){
     return db.collection('admin').doc('bc_history').collection('msgs').add(data);
   }).then(function(){
-    log('📢 Firestore broadcast: ['+title+'] '+msg.substring(0,50),'ok');
-  }).catch(function(e){log('❌ Firestore: '+e.message,'err');});
-
-  // 2. Send via OneSignal (push notification - even when app closed)
-  var ONESIGNAL_APP_ID='9c300333-1e3c-4e15-a248-33473d972b5d';
-  // Note: REST API key needed - store in admin settings
-  var restKey=localStorage.getItem('os_rest_key')||'';
-  if(!restKey){
-    toast('⚠️ OneSignal REST Key daalo Settings mein!');
-    // Still send Firestore broadcast
-    toast('📢 In-app broadcast sent!');
+    toast('📢 Broadcast sent!');log('📢 Broadcast: ['+title+'] '+msg.substring(0,50),'ok');
     document.getElementById('bcTitle').value='';document.getElementById('bcMsg').value='';updateBcPreview();
     loadBcHistory();loadDashboard();
-    return;
-  }
-  fetch('https://onesignal.com/api/v1/notifications',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'Authorization':'Key '+restKey
-    },
-    body:JSON.stringify({
-      app_id:ONESIGNAL_APP_ID,
-      included_segments:['All'],
-      headings:{en:title},
-      contents:{en:msg},
-      url:'https://ps-app-rho.vercel.app',
-      web_push_topic:'broadcast'
-    })
-  }).then(function(r){return r.json();})
-  .then(function(res){
-    if(res.errors){log('❌ OneSignal: '+JSON.stringify(res.errors),'err');}
-    else{
-      toast('🔔 Push notification sent! ('+res.recipients+' users)');
-      log('✅ OneSignal: '+res.recipients+' users ko notification gaya','ok');
-    }
-    document.getElementById('bcTitle').value='';document.getElementById('bcMsg').value='';updateBcPreview();
-    loadBcHistory();loadDashboard();
-  }).catch(function(e){log('❌ OneSignal error: '+e.message,'err');});
+  }).catch(function(e){log('❌ Broadcast: '+e.message,'err');});
 }
 
 function clearBroadcast(){
   db.collection('admin').doc('notification').set({active:false,message:'',title:'',timestamp:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
     toast('🗑 Notification cleared!');log('🗑 Notification cleared','info');loadDashboard();
   });
-}
-
-function saveOSKey(){
-  var key=document.getElementById('osRestKey').value.trim();
-  if(!key){toast('Key daalo!');return;}
-  localStorage.setItem('os_rest_key',key);
-  var st=document.getElementById('osKeyStatus');
-  if(st){st.textContent='✅ Saved!';}
-  toast('✅ REST Key saved!');
-}
-function loadOSKey(){
-  var key=localStorage.getItem('os_rest_key')||'';
-  var inp=document.getElementById('osRestKey');
-  var st=document.getElementById('osKeyStatus');
-  if(inp&&key){inp.value=key;if(st)st.textContent='✅ Key loaded';}
 }
 
 function loadBcHistory(){
@@ -815,6 +876,293 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this)closeDetail();});
 document.getElementById('confirmModal').addEventListener('click',function(e){if(e.target===this)closeConfirm();});
+
+// ── USER PROFILE ──
+function searchUserProfile(){
+  var q=document.getElementById('profileSearch').value.trim();
+  if(!q){toast('UID ya naam daalo');return;}
+  var cont=document.getElementById('profileResult');
+  cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Searching...</div>';
+  // Search by UID first, then by name
+  db.collection('users').doc(q).get().then(function(doc){
+    if(doc.exists){renderUserProfile(doc.id, doc.data());return;}
+    // Try name search
+    return db.collection('users').where('name','>=',q).where('name','<=',q+'z').limit(5).get();
+  }).then(function(snap){
+    if(!snap||snap.empty){cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">User nahi mila</div>';return;}
+    if(snap.docs){
+      var html='';
+      snap.docs.forEach(function(doc){
+        var d=doc.data();var ap={};
+        try{ap=d.appData?JSON.parse(d.appData):{};}catch(e){}
+        html+='<div onclick="renderUserProfile(''+doc.id+'',this.dataset.d)" data-d=''+JSON.stringify(d).replace(/'/g,"&#39;")+'' style="cursor:pointer;padding:10px;background:var(--bg2);border-radius:8px;margin-bottom:6px">'+esc(d.name||'?')+' — '+doc.id.substring(0,12)+'...</div>';
+      });
+      cont.innerHTML=html;
+    }
+  }).catch(function(e){cont.innerHTML='<div style="color:var(--rd)">Error: '+esc(e.message)+'</div>';});
+}
+
+function renderUserProfile(uid, data){
+  var cont=document.getElementById('profileResult');
+  var ap={};try{ap=data.appData?JSON.parse(data.appData):{};}catch(e){}
+  var badges=(ap.badges||[]).join(', ')||'None';
+  var xp=ap.xp||0;var streak=data.streak||0;
+  var refs=ap.referrals||0;
+  // Count correct answers
+  var correct=0;var total=0;
+  Object.values(ap.sStats||{}).forEach(function(v){correct+=(v.correct||0);total+=(v.total||0);});
+  var acc=total>0?Math.round(correct/total*100):0;
+  cont.innerHTML='<div style="background:var(--bg2);border-radius:12px;padding:14px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+    +'<div style="width:44px;height:44px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#000">'+(data.name||'?')[0].toUpperCase()+'</div>'
+    +'<div><div style="font-weight:800;font-size:.85rem">'+esc(data.name||'Unknown')+'</div><div style="font-size:.62rem;color:var(--t2)">'+uid+'</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">'
+    +'<div class="stat-card"><div class="stat-val">'+xp+'</div><div class="stat-label">⚡ XP</div></div>'
+    +'<div class="stat-card"><div class="stat-val" style="color:var(--or)">'+streak+'</div><div class="stat-label">🔥 Streak</div></div>'
+    +'<div class="stat-card"><div class="stat-val" style="color:var(--gr)">'+refs+'</div><div class="stat-label">🤝 Referrals</div></div>'
+    +'<div class="stat-card"><div class="stat-val">'+correct+'</div><div class="stat-label">✅ Correct</div></div>'
+    +'<div class="stat-card"><div class="stat-val">'+total+'</div><div class="stat-label">📝 Total Q</div></div>'
+    +'<div class="stat-card"><div class="stat-val" style="color:var(--bl)">'+acc+'%</div><div class="stat-label">🎯 Accuracy</div></div>'
+    +'</div>'
+    +'<div style="font-size:.68rem;margin-bottom:6px"><b>🏅 Badges:</b> '+esc(badges)+'</div>'
+    +'<div style="font-size:.68rem;margin-bottom:6px"><b>📚 Bookmarks:</b> '+(ap.bookmarks||[]).length+'</div>'
+    +'<div style="font-size:.68rem;margin-bottom:6px"><b>🎭 Mock Tests:</b> '+(ap.mocks||[]).length+'</div>'
+    +'<div style="font-size:.68rem;margin-bottom:12px"><b>🛡 Streak Protection:</b> '+(ap.streakProtection?'✅ Active':'❌ Inactive')+'</div>'
+    +'<div style="font-size:.7rem;font-weight:700;margin-bottom:6px">📊 Subject-wise Performance:</div>'
+    +renderSubjectStats(ap.sStats||{})
+    +'<div style="display:flex;gap:8px;margin-top:12px">'
+    +'<button class="btn btn-primary btn-sm" onclick="openDirectMsgFor(''+uid+'',''+esc(data.name||'User')+'')">✉️ Message Bhejo</button>'
+    +'<button class="btn btn-danger btn-sm" onclick="confirmAction('User ban karna hai?',''+esc(data.name||'User')+' ko ban karoge?',function(){banUser(''+uid+'')})">🚫 Ban</button>'
+    +'</div></div>';
+}
+
+function renderSubjectStats(sStats){
+  var html='<div style="font-size:.65rem">';
+  Object.keys(sStats).forEach(function(sub){
+    var v=sStats[sub];var acc=v.total>0?Math.round(v.correct/v.total*100):0;
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
+      +'<div style="width:60px;color:var(--t2)">'+sub+'</div>'
+      +'<div style="flex:1;background:var(--bg3);border-radius:4px;height:6px"><div style="width:'+acc+'%;background:var(--gr);height:100%;border-radius:4px"></div></div>'
+      +'<div style="width:35px;text-align:right">'+acc+'%</div></div>';
+  });
+  return html+'</div>';
+}
+
+function banUser(uid){
+  db.collection('users').doc(uid).update({banned:true}).then(function(){
+    toast('🚫 User banned!');log('🚫 User banned: '+uid,'warn');
+  });
+}
+
+function openDirectMsgFor(uid, name){
+  showPage('directmsg', document.querySelector('[onclick*="directmsg"]'));
+  document.getElementById('dmUid').value=uid;
+  document.getElementById('dmTitle').value='Admin ka Message';
+  document.getElementById('dmMsg').focus();
+}
+
+// ── REFERRALS ──
+function loadReferrals(){
+  var list=document.getElementById('referralList');
+  list.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Loading...</div>';
+  db.collection('users').orderBy('referrals','desc').limit(50).get().then(function(snap){
+    var total=0;var today=new Date().toDateString();var topName='—';var topCount=0;
+    var html='<table class="tbl"><thead><tr><th>User</th><th>Code</th><th>Referrals</th><th>XP</th></tr></thead><tbody>';
+    snap.docs.forEach(function(doc){
+      var d=doc.data();var ap={};try{ap=d.appData?JSON.parse(d.appData):{};}catch(e){}
+      var refs=d.referrals||0;if(!refs)return;
+      total+=refs;
+      if(refs>topCount){topCount=refs;topName=d.name||'?';}
+      html+='<tr><td>'+esc(d.name||'?')+'</td><td style="font-family:monospace;color:var(--ac)">'+(d.refCode||'—')+'</td><td style="color:var(--gr);font-weight:700">'+refs+'</td><td>'+((ap.xp)||0)+' XP</td></tr>';
+    });
+    html+='</tbody></table>';
+    list.innerHTML=html;
+    document.getElementById('ref-total').textContent=total;
+    document.getElementById('ref-top').textContent=topName;
+    document.getElementById('ref-today').textContent='—';
+  }).catch(function(e){list.innerHTML='<div style="color:var(--rd)">Error: '+e.message+'</div>';});
+}
+
+// ── DIRECT MESSAGE ──
+function sendDirectMsg(){
+  var uid=document.getElementById('dmUid').value.trim();
+  var title=(document.getElementById('dmTitle').value||'').trim()||'Admin Message';
+  var msg=document.getElementById('dmMsg').value.trim();
+  if(!uid||!msg){toast('UID aur message dono chahiye!');return;}
+  var data={to:uid,title:title,message:msg,from:'admin',timestamp:firebase.firestore.FieldValue.serverTimestamp(),read:false};
+  db.collection('users').doc(uid).collection('notifications').add(data).then(function(){
+    // Also save to admin history
+    return db.collection('admin').doc('direct_msgs').collection('history').add(data);
+  }).then(function(){
+    toast('✅ Message sent!');log('✉️ Direct msg to '+uid+': '+msg.substring(0,40),'ok');
+    document.getElementById('dmMsg').value='';
+    loadDmHistory();
+  }).catch(function(e){toast('❌ Error: '+e.message);});
+}
+
+function loadDmHistory(){
+  var hist=document.getElementById('dmHistory');if(!hist)return;
+  db.collection('admin').doc('direct_msgs').collection('history').orderBy('timestamp','desc').limit(20).get().then(function(snap){
+    if(snap.empty){hist.innerHTML='<div style="color:var(--t2);font-size:.7rem">Koi message nahi</div>';return;}
+    var html='';
+    snap.docs.forEach(function(doc){
+      var d=doc.data();
+      var t=d.timestamp?new Date(d.timestamp.toMillis()).toLocaleString('hi-IN'):'—';
+      html+='<div style="padding:8px;background:var(--bg2);border-radius:8px;margin-bottom:6px;font-size:.7rem">'
+        +'<div style="font-weight:700">'+esc(d.title)+'</div>'
+        +'<div style="color:var(--t2)">To: '+d.to.substring(0,16)+'... | '+t+'</div>'
+        +'<div>'+esc(d.message)+'</div></div>';
+    });
+    hist.innerHTML=html;
+  });
+}
+
+// ── QUESTION BANK ──
+var _qbankData=[];
+function loadQBank(){
+  var sub=document.getElementById('qbSubject').value;
+  var list=document.getElementById('qbankList');
+  var stats=document.getElementById('qbankStats');
+  list.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Loading...</div>';
+  // QB is in main app's localStorage - get from Firestore admin collection
+  db.collection('admin').doc('qbank_'+sub).get().then(function(doc){
+    if(doc.exists&&doc.data().questions){
+      _qbankData=doc.data().questions;
+    } else {
+      _qbankData=[];
+    }
+    stats.textContent=_qbankData.length+' questions in '+sub;
+    renderQBank(sub);
+  }).catch(function(){_qbankData=[];renderQBank(sub);});
+}
+
+function renderQBank(sub){
+  var list=document.getElementById('qbankList');
+  if(!_qbankData.length){list.innerHTML='<div style="color:var(--t2);font-size:.72rem;text-align:center;padding:20px">Koi question nahi — Add karo!</div>';return;}
+  var html='';
+  _qbankData.forEach(function(q,i){
+    html+='<div style="background:var(--bg2);border-radius:10px;padding:10px;margin-bottom:8px">'
+      +'<div style="font-size:.72rem;font-weight:700;margin-bottom:6px">Q'+(i+1)+'. '+esc(q.q)+'</div>'
+      +'<div style="font-size:.65rem;color:var(--t2)">'+(q.opts||[]).map(function(o,j){return '<span style="color:'+(j===q.ans?'var(--gr)':'var(--t2)')+'">'+esc(o)+'</span>';}).join(' | ')+'</div>'
+      +'<button onclick="deleteQuestion('+i+',''+sub+'')" style="background:none;border:none;color:var(--rd);font-size:.65rem;cursor:pointer;margin-top:4px">🗑 Delete</button>'
+      +'</div>';
+  });
+  list.innerHTML=html;
+}
+
+function showAddQuestion(){
+  var f=document.getElementById('addQForm');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+function addQuestion(){
+  var q=document.getElementById('newQ').value.trim();
+  if(!q){toast('Question likho!');return;}
+  var opts=[
+    document.getElementById('newOpt0').value.trim(),
+    document.getElementById('newOpt1').value.trim(),
+    document.getElementById('newOpt2').value.trim(),
+    document.getElementById('newOpt3').value.trim()
+  ];
+  if(opts.filter(Boolean).length<2){toast('Kam se kam 2 options chahiye!');return;}
+  var ans=parseInt(document.getElementById('newAns').value);
+  var sol=document.getElementById('newSol').value.trim();
+  var sub=document.getElementById('qbSubject').value;
+  _qbankData.push({q:q,opts:opts,ans:ans,sol:sol,level:'medium',ch:sub});
+  db.collection('admin').doc('qbank_'+sub).set({questions:_qbankData},{merge:true}).then(function(){
+    toast('✅ Question added!');log('📚 Q added to '+sub,'ok');
+    renderQBank(sub);
+    document.getElementById('addQForm').style.display='none';
+    ['newQ','newOpt0','newOpt1','newOpt2','newOpt3','newSol'].forEach(function(id){document.getElementById(id).value='';});
+  });
+}
+
+function deleteQuestion(idx, sub){
+  _qbankData.splice(idx,1);
+  db.collection('admin').doc('qbank_'+sub).set({questions:_qbankData}).then(function(){
+    toast('🗑 Question deleted!');renderQBank(sub);
+    document.getElementById('qbankStats').textContent=_qbankData.length+' questions in '+sub;
+  });
+}
+
+// ── EXAM STATS ──
+function loadExamStats(){
+  var grid=document.getElementById('examStatsGrid');
+  var subPerf=document.getElementById('subjectPerf');
+  grid.innerHTML='<div style="color:var(--t2);font-size:.72rem">Loading...</div>';
+  db.collection('users').get().then(function(snap){
+    var examCounts={};var subStats={};var totalUsers=snap.size;
+    snap.docs.forEach(function(doc){
+      var d=doc.data();var ap={};try{ap=d.appData?JSON.parse(d.appData):{};}catch(e){}
+      // Exam dates
+      Object.keys(d.examDates||{}).forEach(function(exam){
+        examCounts[exam]=(examCounts[exam]||0)+1;
+      });
+      // Subject stats
+      Object.keys(ap.sStats||{}).forEach(function(sub){
+        if(!subStats[sub]) subStats[sub]={correct:0,total:0,users:0};
+        subStats[sub].correct+=(ap.sStats[sub].correct||0);
+        subStats[sub].total+=(ap.sStats[sub].total||0);
+        subStats[sub].users++;
+      });
+    });
+    // Render exam counts
+    var html='';
+    var examLabels={ssc_gd:'SSC GD',ssc_cgl:'SSC CGL',bihar_police:'Bihar Police',up_police:'UP Police',rrb_ntpc:'RRB NTPC',nda:'NDA',agniveer:'Agniveer'};
+    Object.keys(examCounts).sort(function(a,b){return examCounts[b]-examCounts[a];}).forEach(function(exam){
+      html+='<div class="stat-card"><div class="stat-val" style="color:var(--or)">'+examCounts[exam]+'</div><div class="stat-label">'+(examLabels[exam]||exam)+'</div></div>';
+    });
+    if(!html) html='<div style="color:var(--t2);font-size:.72rem">Koi exam date set nahi kiya</div>';
+    grid.innerHTML=html;
+    // Render subject performance
+    var sHtml='<table class="tbl"><thead><tr><th>Subject</th><th>Users</th><th>Avg Accuracy</th><th>Total Questions</th></tr></thead><tbody>';
+    Object.keys(subStats).sort(function(a,b){return subStats[b].total-subStats[a].total;}).forEach(function(sub){
+      var v=subStats[sub];var acc=v.total>0?Math.round(v.correct/v.total*100):0;
+      sHtml+='<tr><td>'+sub+'</td><td>'+v.users+'</td><td style="color:'+(acc>=70?'var(--gr)':acc>=50?'var(--or)':'var(--rd)')+'">'+acc+'%</td><td>'+v.total+'</td></tr>';
+    });
+    sHtml+='</tbody></table>';
+    subPerf.innerHTML=sHtml;
+  });
+}
+
+// ── ERRORS ──
+function loadErrors(){
+  var list=document.getElementById('errorsList');
+  list.innerHTML='Loading...';
+  db.collection('admin').doc('errors').collection('log').orderBy('ts','desc').limit(50).get().then(function(snap){
+    if(snap.empty){list.innerHTML='<div style="color:var(--gr);text-align:center;padding:20px;font-size:.72rem">✅ Koi error nahi!</div>';return;}
+    var html='';
+    snap.docs.forEach(function(doc){
+      var d=doc.data();
+      var t=d.ts?new Date(d.ts.toMillis()).toLocaleString('hi-IN'):'—';
+      html+='<div style="padding:8px;background:rgba(255,50,50,.08);border:1px solid rgba(255,50,50,.2);border-radius:8px;margin-bottom:6px;font-size:.68rem">'
+        +'<div style="color:var(--rd);font-weight:700">'+esc(d.type||'Error')+'</div>'
+        +'<div>'+esc(d.message||'')+'</div>'
+        +'<div style="color:var(--t2);margin-top:3px">User: '+(d.uid||'anon').substring(0,16)+' | '+t+'</div></div>';
+    });
+    list.innerHTML=html;
+  }).catch(function(e){list.innerHTML='<div style="color:var(--rd)">Error loading: '+e.message+'</div>';});
+}
+
+function clearErrors(){
+  db.collection('admin').doc('errors').collection('log').get().then(function(snap){
+    var batch=db.batch();
+    snap.docs.forEach(function(doc){batch.delete(doc.ref);});
+    return batch.commit();
+  }).then(function(){toast('✅ Errors cleared!');loadErrors();});
+}
+
+// ── PAGE INIT ──
+var _origShowPage=showPage;
+function showPage(page, el){
+  _origShowPage(page, el);
+  if(page==='referrals') loadReferrals();
+  if(page==='errors') loadErrors();
+  if(page==='directmsg') loadDmHistory();
+  if(page==='examstats') loadExamStats();
+  if(page==='userprofile') document.getElementById('profileSearch').focus();
+}
+
 </script>
 </body>
 </html>
