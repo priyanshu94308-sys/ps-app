@@ -4229,8 +4229,17 @@ function initReferral(){
   var code=getRefCode();
   var el=document.getElementById('myRefCode');
   if(el) el.textContent=code;
+  // Load referral count from Firestore (most accurate)
   var rc=document.getElementById('refCount');
   if(rc) rc.textContent=S.referrals||0;
+  if(uid){
+    db.collection('users').doc(uid).get().then(function(doc){
+      if(doc.exists&&doc.data().referrals){
+        S.referrals=doc.data().referrals;
+        if(rc) rc.textContent=S.referrals;
+      }
+    }).catch(function(){});
+  }
   // Check if streak protection active
   updateStreakProtectionUI();
   // Check URL for ref param (new user opening ref link)
@@ -4261,7 +4270,7 @@ function shareRefWhatsApp(){
   var code=getRefCode();
   if(!code){toast('Pehle login karo','w');return;}
   var link='https://ps-app-rho.vercel.app?ref='+code;
-  var msg='Yaar PS Study app try karo — SSC GD/Bihar Police prep ka best app!%0A%0AMere referral se join karo:%0A'+encodeURIComponent(link)+'%0A%0ACode: '+code;
+  var msg='🎯 PS Study — SSC GD & Bihar Police ki FREE taiyari!%0A%0A✅ AI Questions%0A✅ Daily Current Affairs%0A✅ Practice Questions%0A%0AJoin karo:%0A'+encodeURIComponent(link)+'%0A%0ACode: '+code+'%0A%0A📢 Join WhatsApp Channel for more updates:%0Ahttps://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E';
   window.open('https://wa.me/?text='+msg,'_blank');
 }
 
@@ -4291,27 +4300,26 @@ function submitRefCode(){
 }
 
 function creditReferrer(theirCode){
-  // Find user with this ref code and credit them
-  db.collection('users').get().then(function(snap){
-    snap.docs.forEach(function(doc){
-      var uid=doc.id;
-      var generatedCode='';
-      var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      for(var i=0;i<6;i++) generatedCode+=chars[uid.charCodeAt(i%uid.length)%chars.length];
-      if(generatedCode===theirCode){
-        // Found referrer - give them XP
-        var data=doc.data();var appData={};
-        try{appData=data.appData?JSON.parse(data.appData):{};}catch(e){}
-        appData.xp=(appData.xp||0)+50;
-        appData.referrals=(appData.referrals||0)+1;
-        if(!appData.badges) appData.badges=[];
-        if(appData.badges.indexOf('ref1')<0) appData.badges.push('ref1');
-        if(appData.referrals>=5&&appData.badges.indexOf('ref5')<0) appData.badges.push('ref5');
-        appData.streakProtection=true;
-        db.collection('users').doc(uid).update({appData:JSON.stringify(appData)});
-      }
+  // Query directly by refCode field — no full scan
+  db.collection('users').where('refCode','==',theirCode).limit(1).get()
+  .then(function(snap){
+    if(snap.empty){console.log('Referrer not found:',theirCode);return;}
+    var doc=snap.docs[0];
+    var data=doc.data();var appData={};
+    try{appData=data.appData?JSON.parse(data.appData):{};}catch(e){}
+    var newReferrals=(appData.referrals||0)+1;
+    appData.xp=(appData.xp||0)+50;
+    appData.referrals=newReferrals;
+    if(!appData.badges) appData.badges=[];
+    if(appData.badges.indexOf('ref1')<0) appData.badges.push('ref1');
+    if(newReferrals>=5&&appData.badges.indexOf('ref5')<0) appData.badges.push('ref5');
+    appData.streakProtection=true;
+    doc.ref.update({
+      appData:JSON.stringify(appData),
+      referrals:newReferrals
     });
-  });
+    console.log('✅ Referrer credited:',doc.id);
+  }).catch(function(e){console.error('Credit error:',e);});
 }
 
 function updateStreakProtectionUI(){
@@ -5723,7 +5731,9 @@ function saveToFirestore(){
       name:S.name,
       streak:calcStreak(),
       examDates:S.examDates||{},
-      studyLog:studyLog
+      studyLog:studyLog,
+      refCode:getRefCode(),
+      referrals:S.referrals||0
     },{merge:true}).catch(function(e){console.error('Save error:',e);});
   },1500);
 }
