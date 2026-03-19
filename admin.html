@@ -247,7 +247,13 @@ select.inp{cursor:pointer;}
   <div id="page-broadcast" class="page">
     <div class="card">
       <div class="card-title">📢 Sabhi Users ko Message Bhejo</div>
-      <div class="card-desc">Yeh message sab users ko app kholne pe popup mein dikhega</div>
+      <div class="card-desc">Yeh message sab users ko <b>push notification</b> + app popup mein jaayega</div>
+      <div style="background:rgba(255,165,0,.1);border:1px solid rgba(255,165,0,.3);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.72rem">
+        ⚙️ OneSignal REST Key:
+        <input type="password" id="osRestKey" placeholder="Daalo..." style="background:var(--bg2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:4px 8px;font-size:.7rem;width:100%;margin-top:4px">
+        <button onclick="saveOSKey()" style="background:var(--ac);border:none;border-radius:6px;color:#000;padding:4px 10px;font-size:.68rem;font-weight:700;cursor:pointer;margin-top:4px">Save</button>
+        <span id="osKeyStatus" style="font-size:.65rem;color:var(--gr);margin-left:6px"></span>
+      </div>
       <input class="inp" id="bcTitle" placeholder="📌 Title (e.g. 🎉 Naya Feature!)" maxlength="60">
       <textarea class="admin-ta" id="bcMsg" placeholder="Message likho... (max 300 char)" maxlength="300" oninput="updateBcPreview()"></textarea>
       <div style="font-size:.6rem;color:var(--t2);margin-bottom:6px">👁 Preview:</div>
@@ -627,23 +633,75 @@ function updateBcPreview(){
 }
 
 function sendBroadcast(){
-  var title=(document.getElementById('bcTitle').value||'').trim()||'Admin ka Message';
+  var title=(document.getElementById('bcTitle').value||'').trim()||'PS Study';
   var msg=(document.getElementById('bcMsg').value||'').trim();
   if(!msg){toast('❌ Message likho!');return;}
+
+  // 1. Save to Firestore (in-app notification)
   var data={message:msg,title:title,timestamp:firebase.firestore.FieldValue.serverTimestamp(),active:true,type:'broadcast'};
   db.collection('admin').doc('notification').set(data).then(function(){
     return db.collection('admin').doc('bc_history').collection('msgs').add(data);
   }).then(function(){
-    toast('📢 Broadcast sent!');log('📢 Broadcast: ['+title+'] '+msg.substring(0,50),'ok');
+    log('📢 Firestore broadcast: ['+title+'] '+msg.substring(0,50),'ok');
+  }).catch(function(e){log('❌ Firestore: '+e.message,'err');});
+
+  // 2. Send via OneSignal (push notification - even when app closed)
+  var ONESIGNAL_APP_ID='9c300333-1e3c-4e15-a248-33473d972b5d';
+  // Note: REST API key needed - store in admin settings
+  var restKey=localStorage.getItem('os_rest_key')||'';
+  if(!restKey){
+    toast('⚠️ OneSignal REST Key daalo Settings mein!');
+    // Still send Firestore broadcast
+    toast('📢 In-app broadcast sent!');
     document.getElementById('bcTitle').value='';document.getElementById('bcMsg').value='';updateBcPreview();
     loadBcHistory();loadDashboard();
-  }).catch(function(e){log('❌ Broadcast: '+e.message,'err');});
+    return;
+  }
+  fetch('https://onesignal.com/api/v1/notifications',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':'Key '+restKey
+    },
+    body:JSON.stringify({
+      app_id:ONESIGNAL_APP_ID,
+      included_segments:['All'],
+      headings:{en:title},
+      contents:{en:msg},
+      url:'https://ps-app-rho.vercel.app',
+      web_push_topic:'broadcast'
+    })
+  }).then(function(r){return r.json();})
+  .then(function(res){
+    if(res.errors){log('❌ OneSignal: '+JSON.stringify(res.errors),'err');}
+    else{
+      toast('🔔 Push notification sent! ('+res.recipients+' users)');
+      log('✅ OneSignal: '+res.recipients+' users ko notification gaya','ok');
+    }
+    document.getElementById('bcTitle').value='';document.getElementById('bcMsg').value='';updateBcPreview();
+    loadBcHistory();loadDashboard();
+  }).catch(function(e){log('❌ OneSignal error: '+e.message,'err');});
 }
 
 function clearBroadcast(){
   db.collection('admin').doc('notification').set({active:false,message:'',title:'',timestamp:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){
     toast('🗑 Notification cleared!');log('🗑 Notification cleared','info');loadDashboard();
   });
+}
+
+function saveOSKey(){
+  var key=document.getElementById('osRestKey').value.trim();
+  if(!key){toast('Key daalo!');return;}
+  localStorage.setItem('os_rest_key',key);
+  var st=document.getElementById('osKeyStatus');
+  if(st){st.textContent='✅ Saved!';}
+  toast('✅ REST Key saved!');
+}
+function loadOSKey(){
+  var key=localStorage.getItem('os_rest_key')||'';
+  var inp=document.getElementById('osRestKey');
+  var st=document.getElementById('osKeyStatus');
+  if(inp&&key){inp.value=key;if(st)st.textContent='✅ Key loaded';}
 }
 
 function loadBcHistory(){
