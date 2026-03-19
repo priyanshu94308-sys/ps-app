@@ -631,9 +631,12 @@ display:none;
         <div style="font-size:.85rem;font-weight:700;letter-spacing:.2px" id="uname">Student</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <div class="streak" id="streakPill">🔥 0 days</div>
-      <div style="font-size:.58rem;font-weight:800;background:rgba(92,106,240,.2);border:1px solid rgba(92,106,240,.3);border-radius:20px;padding:3px 8px;color:#7b87ff" id="header-xp">⚡0XP</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <!-- Streak + XP pills — compact -->
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+        <div class="streak" id="streakPill" style="font-size:.62rem;padding:3px 8px">🔥 0 days</div>
+        <div style="font-size:.55rem;font-weight:800;background:rgba(92,106,240,.2);border:1px solid rgba(92,106,240,.3);border-radius:20px;padding:2px 7px;color:#7b87ff" id="header-xp">⚡0XP</div>
+      </div>
       <button class="ibtn" id="themeBtn" onclick="toggleTheme()" style="font-size:.8rem">☀️</button>
     </div>
   </div>
@@ -658,8 +661,8 @@ display:none;
       </div>
       <div class="scard" style="margin-bottom:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="sec" style="margin:0">&#128197; Exam Countdown</div>
-          <div style="font-size:.58rem;color:var(--t2)">Settings mein date set karo</div>
+          <div class="sec" style="margin:0">📅 Exam Countdown</div>
+          <div onclick="sw('settings')" style="font-size:.58rem;color:var(--ac);cursor:pointer;font-weight:700">+ Date set karo</div>
         </div>
         <div id="home-countdown"></div>
       </div>
