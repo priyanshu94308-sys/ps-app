@@ -4257,12 +4257,13 @@ function copyRefLink(){
   var code=getRefCode();
   if(!code){toast('Pehle login karo','w');return;}
   var link='https://ps-app-rho.vercel.app?ref='+code;
+  var fullMsg='🎯 PS Study — SSC GD & Bihar Police ki FREE taiyari!\n\n✅ AI Questions\n✅ Daily Current Affairs\n✅ Practice Questions\n\nJoin karo:\n'+link+'\n\nCode: '+code+'\n\n📢 Join WhatsApp Channel for more updates:\nhttps://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E';
   try{
-    navigator.clipboard.writeText(link).then(function(){toast('🔗 Link copied!','i');});
+    navigator.clipboard.writeText(fullMsg).then(function(){toast('✅ Message copied!','i');});
   }catch(e){
     var ta=document.createElement('textarea');
-    ta.value=link;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-    toast('🔗 Link copied!','i');
+    ta.value=fullMsg;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    toast('✅ Message copied!','i');
   }
 }
 
@@ -4270,8 +4271,8 @@ function shareRefWhatsApp(){
   var code=getRefCode();
   if(!code){toast('Pehle login karo','w');return;}
   var link='https://ps-app-rho.vercel.app?ref='+code;
-  var msg='🎯 PS Study — SSC GD & Bihar Police ki FREE taiyari!%0A%0A✅ AI Questions%0A✅ Daily Current Affairs%0A✅ Practice Questions%0A%0AJoin karo:%0A'+encodeURIComponent(link)+'%0A%0ACode: '+code+'%0A%0A📢 Join WhatsApp Channel for more updates:%0Ahttps://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E';
-  window.open('https://wa.me/?text='+msg,'_blank');
+  var fullMsg='🎯 PS Study — SSC GD & Bihar Police ki FREE taiyari!\n\n✅ AI Questions\n✅ Daily Current Affairs\n✅ Practice Questions\n\nJoin karo:\n'+link+'\n\nCode: '+code+'\n\n📢 Join WhatsApp Channel for more updates:\nhttps://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E';
+  window.open('https://wa.me/?text='+encodeURIComponent(fullMsg),'_blank');
 }
 
 function submitRefCode(){
