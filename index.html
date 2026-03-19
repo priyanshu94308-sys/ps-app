@@ -81,14 +81,11 @@ body::before{
    HEADER
 ═══════════════════════════════ */
 .hdr{
-  height:62px;
-  padding:0 18px;
-  background:rgba(19,22,31,.85);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
+  padding:14px 16px 10px;
+  background:var(--bg);
   border-bottom:1px solid var(--br);
   display:flex;align-items:center;justify-content:space-between;
-  position:fixed;top:0;left:0;right:0;z-index:998;
+  margin-bottom:4px;
 }
 .ps-logo{
   font-size:.78rem;font-weight:900;
@@ -127,7 +124,7 @@ body::before{
    LAYOUT
 ═══════════════════════════════ */
 .content{
-  position:fixed;top:62px;bottom:66px;
+  position:fixed;top:0;bottom:66px;
   left:0;right:0;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
@@ -617,7 +614,14 @@ display:none;
 
 
 <div id="app" style="display:block;height:100vh;">
-  <div class="hdr">
+  
+  <div class="content">
+    <svg width="0" height="0" style="position:absolute">
+      <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#5b6af0"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient></defs>
+    </svg>
+    <!-- HOME -->
+    <div class="tab active" id="tab-home">
+      <div class="hdr">
     <div style="display:flex;align-items:center;gap:10px">
       <!-- Avatar -->
       <div onclick="sw('settings')" style="position:relative;cursor:pointer;flex-shrink:0">
@@ -640,12 +644,6 @@ display:none;
       <button class="ibtn" id="themeBtn" onclick="toggleTheme()" style="font-size:.8rem">☀️</button>
     </div>
   </div>
-  <div class="content">
-    <svg width="0" height="0" style="position:absolute">
-      <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#5b6af0"/><stop offset="100%" style="stop-color:#a78bfa"/></linearGradient></defs>
-    </svg>
-    <!-- HOME -->
-    <div class="tab active" id="tab-home">
       <div class="hero">
         <div style="font-size:.6rem;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">📅 Aaj ka Routine</div>
         <div style="display:flex;align-items:center;gap:14px">
@@ -3522,6 +3520,12 @@ function toggleTheme(){
 function sw(tab){
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
+  // Header sirf Home tab mein dikhega
+  var hdr=document.querySelector('.hdr');
+  if(hdr) hdr.style.display=tab==='home'?'flex':'none';
+  // Content top padding adjust
+  var cont=document.querySelector('.content');
+  if(cont) cont.style.paddingTop=tab==='home'?'72px':'12px';
   var tabEl=document.getElementById('tab-'+tab);
   var tbEl=document.getElementById('tb-'+tab);
   if(tabEl) tabEl.classList.add('active');
