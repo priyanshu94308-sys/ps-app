@@ -678,7 +678,7 @@ function renderUsers(users){
   if(!users.length){cont.innerHTML='<div style="color:var(--t2);text-align:center;padding:20px;font-size:.72rem">Koi user nahi</div>';return;}
   var html='<div style="font-size:.62rem;color:var(--t2);margin-bottom:8px">'+users.length+' users</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>User</th><th>Stats</th><th>Last Active</th><th>Action</th></tr></thead><tbody>';
   users.forEach(function(u){
-    html+='<tr><td><div class="u-name">'+esc(u.name)+'</div><div class="u-sub">'+u.uid.substring(0,14)+'...</div>'+(u.banned?'<span class="badge badge-red">Banned</span>':u.activeToday?'<span class="badge badge-green">Active Today</span>':'<span class="badge badge-gray">Inactive</span>')+'</td>';
+    html+='<tr style="cursor:pointer" onclick="showUserDetail(\''+u.uid+'\')" title="Click to view profile"><td><div class="u-name">'+esc(u.name)+'</div><div class="u-sub">'+u.uid.substring(0,14)+'...</div>'+(u.banned?'<span class="badge badge-red">Banned</span>':u.activeToday?'<span class="badge badge-green">Active Today</span>':'<span class="badge badge-gray">Inactive</span>')+'</td>';
     html+='<td><div class="u-sub">🔥 '+u.streak+' streak</div><div class="u-sub">📝 '+u.mocks+' mocks</div><div class="u-sub">📅 '+u.studyDays+' days</div></td>';
     html+='<td style="font-size:.65rem;color:var(--t2)">'+(u.updatedAt?timeAgo(u.updatedAt.toDate?u.updatedAt.toDate():new Date(u.updatedAt)):'N/A')+'</td>';
     html+='<td><div class="action-col"><button class="btn btn-primary btn-sm" onclick="showUserDetail(\''+u.uid+'\')">👁 Detail</button>';
