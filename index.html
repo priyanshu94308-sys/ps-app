@@ -593,6 +593,7 @@ body::before{
 .room-btn{flex-shrink:0;background:var(--cd2);border:1px solid var(--br);border-radius:20px;color:var(--t2);font-size:.62rem;font-weight:700;padding:5px 12px;cursor:pointer;white-space:nowrap;}
 .room-btn.active-room{background:rgba(245,166,35,.2);border-color:rgba(245,166,35,.5);color:var(--ac);}
 .ocr-loading{text-align:center;padding:16px;color:var(--t2);font-size:.72rem;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -1000,7 +1001,7 @@ display:none;
       <div class="scard">
         <div class="sec">📢 WhatsApp Channel</div>
         <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:6px;background:linear-gradient(135deg,#25D366,#128C7E)">📢 PS Channel Join Karo</a>
-        <a href="https://wa.me/919430804330" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:0;background:linear-gradient(135deg,#25D366,#075E54)">👨‍💻 Contact Developer</a>
+        <button onclick="showContactPopup()" style="width:100%;background:linear-gradient(135deg,#5c6af0,#7c3aed);border:none;border-radius:12px;color:#fff;font-size:.78rem;font-weight:800;padding:10px;cursor:pointer">👨‍💻 Contact Developer</button>
       </div>
       <div class="scard">
         <div class="sec">🤝 Refer &amp; Earn</div>
@@ -5743,6 +5744,16 @@ function saveToFirestore(){
 
 // ── START ──
 
+function showContactPopup(){
+  var p=document.getElementById('contactPopup');
+  if(p){p.style.display='flex';}
+}
+function hideContactPopup(){
+  var p=document.getElementById('contactPopup');
+  if(p){p.style.display='none';}
+}
+
+
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
 
 </script>
@@ -5766,5 +5777,32 @@ window.addEventListener('popstate',function(event){
 });
 </script>
 
+
+<!-- Contact Developer Popup -->
+<div id="contactPopup" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center" onclick="if(event.target===this)hideContactPopup()">
+  <div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:480px;animation:slideUp .3s ease">
+    <div style="width:40px;height:4px;background:var(--br);border-radius:99px;margin:0 auto 20px"></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:1.5rem;margin-bottom:6px">👨‍💻</div>
+      <div style="font-size:.9rem;font-weight:800">Contact Developer</div>
+      <div style="font-size:.68rem;color:var(--t2);margin-top:4px">Priyanshu Singh — PS Study</div>
+    </div>
+    <a href="https://wa.me/919430804330" target="_blank" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:14px;padding:14px 18px;text-decoration:none;margin-bottom:10px">
+      <span style="font-size:1.3rem">💬</span>
+      <div>
+        <div style="color:#fff;font-weight:800;font-size:.82rem">WhatsApp</div>
+        <div style="color:rgba(255,255,255,.7);font-size:.65rem">+91 94308 04330</div>
+      </div>
+    </a>
+    <a href="https://instagram.com/priyanshu_singh__04" target="_blank" style="display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-radius:14px;padding:14px 18px;text-decoration:none;margin-bottom:16px">
+      <span style="font-size:1.3rem">📸</span>
+      <div>
+        <div style="color:#fff;font-weight:800;font-size:.82rem">Instagram</div>
+        <div style="color:rgba(255,255,255,.7);font-size:.65rem">@priyanshu_singh__04</div>
+      </div>
+    </a>
+    <button onclick="hideContactPopup()" style="width:100%;background:var(--cd2);border:1px solid var(--br);border-radius:12px;color:var(--t2);font-size:.78rem;font-weight:700;padding:10px;cursor:pointer">Cancel</button>
+  </div>
+</div>
 </body>
 </html>
