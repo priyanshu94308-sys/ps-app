@@ -4694,30 +4694,30 @@ function initCA(){
   var prevYr=curYr-1;
   var yr=prevYr+'-'+curYr;
   var topics=[
-    {id:'t1',icon:'🏛️',name:'मोदी मंत्रिमंडल 3.0'},
-    {id:'t2',icon:'👤',name:'कौन, क्या? '+curYr},
-    {id:'t3',icon:'🏙️',name:'राज्यों के CM, राज्यपाल, राजधानी'},
-    {id:'t4',icon:'🎉',name:'त्योहार, मेले, GI Tags, चक्रवात'},
-    {id:'t5',icon:'🏅',name:'मोदी को मिले पुरस्कार/सम्मान'},
-    {id:'t6',icon:'🥇',name:'भारत एवं विश्व में प्रथम '+yr},
-    {id:'t7',icon:'📱',name:'मोबाइल ऐप एवं पोर्टल '+yr},
-    {id:'t8',icon:'🎙️',name:'ब्रांड एंबेसडर '+yr},
-    {id:'t9',icon:'🪖',name:'संयुक्त सैन्य अभ्यास '+yr},
-    {id:'t10',icon:'🌐',name:'प्रमुख अंतर्राष्ट्रीय संगठन'},
-    {id:'t11',icon:'🏟️',name:'प्रमुख अंतर्राष्ट्रीय सम्मेलन '+yr},
-    {id:'t12',icon:'📊',name:'विभिन्न सूचकांक '+yr},
-    {id:'t13',icon:'💹',name:'आर्थिक परिदृश्य '+yr},
-    {id:'t14',icon:'🇮🇳',name:'राष्ट्रीय परिदृश्य '+yr},
-    {id:'t15',icon:'🌍',name:'अंतर्राष्ट्रीय परिदृश्य '+yr},
-    {id:'t16',icon:'🛡️',name:'रक्षा विज्ञान '+yr},
-    {id:'t17',icon:'🔬',name:'विज्ञान एवं प्रौद्योगिकी '+yr},
-    {id:'t18',icon:'📚',name:'नवीनतम पुस्तकें एवं लेखक '+yr},
-    {id:'t19',icon:'🕊️',name:'निधन '+yr},
-    {id:'t20',icon:'⚽',name:'खेल परिदृश्य '+yr},
-    {id:'t21',icon:'🏆',name:'पुरस्कार '+yr},
-    {id:'t22',icon:'📅',name:'महत्त्वपूर्ण दिवस एवं थीम'},
-    {id:'t23',icon:'🌿',name:'रामसर स्थल'},
-    {id:'t24',icon:'🏛️',name:'यूनेस्को स्थल'}
+    {id:'t1',icon:'👤',name:'कौन, क्या? '+curYr},
+    {id:'t2',icon:'🏛️',name:'नई नियुक्तियाँ '+curYr},
+    {id:'t3',icon:'🏙️',name:'राज्यों के CM और राज्यपाल '+curYr},
+    {id:'t4',icon:'🥇',name:'भारत एवं विश्व में प्रथम '+curYr},
+    {id:'t5',icon:'🏆',name:'पुरस्कार एवं सम्मान '+curYr},
+    {id:'t6',icon:'⚽',name:'खेल परिदृश्य '+curYr},
+    {id:'t7',icon:'🪖',name:'संयुक्त सैन्य अभ्यास '+curYr},
+    {id:'t8',icon:'🛡️',name:'रक्षा एवं सुरक्षा '+curYr},
+    {id:'t9',icon:'🔬',name:'विज्ञान एवं प्रौद्योगिकी '+curYr},
+    {id:'t10',icon:'🌍',name:'अंतर्राष्ट्रीय परिदृश्य '+curYr},
+    {id:'t11',icon:'🇮🇳',name:'राष्ट्रीय परिदृश्य '+curYr},
+    {id:'t12',icon:'💹',name:'आर्थिक परिदृश्य '+curYr},
+    {id:'t13',icon:'📊',name:'सूचकांक एवं रिपोर्ट '+curYr},
+    {id:'t14',icon:'🏟️',name:'सम्मेलन एवं शिखर बैठक '+curYr},
+    {id:'t15',icon:'🎙️',name:'ब्रांड एंबेसडर '+curYr},
+    {id:'t16',icon:'📱',name:'योजनाएं एवं पोर्टल '+curYr},
+    {id:'t17',icon:'🎉',name:'GI Tags एवं विरासत '+curYr},
+    {id:'t18',icon:'📚',name:'पुस्तकें एवं लेखक '+curYr},
+    {id:'t19',icon:'🕊️',name:'निधन '+curYr},
+    {id:'t20',icon:'📅',name:'महत्त्वपूर्ण दिवस एवं थीम '+curYr},
+    {id:'t21',icon:'🌿',name:'पर्यावरण एवं जलवायु '+curYr},
+    {id:'t22',icon:'🏛️',name:'संविधान एवं कानून '+curYr},
+    {id:'t23',icon:'🚀',name:'अंतरिक्ष एवं ISRO '+curYr},
+    {id:'t24',icon:'🌐',name:'अंतर्राष्ट्रीय संगठन एवं समझौते '+curYr}
   ];
   container.innerHTML='';
   topics.forEach(function(t){
@@ -4833,15 +4833,19 @@ function loadCAQuestions(id,name,more){
       +'<div style="font-size:.68rem;color:var(--t2)">NewsData → Verified MCQ</div>'
       +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
     var ndQuery=encodeURIComponent(name+' India');
-    var ndUrl='https://newsdata.io/api/1/news?apikey='+ndKey+'&q='+ndQuery+'&country=in&language=hi,en&size=5';
+    // Get last 30 days date for fresh news
+    var ndDate=new Date();ndDate.setDate(ndDate.getDate()-30);
+    var ndFrom=ndDate.getFullYear()+'-'+String(ndDate.getMonth()+1).padStart(2,'0')+'-'+String(ndDate.getDate()).padStart(2,'0');
+    var ndUrl='https://newsdata.io/api/1/news?apikey='+ndKey+'&q='+ndQuery+'&country=in&language=hi,en&size=8&from_date='+ndFrom+'&prioritydomain=top';
     fetch(ndUrl)
     .then(function(r){return r.json();})
     .then(function(d){
       var ctx='';
       if(d.results&&d.results.length){
         ctx=d.results.map(function(r){
-          return (r.title||'')+(r.description?' — '+r.description:'');
-        }).join('\n\n').substring(0,2000);
+          var pubDate=r.pubDate?r.pubDate.substring(0,10):'';
+          return '['+pubDate+'] '+(r.title||'')+(r.description?' — '+r.description:'');
+        }).join('\n\n').substring(0,3000);
       }
       generateMCQ(ctx);
     })
