@@ -3521,6 +3521,11 @@ function toggleTheme(){
   save();
 }
 function sw(tab){
+  // Check maintenance mode
+  var _locks=JSON.parse(localStorage.getItem('ps_locks')||'{}');
+  if(_locks[tab]){
+    showMaintenance(tab,_locks[tab]);return;
+  }
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
   // Header sirf Home tab mein dikhega
@@ -5755,6 +5760,40 @@ function showContactPopup(){
 function hideContactPopup(){
   var p=document.getElementById('contactPopup');
   if(p){p.style.display='none';}
+}
+
+
+// ── MAINTENANCE MODE ──
+function showMaintenance(tab, msg){
+  // Show maintenance overlay on current tab
+  var existing=document.getElementById('maintenanceOverlay');
+  if(existing) existing.remove();
+  var overlay=document.createElement('div');
+  overlay.id='maintenanceOverlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9990;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center';
+  overlay.innerHTML='<div style="font-size:3.5rem;margin-bottom:16px">🔧</div>'
+    +'<div style="font-size:1.1rem;font-weight:900;color:var(--ac);margin-bottom:8px">Maintenance Mode</div>'
+    +'<div style="font-size:.78rem;color:var(--t2);line-height:1.7;max-width:280px">'+esc(msg||'Yeh section abhi update ho raha hai. Thodi der mein wapas aao!')+'</div>'
+    +'<div style="margin-top:20px;font-size:.65rem;color:var(--t2)">🛠 Jaldi wapas aayenge...</div>'
+    +'<button id="maintHomeBtn" style="margin-top:24px;background:var(--ac);border:none;border-radius:12px;color:#000;font-weight:800;padding:10px 24px;cursor:pointer;font-size:.78rem">🏠 Home Jao</button>';
+  overlay.querySelector('#maintHomeBtn').onclick=function(){
+    var ov=document.getElementById('maintenanceOverlay');
+    if(ov)ov.remove();
+    sw('home');
+  };
+  document.body.appendChild(overlay);
+}
+
+function checkMaintenanceLocks(){
+  // Check Firestore for admin-set locks
+  db.collection('admin').doc('maintenance').get().then(function(doc){
+    if(!doc.exists)return;
+    var locks=doc.data().locks||{};
+    try{localStorage.setItem('ps_locks',JSON.stringify(locks));}catch(e){}
+    // If current tab is locked, show maintenance
+    var currentTab=location.hash.replace('#','')||'home';
+    if(locks[currentTab]) showMaintenance(currentTab,locks[currentTab]);
+  }).catch(function(){});
 }
 
 
