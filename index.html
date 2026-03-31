@@ -3521,11 +3521,13 @@ function toggleTheme(){
   save();
 }
 function sw(tab){
-  // Check maintenance mode
-  var _locks=JSON.parse(localStorage.getItem('ps_locks')||'{}');
-  if(_locks[tab]){
-    showMaintenance(tab,_locks[tab]);return;
-  }
+  // Check maintenance mode (from localStorage cache)
+  try{
+    var _locks=JSON.parse(localStorage.getItem('ps_locks')||'{}');
+    if(_locks[tab]){
+      showMaintenance(tab,_locks[tab]);return;
+    }
+  }catch(e){}
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
   // Header sirf Home tab mein dikhega
@@ -5785,15 +5787,22 @@ function showMaintenance(tab, msg){
 }
 
 function checkMaintenanceLocks(){
-  // Check Firestore for admin-set locks
-  db.collection('admin').doc('maintenance').get().then(function(doc){
-    if(!doc.exists)return;
-    var locks=doc.data().locks||{};
+  // Real-time listener — admin lock kare toh turant apply ho
+  db.collection('admin').doc('maintenance').onSnapshot(function(doc){
+    var locks={};
+    if(doc.exists) locks=doc.data().locks||{};
     try{localStorage.setItem('ps_locks',JSON.stringify(locks));}catch(e){}
-    // If current tab is locked, show maintenance
+    // Check current active tab
     var currentTab=location.hash.replace('#','')||'home';
-    if(locks[currentTab]) showMaintenance(currentTab,locks[currentTab]);
-  }).catch(function(){});
+    var overlay=document.getElementById('maintenanceOverlay');
+    if(locks[currentTab]){
+      // Show maintenance if not already showing
+      if(!overlay) showMaintenance(currentTab,locks[currentTab]);
+    } else {
+      // Remove maintenance if unlocked
+      if(overlay) overlay.remove();
+    }
+  },function(){});
 }
 
 
