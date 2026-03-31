@@ -164,6 +164,7 @@ select.inp{cursor:pointer;}
     <div class="tab" onclick="showPage('apimonitor',this)">🔑 API Monitor</div>
     <div class="tab" onclick="showPage('chat',this)">💬 Chat</div>
     <div class="tab" onclick="showPage('errors',this)">🐛 Errors</div>
+    <div class="tab" onclick="showPage('maintenance',this)">🔧 Maintenance</div>
     <div class="tab" onclick="showPage('actions',this)">⚡ Actions</div>
     <div class="tab" onclick="showPage('logs',this)">📋 Logs</div>
   </div>
@@ -490,6 +491,27 @@ select.inp{cursor:pointer;}
       <button class="btn btn-danger btn-sm" onclick="clearErrors()">🗑 Clear All</button>
     </div>
     <div id="errorsList"><div style="color:var(--t2);font-size:.72rem;text-align:center;padding:20px">Load karo errors dekhe ke liye</div></div>
+  </div>
+</div>
+
+<div id="page-maintenance" class="page">
+  <div class="card">
+    <div class="card-title">🔧 Tab Lock / Maintenance Mode</div>
+    <div class="card-desc">Kisi bhi tab ko lock karo — users wahan jayenge toh maintenance screen dikhegi</div>
+    <div id="lockStatus" style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.7rem;color:var(--t2)">Loading...</div>
+    <div id="tabLockList"></div>
+    <div style="margin-top:14px;border-top:1px solid var(--bdr);padding-top:12px">
+      <div style="font-size:.68rem;font-weight:700;margin-bottom:8px">Custom Maintenance Message:</div>
+      <textarea class="admin-ta" id="maintMsg" placeholder="Yeh section update ho raha hai..." maxlength="200" style="margin-bottom:8px"></textarea>
+      <button class="btn btn-primary" onclick="saveMaintSettings()">💾 Save All Settings</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-title">⚡ Quick Actions</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-danger btn-sm" onclick="lockAllTabs()">🔒 Sab Lock Karo</button>
+      <button class="btn btn-success btn-sm" onclick="unlockAllTabs()">🔓 Sab Unlock Karo</button>
+    </div>
   </div>
 </div>
 
@@ -1181,6 +1203,101 @@ function clearErrors(){
   }).then(function(){toast('✅ Errors cleared!');loadErrors();});
 }
 
+
+
+// ── MAINTENANCE ──
+var TABS=[
+  {id:'home',label:'🏠 Home'},
+  {id:'rwa',label:'📚 Topic Practice'},
+  {id:'ca',label:'📰 Current Affairs'},
+  {id:'ask',label:'🤖 AI Assistant'},
+  {id:'report',label:'📊 Log'},
+  {id:'chat',label:'💬 Chat'},
+  {id:'settings',label:'⚙️ Settings'}
+];
+var _maintLocks={};
+
+function loadMaintenance(){
+  db.collection('admin').doc('maintenance').get().then(function(doc){
+    _maintLocks=doc.exists?(doc.data().locks||{}):{};
+    var msg=doc.exists?doc.data().message||'':"Yeh section update ho raha hai. Thodi der mein wapas aao!";
+    document.getElementById('maintMsg').value=msg;
+    renderLockList();
+    updateLockStatus();
+  }).catch(function(e){
+    _maintLocks={};renderLockList();
+  });
+}
+
+function renderLockList(){
+  var cont=document.getElementById('tabLockList');
+  cont.innerHTML='';
+  TABS.forEach(function(tab){
+    var locked=!!_maintLocks[tab.id];
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)';
+    // Label
+    var label=document.createElement('div');
+    label.innerHTML='<div style="font-size:.8rem;font-weight:700">'+tab.label+'</div>'
+      +'<div style="font-size:.62rem;color:'+(locked?'var(--rd)':'var(--gr)')+';">'+(locked?'🔒 Locked — users nahi ja payenge':'🔓 Open')+'</div>';
+    // Toggle switch
+    var toggleWrap=document.createElement('div');
+    toggleWrap.style.cssText='position:relative;width:48px;height:26px;cursor:pointer;flex-shrink:0';
+    toggleWrap.innerHTML='<div style="position:absolute;inset:0;border-radius:99px;background:'+(locked?'var(--rd)':'var(--bg3)')+';transition:background .2s"></div>'
+      +'<div style="position:absolute;top:3px;left:'+(locked?'25px':'3px')+';width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>';
+    toggleWrap.onclick=(function(id){return function(){toggleTabLock(id);};})(tab.id);
+    row.appendChild(label);row.appendChild(toggleWrap);
+    cont.appendChild(row);
+  });
+}
+
+function toggleTabLock(tabId){
+  if(_maintLocks[tabId]) delete _maintLocks[tabId];
+  else _maintLocks[tabId]=document.getElementById('maintMsg').value||'Yeh section update ho raha hai. Thodi der mein wapas aao!';
+  renderLockList();
+  updateLockStatus();
+}
+
+function updateLockStatus(){
+  var locked=Object.keys(_maintLocks);
+  var st=document.getElementById('lockStatus');
+  if(!locked.length){
+    st.innerHTML='✅ Sab tabs open hain — koi maintenance nahi';
+    st.style.background='rgba(34,197,94,.1)';
+    st.style.borderColor='rgba(34,197,94,.3)';
+  } else {
+    st.innerHTML='⚠️ '+locked.length+' tab(s) locked: <b>'+locked.join(', ')+'</b>';
+    st.style.background='rgba(245,166,35,.1)';
+    st.style.borderColor='rgba(245,166,35,.3)';
+  }
+}
+
+function saveMaintSettings(){
+  var msg=document.getElementById('maintMsg').value||'Yeh section update ho raha hai. Thodi der mein wapas aao!';
+  // Update message in all locked tabs
+  Object.keys(_maintLocks).forEach(function(k){_maintLocks[k]=msg;});
+  db.collection('admin').doc('maintenance').set({
+    locks:_maintLocks,
+    message:msg,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    toast('✅ Maintenance settings saved!');
+    log('🔧 Maintenance updated: '+Object.keys(_maintLocks).length+' tabs locked','ok');
+  }).catch(function(e){toast('❌ Error: '+e.message);});
+}
+
+function lockAllTabs(){
+  var msg=document.getElementById('maintMsg').value||'App update ho raha hai. Thodi der mein wapas aao!';
+  TABS.forEach(function(t){if(t.id!=='home')_maintLocks[t.id]=msg;});
+  renderLockList();updateLockStatus();
+  toast('🔒 Sab tabs locked (unsaved)');
+}
+
+function unlockAllTabs(){
+  _maintLocks={};
+  renderLockList();updateLockStatus();
+  toast('🔓 Sab tabs unlocked (unsaved)');
+}
 
 </script>
 </body>
