@@ -495,23 +495,23 @@ select.inp{cursor:pointer;}
 </div>
 
 <div id="page-maintenance" class="page">
-  <div class="card">
-    <div class="card-title">🔧 Tab Lock / Maintenance Mode</div>
-    <div class="card-desc">Kisi bhi tab ko lock karo — users wahan jayenge toh maintenance screen dikhegi</div>
-    <div id="lockStatus" style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.7rem;color:var(--t2)">Loading...</div>
-    <div id="tabLockList"></div>
-    <div style="margin-top:14px;border-top:1px solid var(--bdr);padding-top:12px">
-      <div style="font-size:.68rem;font-weight:700;margin-bottom:8px">Custom Maintenance Message:</div>
-      <textarea class="admin-ta" id="maintMsg" placeholder="Yeh section update ho raha hai..." maxlength="200" style="margin-bottom:8px"></textarea>
-      <button class="btn btn-primary" onclick="saveMaintSettings()">💾 Save All Settings</button>
-    </div>
+  <!-- Status Banner -->
+  <div id="lockStatus" style="border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:.72rem;font-weight:600;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--gr)">✅ Sab tabs open hain</div>
+
+  <!-- Quick Actions -->
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button class="btn btn-danger btn-sm" style="flex:1" onclick="lockAllTabs()">🔒 Sab Lock</button>
+    <button class="btn btn-success btn-sm" style="flex:1" onclick="unlockAllTabs()">🔓 Sab Unlock</button>
+    <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveMaintSettings()">💾 Save</button>
   </div>
-  <div class="card" style="margin-top:12px">
-    <div class="card-title">⚡ Quick Actions</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-danger btn-sm" onclick="lockAllTabs()">🔒 Sab Lock Karo</button>
-      <button class="btn btn-success btn-sm" onclick="unlockAllTabs()">🔓 Sab Unlock Karo</button>
-    </div>
+
+  <!-- Tab Toggles - directly visible -->
+  <div id="tabLockList" style="background:var(--bg2);border-radius:14px;overflow:hidden;margin-bottom:12px"></div>
+
+  <!-- Message -->
+  <div style="background:var(--bg2);border-radius:12px;padding:12px">
+    <div style="font-size:.68rem;font-weight:700;margin-bottom:6px;color:var(--t2)">📝 Maintenance Message:</div>
+    <textarea class="admin-ta" id="maintMsg" placeholder="Yeh section update ho raha hai. Thodi der mein wapas aao!" maxlength="200" style="margin-bottom:0"></textarea>
   </div>
 </div>
 
@@ -560,6 +560,8 @@ function showPage(id,el){
   if(id==='directmsg')loadDmHistory();
   if(id==='examstats')loadExamStats();
   if(id==='userprofile'){var ps=document.getElementById('profileSearch');if(ps)ps.focus();}
+  if(id==='maintenance')loadMaintenance();
+  if(id==='users')loadUsers();
 }
 
 // ── DASHBOARD ──
@@ -1218,14 +1220,19 @@ var TABS=[
 var _maintLocks={};
 
 function loadMaintenance(){
+  // Render immediately with cached state
+  renderLockList();
+  updateLockStatus();
+  // Then fetch from Firestore
   db.collection('admin').doc('maintenance').get().then(function(doc){
     _maintLocks=doc.exists?(doc.data().locks||{}):{};
-    var msg=doc.exists?doc.data().message||'':"Yeh section update ho raha hai. Thodi der mein wapas aao!";
-    document.getElementById('maintMsg').value=msg;
+    var msg=doc.exists?doc.data().message||'':'Yeh section update ho raha hai. Thodi der mein wapas aao!';
+    var msgEl=document.getElementById('maintMsg');
+    if(msgEl) msgEl.value=msg;
     renderLockList();
     updateLockStatus();
   }).catch(function(e){
-    _maintLocks={};renderLockList();
+    _maintLocks={};renderLockList();updateLockStatus();
   });
 }
 

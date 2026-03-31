@@ -3521,13 +3521,13 @@ function toggleTheme(){
   save();
 }
 function sw(tab){
-  // Check maintenance mode (from localStorage cache)
-  try{
-    var _locks=JSON.parse(localStorage.getItem('ps_locks')||'{}');
-    if(_locks[tab]){
-      showMaintenance(tab,_locks[tab]);return;
-    }
-  }catch(e){}
+  // Check maintenance mode — Firestore se fresh check
+  var _cachedLocks={};
+  try{_cachedLocks=JSON.parse(localStorage.getItem('ps_locks')||'{}');}catch(e){}
+  if(_cachedLocks[tab]){
+    showMaintenance(tab,_cachedLocks[tab]);
+    return;
+  }
   document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.tb').forEach(function(b){b.classList.remove('on');});
   // Header sirf Home tab mein dikhega
@@ -5791,18 +5791,29 @@ function checkMaintenanceLocks(){
   db.collection('admin').doc('maintenance').onSnapshot(function(doc){
     var locks={};
     if(doc.exists) locks=doc.data().locks||{};
+    // Save to localStorage for sw() check
     try{localStorage.setItem('ps_locks',JSON.stringify(locks));}catch(e){}
+    // Check ALL bottom nav tabs - disable locked ones visually
+    ['home','rwa','ca','ask','report','chat','settings'].forEach(function(t){
+      var tbEl=document.getElementById('tb-'+t);
+      if(!tbEl) return;
+      if(locks[t]){
+        tbEl.style.opacity='0.4';
+        tbEl.title='Maintenance mode';
+      } else {
+        tbEl.style.opacity='';
+        tbEl.title='';
+      }
+    });
     // Check current active tab
     var currentTab=location.hash.replace('#','')||'home';
     var overlay=document.getElementById('maintenanceOverlay');
     if(locks[currentTab]){
-      // Show maintenance if not already showing
       if(!overlay) showMaintenance(currentTab,locks[currentTab]);
     } else {
-      // Remove maintenance if unlocked
       if(overlay) overlay.remove();
     }
-  },function(){});
+  },function(e){console.log('Maintenance listener error:',e);});
 }
 
 
