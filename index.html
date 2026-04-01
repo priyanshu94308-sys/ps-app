@@ -4470,6 +4470,7 @@ function initApp(){
   // Save today's task snapshot so Log tab shows correct tasks
   if(S.tasks && S.tasks.length) _saveTaskSnapshot();
   setTimeout(initReferral, 500);
+  setTimeout(checkMaintenanceLocks, 1000);
   var todayXP='xp_'+today();
   if(!localStorage.getItem(todayXP)){try{localStorage.setItem(todayXP,'1');}catch(e){}setTimeout(function(){addXP(5);},2000);}
 }
