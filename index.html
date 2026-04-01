@@ -949,16 +949,6 @@ display:none;
         </div>
         <div style="font-size:.63rem;font-weight:700" id="gkStatus">⚪ Key nahi hai</div>
         <a href="https://console.groq.com/keys" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#f55036,#ff8c00);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE Groq Key Lo</a>
-      <div class="scard">
-        <div class="sec">📰 NewsData Key (CA News)</div>
-        <div style="font-size:.69rem;color:var(--t2);margin-bottom:5px">Real India news → Verified CA MCQ — 200 req/day free!</div>
-        <div style="display:flex;gap:5px;margin-bottom:5px">
-          <input type="text" class="fi" id="newsdataKey" placeholder="pub_...">
-          <button class="add-btn2" style="width:auto;padding:7px 12px;flex-shrink:0" onclick="saveNewsDataKey()">Save</button>
-        </div>
-        <div style="font-size:.63rem;font-weight:700" id="newsdataStatus">⚪ Key nahi hai</div>
-        <a href="https://newsdata.io/register" target="_blank" style="display:block;margin-top:7px;background:linear-gradient(135deg,#0066ff,#00aaff);border:none;border-radius:8px;color:#fff;font-size:.78rem;font-weight:800;padding:8px;text-align:center;text-decoration:none">🔑 FREE NewsData Key Lo</a>
-      </div>
       </div>
       <div class="scard">
         <div onclick="toggleGamFolder()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0">
@@ -3557,9 +3547,7 @@ function sw(tab){
   if(tab==='settings'){
     var gk2=document.getElementById('geminiKey');
     if(gk2){try{var gv=localStorage.getItem('ps_gkey');if(gv)gk2.value=gv;}catch(e){}}
-    var ndk2=document.getElementById('newsdataKey');
-    if(ndk2){try{var ndv2=localStorage.getItem('ps_ndkey');if(ndv2)ndk2.value=ndv2;}catch(e){}}
-    updateGKStatus();updateNewsDataStatus();renderCountdown();
+    updateGKStatus();renderCountdown();
     initReferral();
   }
   // Fix #3: pushState for back button
@@ -4461,9 +4449,6 @@ function initApp(){
   if(ni) ni.value=S.name;
   var gk=document.getElementById('geminiKey');
   if(gk){try{var k=localStorage.getItem('ps_gkey');if(k)gk.value=k;}catch(e){}}
-  var ndk=document.getElementById('newsdataKey');
-  if(ndk){try{var ndv=localStorage.getItem('ps_ndkey');if(ndv)ndk.value=ndv;}catch(e){}}
-  updateNewsDataStatus();
   updateHeader();
   renderHome();
   renderCountdown();
@@ -4844,35 +4829,39 @@ function loadCAQuestions(id,name,more){
     });
   }
 
-  // NewsData se real India news lo, phir MCQ banao
-  var ndKey=getNewsDataKey();
-  if(ndKey && !more){
+  // Wikipedia API se context lo — free, no key needed!
+  if(!more){
     cont.innerHTML='<div style="text-align:center;padding:30px">'
-      +'<div style="font-size:2.5rem">📰</div>'
-      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Real news dhundh rahe hain...</div>'
-      +'<div style="font-size:.68rem;color:var(--t2)">NewsData → Verified MCQ</div>'
+      +'<div style="font-size:2.5rem">📖</div>'
+      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Facts dhundh rahe hain...</div>'
+      +'<div style="font-size:.68rem;color:var(--t2)">Wikipedia → Verified MCQ</div>'
       +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
-    var ndQuery=encodeURIComponent(name+' India');
-    // Get last 30 days date for fresh news
-    var ndDate=new Date();ndDate.setDate(ndDate.getDate()-30);
-    var ndFrom=ndDate.getFullYear()+'-'+String(ndDate.getMonth()+1).padStart(2,'0')+'-'+String(ndDate.getDate()).padStart(2,'0');
-    var ndUrl='https://newsdata.io/api/1/news?apikey='+ndKey+'&q='+ndQuery+'&country=in&language=hi,en&size=8&from_date='+ndFrom+'&prioritydomain=top';
-    fetch(ndUrl)
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var ctx='';
-      if(d.results&&d.results.length){
-        ctx=d.results.map(function(r){
-          var pubDate=r.pubDate?r.pubDate.substring(0,10):'';
-          return '['+pubDate+'] '+(r.title||'')+(r.description?' — '+r.description:'');
-        }).join('\n\n').substring(0,3000);
-      }
-      generateMCQ(ctx);
-    })
-    .catch(function(){ generateMCQ(''); });
-  } else {
-    generateMCQ('');
   }
+  // Wikipedia search API
+  var wikiQuery=name.replace(/[0-9]/g,'').trim();
+  var wikiUrl='https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(wikiQuery+' India 2025 2026')+'&srlimit=3&format=json&origin=*';
+  fetch(wikiUrl)
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var pages=data.query&&data.query.search?data.query.search:[];
+    if(!pages.length){generateMCQ('');return;}
+    // Get extract for top result
+    var pageId=pages[0].pageid;
+    var extractUrl='https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids='+pageId+'&format=json&origin=*';
+    return fetch(extractUrl);
+  })
+  .then(function(r){if(!r)return null;return r.json();})
+  .then(function(data){
+    var ctx='';
+    if(data&&data.query&&data.query.pages){
+      var pages=data.query.pages;
+      var pageId=Object.keys(pages)[0];
+      var extract=pages[pageId].extract||'';
+      ctx=extract.substring(0,2500);
+    }
+    generateMCQ(ctx);
+  })
+  .catch(function(){generateMCQ('');});
 }
 
 function showCAError(cont,id,name,msg,more){
