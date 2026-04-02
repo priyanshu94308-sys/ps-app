@@ -3421,7 +3421,7 @@ QB.maths = QB.maths.concat([
 
 
 // ── STATE ──
-var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],xp:0,badges:[],streakProtection:false,referrals:0};
+var S={dark:true,name:'Student',tasks:[],log:{},sStats:{},mocks:[],bookmarks:[],xp:0,badges:[],streakProtection:false,referrals:0,caRevision:{}};
 if(!S.examDates) S.examDates={};
 if(!S.customExams) S.customExams=[];
 
@@ -4729,9 +4729,17 @@ function initCA(){
     var div=document.createElement('div');
     div.className='chi';
     div.style.borderLeft='3px solid var(--ac)';
+    var rev=(S.caRevision&&S.caRevision[t.id])||null;
+    var revBadge='';
+    if(rev&&rev.total>0){
+      var acc=Math.round(rev.correct/rev.total*100);
+      var badgeColor=acc>=70?'var(--gr)':acc>=50?'var(--or)':'var(--rd)';
+      revBadge='<span style="background:'+badgeColor+';color:#000;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:4px">'+acc+'%</span>';
+    }
+    var lastDone=rev&&rev.lastDone?'Last: '+rev.lastDone:'Abhi tak nahi';
     div.innerHTML='<span style="font-size:1.2rem">'+t.icon+'</span>'
-      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+t.name+'</div>'
-      +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">AI Questions • '+curYr+'</div></div>'
+      +'<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+t.name+revBadge+'</div>'
+      +'<div style="font-size:.57rem;color:var(--t2);margin-top:2px">'+lastDone+' • AI Questions</div></div>'
       +'<span style="font-size:.7rem;color:var(--t2)">▶</span>';
     div.addEventListener('click',function(){openCATopic(t.id,t.name);});
     container.appendChild(div);
@@ -4785,9 +4793,24 @@ function loadCAQuestions(id,name,more){
 
   function generateMCQ(context){
     var qprompt='Aaj ki date: '+currentDate+' (Year: '+yr+').'
-      +'\n\nTu Bihar Police Sipahi Bharti, SSC GD Constable, aur SSC CGL ka EXPERT question setter hai.'
-      +'\nTera kaam hai: Topic "'+name+'" par 15 UNIQUE, HIGH-QUALITY MCQ banana.'
-      +(context ? '\n\n📰 VERIFIED SOURCES SE CONTEXT (PIB/RBI/Wikipedia — SIRF inhi facts pe questions banana):\n'+context : '\n\n⚠️ '+yr+' ke VERIFIED aur ACCURATE facts use karo. PIB, RBI, Govt sources jaise facts. Kuch bhi mat banana.')  
+      +'\n\nTu SSC GD/Bihar Police/SSC CGL ka EXPERT AI Current Affairs Engine hai.'
+      +'\nTera kaam hai: Topic "'+name+'" par ADVANCED exam content banana.'
+      +(context?'\n\n📰 SOURCES (PIB/RBI/Wikipedia):\n'+context:'\n\n⚠️ '+yr+' ke VERIFIED facts use karo — PIB/RBI/Govt sources style.')
+      +'\n\n🎯 OUTPUT FORMAT (STRICT JSON):'
+      +'\n{'
+      +'\n  "notes": {"heading": "topic heading", "points": ["5 short revision points"]},'
+      +'\n  "one_liners": ["5 important facts — first/rank/date/organization format"],'
+      +'\n  "mcqs": ['
+      +'\n    {"q": "Hindi question?", "opts": ["(A) ","(B) ","(C) ","(D) "], "ans": 0, "sol": "explanation", "difficulty": "easy/medium/hard", "pyq": true/false, "wrong_explain": "galat answer ki wajah"}'
+      +'\n  ] (15 MCQs total — 5 easy, 7 medium, 3 hard)'
+      +'}'
+      +'\n\n📌 RULES:'
+      +'\n- MCQs: UPSC/BPSC/SSC pattern, tricky options, ans equally distributed 0-3'
+      +'\n- pyq:true sirf tab jab topic UPSC/SSC mein pehle aaya ho'
+      +'\n- one_liners mein: rank, award, scheme, organization facts'
+      +'\n- Hindi Devanagari ONLY (names/places English allowed)'
+      +avoid
+      +'\n\n⚡ SIRF valid JSON return karo — koi markdown nahi'
       +'\n\n🎯 QUESTION QUALITY RULES:'
       +'\n1. Har question EXAM-WORTHY ho — wahi poochho jo actually Bihar Police/SSC mein aata hai'
       +'\n2. Questions variety mein rakho: naam, date, jagah, rank, award, appointment, fact'
@@ -4815,12 +4838,28 @@ function loadCAQuestions(id,name,more){
     },function(data){
       try{
         var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-        var s=txt.indexOf('['),e=txt.lastIndexOf(']');
-        if(s===-1) throw new Error('JSON nahi mila');
-        var arr=JSON.parse(txt.substring(s,e+1));
-        arr=arr.filter(function(q){ return q.opts&&q.opts.length>=4; });
-        if(!arr.length) throw new Error('Valid questions nahi mile');
-        renderCAQuestions(arr,cont,more,id,offset);
+        var parsed=null;
+        // Try new format first (object with mcqs)
+        try{
+          var os=txt.indexOf('{'),oe=txt.lastIndexOf('}');
+          if(os!==-1){
+            parsed=JSON.parse(txt.substring(os,oe+1));
+            if(!parsed.mcqs) parsed=null;
+          }
+        }catch(e){}
+        // Fallback to old array format
+        if(!parsed){
+          var as=txt.indexOf('['),ae=txt.lastIndexOf(']');
+          if(as===-1) throw new Error('JSON nahi mila');
+          var arr=JSON.parse(txt.substring(as,ae+1));
+          arr=arr.filter(function(q){return q.opts&&q.opts.length>=4;});
+          if(!arr.length) throw new Error('Valid questions nahi mile');
+          parsed=arr;
+        } else {
+          parsed.mcqs=parsed.mcqs.filter(function(q){return q.opts&&q.opts.length>=4;});
+          if(!parsed.mcqs.length) throw new Error('Valid questions nahi mile');
+        }
+        renderCAQuestions(parsed,cont,more,id,offset);
       }catch(err){
         showCAError(cont,id,name,String(err).substring(0,80),more);
       }
@@ -4924,30 +4963,67 @@ function showCAError(cont,id,name,msg,more){
   }
 }
 
-function renderCAQuestions(arr,cont,more,id,offset){
+function renderCAQuestions(data,cont,more,id,offset){
     var ind=document.getElementById('ca_ind');
     if(ind) ind.remove();
+
+    // Handle both old format (array) and new format (object with mcqs)
+    var arr=Array.isArray(data)?data:(data.mcqs||data);
+    var notes=Array.isArray(data)?null:data.notes;
+    var oneLiners=Array.isArray(data)?null:data.one_liners;
+
     _saveCAHistory(id,arr);
 
     var out='';
+
+    // Notes section
+    if(notes&&notes.heading&&!more){
+      out+='<div style="background:linear-gradient(135deg,rgba(92,106,240,.15),rgba(124,111,255,.1));border:1px solid rgba(92,106,240,.3);border-radius:14px;padding:14px;margin-bottom:12px">'
+        +'<div style="font-size:.72rem;font-weight:900;color:#7b87ff;margin-bottom:8px">📝 '+esc(notes.heading)+'</div>'
+        +'<ul style="margin:0;padding-left:16px">'
+        +(notes.points||[]).map(function(p){return '<li style="font-size:.68rem;color:var(--t2);margin-bottom:4px">'+esc(p)+'</li>';}).join('')
+        +'</ul></div>';
+    }
+
+    // One-liners section
+    if(oneLiners&&oneLiners.length&&!more){
+      out+='<div style="background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);border-radius:14px;padding:12px;margin-bottom:12px">'
+        +'<div style="font-size:.72rem;font-weight:900;color:var(--ac);margin-bottom:8px">⚡ One-Liners</div>'
+        +oneLiners.map(function(ol){return '<div style="font-size:.68rem;color:var(--t2);padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">→ '+esc(ol)+'</div>';}).join('')
+        +'</div>';
+    }
+
+    // MCQs
     arr.forEach(function(q,i){
       var idx=offset+i;
-      // Shuffle options so correct answer is not always A
       var correctText=q.opts[q.ans];
       var shuffled=q.opts.slice().sort(function(){return Math.random()-.5;});
-      // Fix option labels (A/B/C/D)
       shuffled=shuffled.map(function(o,si){
         var text=o.replace(/^\([A-D]\)\s*/,'');
         return '('+'ABCD'[si]+') '+text;
       });
       var newAns=shuffled.findIndex(function(o){return o.replace(/^\([A-D]\)\s*/,'')===correctText.replace(/^\([A-D]\)\s*/,'');});
-      if(newAns===-1) newAns=q.ans; // fallback
+      if(newAns===-1) newAns=q.ans;
+
+      // Difficulty badge
+      var diff=q.difficulty||'medium';
+      var diffColor=diff==='easy'?'var(--gr)':diff==='hard'?'var(--rd)':'var(--or)';
+      var diffLabel=diff==='easy'?'आसान':diff==='hard'?'कठिन':'मध्यम';
+
       out+='<div class="qcard" id="caq'+idx+'">'
+        +'<div style="display:flex;gap:5px;margin-bottom:6px">'
+        +'<span style="background:'+diffColor+';color:#000;font-size:.55rem;font-weight:800;padding:2px 7px;border-radius:99px">'+diffLabel+'</span>'
+        +(q.pyq?'<span style="background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.4);color:#a855f7;font-size:.55rem;font-weight:800;padding:2px 7px;border-radius:99px">PYQ ⭐</span>':'')
+        +'</div>'
         +'<div class="qtxt">Q'+(idx+1)+'. '+q.q+'</div>';
       shuffled.forEach(function(o,j){
-        out+='<button class="opt" id="cao'+idx+'_'+j+'" onclick="pickCA('+idx+','+j+','+newAns+')">'+(o||'')+'</button>';
+        out+='<button class="opt" data-qi="'+idx+'" data-oi="'+j+'" data-ans="'+newAns+'" data-tid="'+id+'" id="cao'+idx+'_'+j+'" onclick="pickCA(+this.dataset.qi,+this.dataset.oi,+this.dataset.ans,this.dataset.tid)">'+esc(o||'')+'</button>';
       });
-      if(q.sol) out+='<div class="sol" id="casol'+idx+'" style="display:none"><div class="sol-t">✅ व्याख्या</div><div class="sol-txt">'+q.sol+'</div></div>';
+      if(q.sol) out+='<div class="sol" id="casol'+idx+'" style="display:none">'
+        +'<div class="sol-t">✅ व्याख्या</div>'
+        +'<div class="sol-txt">'+esc(q.sol)+'</div>'
+        +(q.wrong_explain?'<div style="margin-top:6px;font-size:.67rem;color:var(--rd)">❌ Galat options kyun: '+esc(q.wrong_explain)+'</div>':'')
+        +'</div>';
       out+='</div>';
     });
 
@@ -4963,17 +5039,80 @@ function renderCAQuestions(arr,cont,more,id,offset){
     }
     var lb=document.getElementById('caMoreBtn');
     if(lb) lb.onclick=function(){loadCAQuestions(id,name,true);};
+
+    // Update revision tracker
+    _updateCARevisionTracker(id,arr);
     toast('✅ '+arr.length+' questions!','i');
 }
 
-function pickCA(qi,oi,correct){
+function pickCA(qi,oi,correct,topicId){
   var opts=document.querySelectorAll('[id^="cao'+qi+'_"]');
   opts.forEach(function(o){o.disabled=true;});
   var sel=document.getElementById('cao'+qi+'_'+oi);
   if(sel) sel.className='opt '+(oi===correct?'c':'w');
-  if(oi!==correct){var cor=document.getElementById('cao'+qi+'_'+correct);if(cor)cor.className='opt c';}
+  if(oi!==correct){
+    var cor=document.getElementById('cao'+qi+'_'+correct);
+    if(cor)cor.className='opt c';
+  }
   var sol=document.getElementById('casol'+qi);
   if(sol) sol.style.display='block';
+  // XP
+  if(oi===correct){addXP(15);}
+  // Wrong answer - AI explain
+  if(oi!==correct){
+    _caWrongAnswerExplain(qi,oi,correct,topicId);
+  }
+  // Track revision
+  if(topicId) _trackCAAnswer(topicId, oi===correct);
+}
+
+function _caWrongAnswerExplain(qi,oi,correct,topicId){
+  var qCard=document.getElementById('caq'+qi);
+  if(!qCard) return;
+  var qText=qCard.querySelector('.qtxt');
+  if(!qText) return;
+  var key=getGKey();if(!key)return;
+  var selOpt=document.getElementById('cao'+qi+'_'+oi);
+  var corOpt=document.getElementById('cao'+qi+'_'+correct);
+  if(!selOpt||!corOpt)return;
+  var q=qText.textContent;
+  var wrong=selOpt.textContent;
+  var right=corOpt.textContent;
+  // Add AI explain div
+  var existingExplain=document.getElementById('ai_explain_'+qi);
+  if(existingExplain) return;
+  var explainDiv=document.createElement('div');
+  explainDiv.id='ai_explain_'+qi;
+  explainDiv.style.cssText='margin-top:8px;padding:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;font-size:.68rem';
+  explainDiv.innerHTML='<div style="color:var(--ac);font-weight:700;margin-bottom:4px">🤖 AI Explain kar raha hai...</div>';
+  qCard.appendChild(explainDiv);
+  groqFetch(key,{
+    _models:['llama-3.3-70b-versatile','llama3-70b-8192'],
+    messages:[{role:'user',content:'SSC exam question: '+q+'\nGalat answer diya: '+wrong+'\nSahi answer: '+right+'\n\n2-3 lines mein Hindi mein batao: kyun galat tha aur kyun sahi answer correct hai. Exam tip bhi do.'}],
+    max_tokens:300,temperature:0.3
+  },function(data){
+    var txt=data.choices[0].message.content;
+    explainDiv.innerHTML='<div style="color:var(--rd);font-weight:700;margin-bottom:4px">❌ Galat kyun?</div>'
+      +'<div style="color:var(--t2);line-height:1.6">'+esc(txt)+'</div>';
+  },function(){
+    explainDiv.remove();
+  });
+}
+
+function _trackCAAnswer(topicId, correct){
+  if(!S.caRevision) S.caRevision={};
+  if(!S.caRevision[topicId]) S.caRevision[topicId]={total:0,correct:0,lastDone:null};
+  S.caRevision[topicId].total++;
+  if(correct) S.caRevision[topicId].correct++;
+  S.caRevision[topicId].lastDone=today();
+  save();
+}
+
+function _updateCARevisionTracker(topicId, arr){
+  if(!S.caRevision) S.caRevision={};
+  if(!S.caRevision[topicId]) S.caRevision[topicId]={total:0,correct:0,lastDone:null,count:arr.length};
+  S.caRevision[topicId].count=arr.length;
+  save();
 }
 
 // ── DAILY CA ──
