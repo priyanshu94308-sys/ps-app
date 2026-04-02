@@ -4784,10 +4784,10 @@ function loadCAQuestions(id,name,more){
   var offset=cont.querySelectorAll('.qcard').length;
 
   function generateMCQ(context){
-    var qprompt='Aaj ki date: '+currentDate+'.'
+    var qprompt='Aaj ki date: '+currentDate+' (Year: '+yr+').'
       +'\n\nTu Bihar Police Sipahi Bharti, SSC GD Constable, aur SSC CGL ka EXPERT question setter hai.'
       +'\nTera kaam hai: Topic "'+name+'" par 15 UNIQUE, HIGH-QUALITY MCQ banana.'
-      +(context ? '\n\n📰 REAL NEWS CONTEXT (SIRF inhi verified facts pe questions banana):\n'+context : '\n\n⚠️ Sirf '+yr+' tak ke VERIFIED aur ACCURATE facts use karo. Kuch bhi mat banana.')
+      +(context ? '\n\n📰 VERIFIED SOURCES SE CONTEXT (PIB/RBI/Wikipedia — SIRF inhi facts pe questions banana):\n'+context : '\n\n⚠️ '+yr+' ke VERIFIED aur ACCURATE facts use karo. PIB, RBI, Govt sources jaise facts. Kuch bhi mat banana.')  
       +'\n\n🎯 QUESTION QUALITY RULES:'
       +'\n1. Har question EXAM-WORTHY ho — wahi poochho jo actually Bihar Police/SSC mein aata hai'
       +'\n2. Questions variety mein rakho: naam, date, jagah, rank, award, appointment, fact'
@@ -4837,31 +4837,80 @@ function loadCAQuestions(id,name,more){
       +'<div style="font-size:.68rem;color:var(--t2)">Wikipedia → Verified MCQ</div>'
       +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
   }
-  // Wikipedia search API
-  var wikiQuery=name.replace(/[0-9]/g,'').trim();
-  var wikiUrl='https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(wikiQuery+' India 2025 2026')+'&srlimit=3&format=json&origin=*';
-  fetch(wikiUrl)
-  .then(function(r){return r.json();})
-  .then(function(data){
-    var pages=data.query&&data.query.search?data.query.search:[];
-    if(!pages.length){generateMCQ('');return;}
-    // Get extract for top result
-    var pageId=pages[0].pageid;
-    var extractUrl='https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids='+pageId+'&format=json&origin=*';
-    return fetch(extractUrl);
-  })
-  .then(function(r){if(!r)return null;return r.json();})
-  .then(function(data){
-    var ctx='';
-    if(data&&data.query&&data.query.pages){
-      var pages=data.query.pages;
-      var pageId=Object.keys(pages)[0];
-      var extract=pages[pageId].extract||'';
-      ctx=extract.substring(0,2500);
-    }
-    generateMCQ(ctx);
-  })
-  .catch(function(){generateMCQ('');});
+  // Multi-source: RSS feeds + Wikipedia parallel fetch
+  var rssProxy='https://api.rss2json.com/v1/api.json?rss_url=';
+  var RSS_SOURCES=[
+    // PIB - Press Information Bureau (Official Govt)
+    rssProxy+encodeURIComponent('https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3'),
+    // PIB Science & Tech
+    rssProxy+encodeURIComponent('https://pib.gov.in/RssMain.aspx?ModId=21&Lang=1&Regid=3'),
+    // RBI
+    rssProxy+encodeURIComponent('https://www.rbi.org.in/Scripts/rss.aspx'),
+    // Ministry of External Affairs
+    rssProxy+encodeURIComponent('https://mea.gov.in/rssfeed/pressreleases.xml')
+  ];
+
+  if(!more){
+    cont.innerHTML='<div style="text-align:center;padding:30px">'
+      +'<div style="font-size:2.5rem">📡</div>'
+      +'<div style="font-size:.85rem;font-weight:800;color:var(--ac);margin:8px 0">Sources fetch ho rahi hain...</div>'
+      +'<div style="font-size:.68rem;color:var(--t2)">PIB + RBI + Wikipedia → AI MCQ</div>'
+      +'<div class="load-bar" style="margin:14px auto"><div class="load-fill"></div></div></div>';
+  }
+
+  // Fetch all sources in parallel with timeout
+  function fetchWithTimeout(url,ms){
+    return Promise.race([
+      fetch(url).then(function(r){return r.json();}),
+      new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'));},ms);})
+    ]);
+  }
+
+  var topicKeyword=name.replace(/[0-9२०२५२०२६]/g,'').trim();
+
+  // RSS fetch - pick relevant items
+  function fetchRSS(){
+    return Promise.all(RSS_SOURCES.map(function(url){
+      return fetchWithTimeout(url,4000).catch(function(){return null;});
+    })).then(function(results){
+      var items=[];
+      results.forEach(function(data){
+        if(!data||!data.items) return;
+        data.items.forEach(function(item){
+          // Filter relevant items
+          var text=(item.title||'')+(item.description||'');
+          items.push('['+((item.pubDate||'').substring(0,10))+'] '+(item.title||'')+(item.description?' — '+item.description.replace(/<[^>]*>/g,'').substring(0,200):''));
+        });
+      });
+      return items.slice(0,15).join('\n\n').substring(0,2000);
+    }).catch(function(){return '';});
+  }
+
+  // Wikipedia fetch
+  function fetchWiki(){
+    var wUrl='https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(topicKeyword+' India 2025 2026')+'&srlimit=2&format=json&origin=*';
+    return fetchWithTimeout(wUrl,4000).then(function(data){
+      var pages=data.query&&data.query.search?data.query.search:[];
+      if(!pages.length) return '';
+      var pid=pages[0].pageid;
+      var eUrl='https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&pageids='+pid+'&format=json&origin=*';
+      return fetchWithTimeout(eUrl,4000).then(function(d){
+        var pg=d.query&&d.query.pages?d.query.pages:{};
+        var k=Object.keys(pg)[0];
+        return (pg[k]&&pg[k].extract?pg[k].extract:'').substring(0,1500);
+      });
+    }).catch(function(){return '';});
+  }
+
+  // Run both in parallel, combine context
+  Promise.all([fetchRSS(), fetchWiki()]).then(function(results){
+    var rssCtx=results[0]||'';
+    var wikiCtx=results[1]||'';
+    var combined='';
+    if(rssCtx) combined+='📰 LATEST NEWS:\n'+rssCtx+'\n\n';
+    if(wikiCtx) combined+='📖 BACKGROUND:\n'+wikiCtx;
+    generateMCQ(combined.substring(0,3500));
+  }).catch(function(){generateMCQ('');});
 }
 
 function showCAError(cont,id,name,msg,more){
