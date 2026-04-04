@@ -4619,24 +4619,15 @@ function loadCAQuestions(id,name,more){
   var offset=cont.querySelectorAll('.qcard').length;
 
   function generateMCQ(context){
-    var qprompt='Tu SSC GD Constable, Bihar Police, SSC CGL ka EXPERT AI Current Affairs Engine hai.\n'
-      +'Aaj ki date: '+currentDate+' | Year: '+yr+'\n\n'
+    var qprompt='Tu SSC GD/Bihar Police/SSC CGL ka EXPERT Current Affairs Engine hai.\n'
+      +'Date: '+currentDate+' | Year: '+yr+'\n'
       +'Topic: "'+name+'"\n\n'
-      +'TASK: Is topic par 2024-'+yr+' ke REAL, VERIFIED, EXAM-RELEVANT content banao.\n\n'
-      +'IMPORTANT RULES:\n'
-      +'- SIRF wahi facts use karo jo ACTUALLY 2024-'+yr+' mein hua hai\n'
-      +'- PIB, RBI, Ministry, ISRO jaise official sources ke facts\n'
-      +'- Koi bhi fact GUESS mat karo — agar confirm nahi toh mat likho\n'
-      +'- Questions wahi banao jo SSC GD/Bihar Police mein ACTUALLY pooche jaate hain\n\n'
-      +'OUTPUT FORMAT (STRICT JSON ONLY):\n'
-      +'{\n'
-      +'  "notes":{"heading":"Topic heading","points":["5 crisp revision points"]},\n'
-      +'  "one_liners":["5 exam one-liners — rank/award/first/org format"],\n'
-      +'  "mcqs":[{"q":"Hindi question?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"Explanation","difficulty":"easy/medium/hard","pyq":false,"wrong_explain":"Galat kyun"}]\n'
-      +'}\n\n'
-      +'MCQ RULES: 15 total (5 easy, 7 medium, 3 hard) | ans 0-3 equally distribute | tricky distractors\n'
-      +avoid+' SIRF valid JSON — no markdown';
-    groqFetch(key,{
+      +'VERIFIED 2024-'+yr+' facts se exam-relevant content banao.\n\n'
+      +'OUTPUT - ONLY VALID JSON (no markdown, no extra text):\n'
+      +'{"notes":{"heading":"heading","points":["point1","point2","point3","point4","point5"]},"one_liners":["fact1","fact2","fact3","fact4","fact5"],"mcqs":[{"q":"question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":0,"sol":"explanation","difficulty":"easy","pyq":false,"wrong_explain":"reason"}]}\n\n'
+      +'Rules: 15 MCQs (5 easy/7 medium/3 hard), ans 0-3 distributed, Hindi Devanagari, tricky options\n'
+      +avoid;
+        groqFetch(key,{
       _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192','deepseek-r1-distill-llama-70b'],
       messages:[
         {role:'system',content:'JSON array generator. Return ONLY valid JSON array. Hindi Devanagari. No markdown.'},
@@ -4645,11 +4636,35 @@ function loadCAQuestions(id,name,more){
       max_tokens:2500,temperature:0.3
     },function(data){
       try{
-        var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+        var txt=data.choices[0].message.content;
+        // Clean markdown
+        txt=txt.replace(/```json/gi,'').replace(/```/g,'').trim();
+        // Remove control characters
+        txt=txt.replace(/[\x00-\x1F\x7F]/g,function(ch){return ch==='\n'||ch==='\r'||ch==='\t'?ch:' ';});
         var parsed=null;
-        try{var os=txt.indexOf('{'),oe=txt.lastIndexOf('}');if(os!==-1){parsed=JSON.parse(txt.substring(os,oe+1));if(!parsed.mcqs)parsed=null;}}catch(e2){}
-        if(!parsed){var as=txt.indexOf('['),ae=txt.lastIndexOf(']');if(as===-1)throw new Error('JSON nahi mila');var arr=JSON.parse(txt.substring(as,ae+1));arr=arr.filter(function(q){return q.opts&&q.opts.length>=4;});if(!arr.length)throw new Error('Valid questions nahi mile');parsed=arr;}
-        else{parsed.mcqs=(parsed.mcqs||[]).filter(function(q){return q.opts&&q.opts.length>=4;});if(!parsed.mcqs.length)throw new Error('Valid questions nahi mile');}
+        // Try object format {notes,one_liners,mcqs}
+        try{
+          var os=txt.indexOf('{'),oe=txt.lastIndexOf('}');
+          if(os!==-1){
+            var candidate=txt.substring(os,oe+1);
+            parsed=JSON.parse(candidate);
+            if(!parsed.mcqs)parsed=null;
+          }
+        }catch(e2){parsed=null;}
+        // Try array format
+        if(!parsed){
+          try{
+            var as=txt.indexOf('['),ae=txt.lastIndexOf(']');
+            if(as===-1)throw new Error('No JSON');
+            var arr=JSON.parse(txt.substring(as,ae+1));
+            arr=arr.filter(function(q){return q&&q.opts&&q.opts.length>=4;});
+            if(!arr.length)throw new Error('No valid questions');
+            parsed=arr;
+          }catch(e3){throw new Error('JSON parse failed: '+String(e3).substring(0,60));}
+        } else {
+          parsed.mcqs=(parsed.mcqs||[]).filter(function(q){return q&&q.opts&&q.opts.length>=4;});
+          if(!parsed.mcqs.length)throw new Error('No valid MCQs in response');
+        }
         renderCAQuestions(parsed,cont,more,id,offset);
       }catch(err){
         showCAError(cont,id,name,String(err).substring(0,80),more);
