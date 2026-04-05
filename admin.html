@@ -1492,7 +1492,7 @@ function processPDF(){
 
   var processed=0;
   var total=selectedTopics.length;
-  var pdfChunk=_pdfText.substring(0,8000); // First 8K chars
+  var pdfChunk=_pdfText.substring(0,5000);
 
   function addLog(msg){if(logDiv)logDiv.innerHTML+='<div>'+msg+'</div>';logDiv.scrollTop=logDiv.scrollHeight;}
 
@@ -1533,8 +1533,8 @@ function processPDF(){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
       body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        max_tokens:2000,
+        model:'llama3-8b-8192',
+        max_tokens:1500,
         temperature:0.3,
         messages:[
           {role:'system',content:'JSON array generator. Return ONLY valid JSON array.'},
@@ -1558,10 +1558,10 @@ function processPDF(){
       });
     }).then(function(){
       addLog('✅ '+topic.name+' — done!');
-      setTimeout(function(){processNext(idx+1);},1500); // Rate limit delay
+      setTimeout(function(){processNext(idx+1);},3000);
     }).catch(function(e){
       addLog('❌ '+topic.name+' — '+e.message.substring(0,50));
-      setTimeout(function(){processNext(idx+1);},1500);
+      setTimeout(function(){processNext(idx+1);},3000);
     });
   }
 
