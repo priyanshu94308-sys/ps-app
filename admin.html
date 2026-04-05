@@ -1401,11 +1401,17 @@ var _selectedTopics=CPDF_TOPICS.map(function(t){return t.id;});
 function initCAPDFPage(){
   // Render topic checkboxes
   var cont=document.getElementById('cpdf-topic-checkboxes');
-  if(cont&&!cont.children.length){
+  if(cont){
+    cont.innerHTML='';
     CPDF_TOPICS.forEach(function(t){
       var div=document.createElement('div');
       div.style.cssText='display:flex;align-items:center;gap:5px;padding:4px 6px;background:var(--bg3);border-radius:6px;cursor:pointer';
-      div.innerHTML='<input type="checkbox" id="ck_'+t.id+'" checked style="cursor:pointer"><label for="ck_'+t.id+'" style="font-size:.65rem;cursor:pointer">'+t.name+'</label>';
+      var cb=document.createElement('input');
+      cb.type='checkbox';cb.id='ck_'+t.id;cb.checked=true;cb.style.cursor='pointer';
+      var lbl=document.createElement('label');
+      lbl.htmlFor='ck_'+t.id;lbl.style.cssText='font-size:.65rem;cursor:pointer';
+      lbl.textContent=t.name;
+      div.appendChild(cb);div.appendChild(lbl);
       cont.appendChild(div);
     });
   }
