@@ -4619,16 +4619,20 @@ function loadCAQuestions(id,name,more){
   var offset=cont.querySelectorAll('.qcard').length;
 
   function generateMCQ(context){
-    var qprompt='Generate 15 MCQ questions for Indian competitive exams (SSC GD, Bihar Police, SSC CGL).\n'
-      +'Topic: '+name+' | Year: '+yr+' | Date: '+currentDate+'\n\n'
-      +'Return ONLY a JSON array. No text before or after. No markdown.\n'
-      +'Format: [{"q":"Hindi question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":1,"sol":"Hindi explanation","difficulty":"easy","pyq":false}]\n\n'
-      +'Rules:\n'
-      +'- 15 questions: 5 easy, 7 medium, 3 hard\n'
-      +'- Use only verified 2024-'+yr+' facts\n'
-      +'- Questions and explanations in Hindi Devanagari\n'
-      +'- ans must be 0, 1, 2, or 3 (distributed evenly)\n'
-      +'- Make wrong options realistic and tricky\n'
+    // Topic-specific seed for variety
+    var topicSeed=Math.floor(Math.random()*1000);
+    var qprompt='Generate 15 UNIQUE MCQ questions ONLY about: "'+name+'"\n'
+      +'For: SSC GD Constable, Bihar Police Sipahi, SSC CGL exam preparation\n'
+      +'Year focus: '+yr+' (use '+yr+' specific facts, appointments, events)\n'
+      +'Seed: '+topicSeed+' (use this to generate varied questions)\n\n'
+      +'STRICT RULES:\n'
+      +'1. ALL 15 questions must be ONLY about "'+name+'" - nothing else\n'
+      +'2. Use DIFFERENT facts for each question - no repetition\n'
+      +'3. Questions in Hindi Devanagari script\n'
+      +'4. 5 easy + 7 medium + 3 hard questions\n'
+      +'5. ans values: use 0,1,2,3 each at least 3 times\n'
+      +'6. Return ONLY JSON array, nothing else\n\n'
+      +'Format: [{"q":"प्रश्न?","opts":["(A) ","(B) ","(C) ","(D) "],"ans":0,"sol":"व्याख्या","difficulty":"easy","pyq":false}]\n'
       +avoid;
         groqFetch(key,{
       _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192'],
@@ -4636,7 +4640,7 @@ function loadCAQuestions(id,name,more){
         {role:'system',content:'You are a JSON array generator. Return ONLY a valid JSON array starting with [ and ending with ]. No markdown, no text outside the array.'},
         {role:'user',content:qprompt}
       ],
-      max_tokens:2500,temperature:0.3
+      max_tokens:2500,temperature:0.7
     },function(data){
       try{
         var txt=data.choices[0].message.content;
@@ -4677,7 +4681,20 @@ function loadCAQuestions(id,name,more){
     });
   }
 
-  generateMCQ('');
+  // Pehle Firestore check karo (PDF se banaya hua content)
+  var curMo=new Date();
+  var moKey=curMo.getFullYear()+'_'+String(curMo.getMonth()+1).padStart(2,'0');
+  db.collection('ca_content').doc(moKey).collection('topics').doc(id).get()
+  .then(function(doc){
+    if(doc.exists&&doc.data().questions&&doc.data().questions.length){
+      var cached=doc.data().questions;
+      var ind2=document.getElementById('ca_ind');if(ind2)ind2.remove();
+      renderCAQuestions(cached,cont,more,id,offset);
+      toast('📄 PDF content!','i');
+    } else {
+      generateMCQ('');
+    }
+  }).catch(function(){generateMCQ('');});
 }
 
 function showCAError(cont,id,name,msg,more){
