@@ -121,6 +121,7 @@ body{background:var(--bg);color:var(--t1);font-family:'Segoe UI',sans-serif;min-
 .inp:focus{border-color:var(--ac);}
 select.inp{cursor:pointer;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -164,6 +165,7 @@ select.inp{cursor:pointer;}
     <div class="tab" onclick="showPage('apimonitor',this)">🔑 API Monitor</div>
     <div class="tab" onclick="showPage('chat',this)">💬 Chat</div>
     <div class="tab" onclick="showPage('errors',this)">🐛 Errors</div>
+    <div class="tab" onclick="showPage('capdf',this)">📄 CA PDF</div>
     <div class="tab" onclick="showPage('maintenance',this)">🔧 Maintenance</div>
     <div class="tab" onclick="showPage('actions',this)">⚡ Actions</div>
     <div class="tab" onclick="showPage('logs',this)">📋 Logs</div>
@@ -512,6 +514,77 @@ select.inp{cursor:pointer;}
   <div style="background:var(--bg2);border-radius:12px;padding:12px">
     <div style="font-size:.68rem;font-weight:700;margin-bottom:6px;color:var(--t2)">📝 Maintenance Message:</div>
     <textarea class="admin-ta" id="maintMsg" placeholder="Yeh section update ho raha hai. Thodi der mein wapas aao!" maxlength="200" style="margin-bottom:0"></textarea>
+  </div>
+</div>
+
+<!-- CA PDF MANAGER PAGE -->
+<div id="page-capdf" class="page">
+  <!-- Status Overview -->
+  <div id="capdf-status-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+    <div class="stat-card"><div class="stat-val" id="cpdf-total">0</div><div class="stat-label">Months Processed</div></div>
+    <div class="stat-card"><div class="stat-val" id="cpdf-topics" style="color:var(--gr)">0</div><div class="stat-label">Topics Ready</div></div>
+    <div class="stat-card"><div class="stat-val" id="cpdf-questions" style="color:var(--or)">0</div><div class="stat-label">Total Questions</div></div>
+  </div>
+
+  <!-- PDF Upload Card -->
+  <div class="card">
+    <div class="card-title">📄 PDF Upload & Process</div>
+    <div class="card-desc">Monthly CA PDF select karo → AI topics extract karega → Firestore mein save hoga</div>
+
+    <!-- Month + Year select -->
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <select class="inp" id="cpdf-month" style="flex:1;margin:0">
+        <option value="1">January</option><option value="2">February</option>
+        <option value="3">March</option><option value="4">April</option>
+        <option value="5">May</option><option value="6">June</option>
+        <option value="7">July</option><option value="8">August</option>
+        <option value="9">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <select class="inp" id="cpdf-year" style="width:90px;margin:0">
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+      </select>
+    </div>
+
+    <!-- File upload -->
+    <label style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--bg3);border:2px dashed rgba(245,166,35,.4);border-radius:12px;padding:18px;cursor:pointer;margin-bottom:10px">
+      <span style="font-size:1.5rem">📄</span>
+      <div>
+        <div style="font-size:.78rem;font-weight:800">PDF Select Karo</div>
+        <div style="font-size:.62rem;color:var(--t2)" id="cpdf-filename">Max 10MB</div>
+      </div>
+      <input type="file" accept=".pdf" id="cpdf-file" style="display:none" onchange="onPDFSelect(this)">
+    </label>
+
+    <!-- Topic filter -->
+    <div style="font-size:.68rem;font-weight:700;margin-bottom:6px;color:var(--t2)">Kaunse topics process karein?</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      <button onclick="selectAllTopics()" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);border-radius:6px;color:var(--ac);font-size:.62rem;font-weight:700;padding:4px 10px;cursor:pointer">✅ Sab</button>
+      <button onclick="clearAllTopics()" style="background:var(--bg3);border:1px solid var(--br);border-radius:6px;color:var(--t2);font-size:.62rem;font-weight:700;padding:4px 10px;cursor:pointer">❌ Clear</button>
+    </div>
+    <div id="cpdf-topic-checkboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:12px;max-height:200px;overflow-y:auto"></div>
+
+    <!-- Process button -->
+    <button onclick="processPDF()" id="cpdf-process-btn" style="width:100%;background:linear-gradient(135deg,var(--ac),#ff6b00);border:none;border-radius:12px;color:#000;font-size:.82rem;font-weight:900;padding:12px;cursor:pointer">
+      🚀 Process PDF
+    </button>
+  </div>
+
+  <!-- Progress -->
+  <div id="cpdf-progress" style="display:none;background:var(--bg2);border-radius:12px;padding:14px;margin-top:12px">
+    <div style="font-size:.75rem;font-weight:800;margin-bottom:8px" id="cpdf-progress-title">Processing...</div>
+    <div style="background:var(--bg3);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px">
+      <div id="cpdf-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--ac),#ff6b00);border-radius:99px;width:0%;transition:width .5s"></div>
+    </div>
+    <div style="font-size:.65rem;color:var(--t2)" id="cpdf-progress-msg">Preparing...</div>
+    <div id="cpdf-log" style="margin-top:10px;max-height:150px;overflow-y:auto;font-size:.62rem;color:var(--t2);line-height:1.8"></div>
+  </div>
+
+  <!-- Processed months list -->
+  <div class="card" style="margin-top:12px">
+    <div class="card-title">📅 Processed Months</div>
+    <div id="cpdf-months-list"><div style="color:var(--t2);font-size:.72rem;text-align:center;padding:16px">Load ho raha hai...</div></div>
   </div>
 </div>
 
@@ -1304,6 +1377,221 @@ function unlockAllTabs(){
   _maintLocks={};
   renderLockList();updateLockStatus();
   toast('🔓 Sab tabs unlocked (unsaved)');
+}
+
+
+// ── CA PDF MANAGER ──
+var CPDF_TOPICS=[
+  {id:'t1',name:'कौन, क्या?'},{id:'t2',name:'नई नियुक्तियाँ'},
+  {id:'t3',name:'CM और राज्यपाल'},{id:'t4',name:'भारत में प्रथम'},
+  {id:'t5',name:'पुरस्कार'},{id:'t6',name:'खेल'},
+  {id:'t7',name:'सैन्य अभ्यास'},{id:'t8',name:'रक्षा'},
+  {id:'t9',name:'विज्ञान और तकनीक'},{id:'t10',name:'अंतर्राष्ट्रीय'},
+  {id:'t11',name:'राष्ट्रीय'},{id:'t12',name:'आर्थिक'},
+  {id:'t13',name:'सूचकांक'},{id:'t14',name:'सम्मेलन'},
+  {id:'t15',name:'ब्रांड एंबेसडर'},{id:'t16',name:'योजनाएं'},
+  {id:'t17',name:'GI Tags'},{id:'t18',name:'पुस्तकें'},
+  {id:'t19',name:'निधन'},{id:'t20',name:'महत्त्वपूर्ण दिवस'},
+  {id:'t21',name:'पर्यावरण'},{id:'t22',name:'संविधान'},
+  {id:'t23',name:'ISRO और अंतरिक्ष'},{id:'t24',name:'अंतर्राष्ट्रीय संगठन'}
+];
+var _pdfText='';
+var _selectedTopics=CPDF_TOPICS.map(function(t){return t.id;});
+
+function initCAPDFPage(){
+  // Render topic checkboxes
+  var cont=document.getElementById('cpdf-topic-checkboxes');
+  if(cont&&!cont.children.length){
+    CPDF_TOPICS.forEach(function(t){
+      var div=document.createElement('div');
+      div.style.cssText='display:flex;align-items:center;gap:5px;padding:4px 6px;background:var(--bg3);border-radius:6px;cursor:pointer';
+      div.innerHTML='<input type="checkbox" id="ck_'+t.id+'" checked style="cursor:pointer"><label for="ck_'+t.id+'" style="font-size:.65rem;cursor:pointer">'+t.name+'</label>';
+      cont.appendChild(div);
+    });
+  }
+  // Set current month
+  var sel=document.getElementById('cpdf-month');
+  if(sel) sel.value=new Date().getMonth()+1;
+  loadProcessedMonths();
+}
+
+function selectAllTopics(){
+  CPDF_TOPICS.forEach(function(t){var el=document.getElementById('ck_'+t.id);if(el)el.checked=true;});
+}
+function clearAllTopics(){
+  CPDF_TOPICS.forEach(function(t){var el=document.getElementById('ck_'+t.id);if(el)el.checked=false;});
+}
+
+function onPDFSelect(input){
+  var file=input.files[0];if(!file)return;
+  var fn=document.getElementById('cpdf-filename');
+  if(fn) fn.textContent=file.name+' ('+Math.round(file.size/1024)+'KB)';
+  // Load PDF text immediately
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var typedArray=new Uint8Array(e.target.result);
+    if(typeof pdfjsLib==='undefined'){toast('PDF.js load nahi hua - refresh karo','w');return;}
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.getDocument({data:typedArray}).promise.then(function(pdf){
+      var totalPages=pdf.numPages;
+      var textPromises=[];
+      for(var i=1;i<=totalPages;i++){
+        textPromises.push(pdf.getPage(i).then(function(page){
+          return page.getTextContent().then(function(content){
+            return content.items.map(function(item){return item.str;}).join(' ');
+          });
+        }));
+      }
+      return Promise.all(textPromises);
+    }).then(function(pages){
+      _pdfText=pages.join('\n');
+      var fn2=document.getElementById('cpdf-filename');
+      if(fn2) fn2.textContent=file.name+' — '+Math.round(_pdfText.length/1000)+'K characters extracted ✅';
+      toast('✅ PDF ready! '+totalPages+' pages extracted','i');
+    }).catch(function(e){toast('PDF read error: '+e.message,'w');});
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function processPDF(){
+  if(!_pdfText){toast('Pehle PDF select karo!','w');return;}
+  var apiKey=localStorage.getItem('ps_gkey')||'';
+  if(!apiKey){toast('Groq API key chahiye!','w');return;}
+  var month=document.getElementById('cpdf-month').value;
+  var year=document.getElementById('cpdf-year').value;
+  var monthNames=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  var monthKey=year+'_'+String(month).padStart(2,'0');
+  var monthLabel=monthNames[parseInt(month)]+' '+year;
+
+  // Get selected topics
+  var selectedTopics=CPDF_TOPICS.filter(function(t){
+    var el=document.getElementById('ck_'+t.id);return el&&el.checked;
+  });
+  if(!selectedTopics.length){toast('Koi topic select nahi!','w');return;}
+
+  // Show progress
+  var prog=document.getElementById('cpdf-progress');
+  var progBar=document.getElementById('cpdf-progress-bar');
+  var progMsg=document.getElementById('cpdf-progress-msg');
+  var progTitle=document.getElementById('cpdf-progress-title');
+  var logDiv=document.getElementById('cpdf-log');
+  if(prog) prog.style.display='block';
+  if(progTitle) progTitle.textContent='Processing '+monthLabel+'...';
+  document.getElementById('cpdf-process-btn').disabled=true;
+
+  var processed=0;
+  var total=selectedTopics.length;
+  var pdfChunk=_pdfText.substring(0,8000); // First 8K chars
+
+  function addLog(msg){if(logDiv)logDiv.innerHTML+='<div>'+msg+'</div>';logDiv.scrollTop=logDiv.scrollHeight;}
+
+  function processNext(idx){
+    if(idx>=selectedTopics.length){
+      // Done!
+      if(progBar) progBar.style.width='100%';
+      if(progMsg) progMsg.textContent='✅ Sab topics processed!';
+      if(progTitle) progTitle.textContent='✅ '+monthLabel+' Complete!';
+      document.getElementById('cpdf-process-btn').disabled=false;
+      // Update metadata
+      db.collection('ca_content').doc(monthKey).set({
+        month:parseInt(month),year:parseInt(year),
+        label:monthLabel,processedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        topicsCount:selectedTopics.length
+      },{merge:true});
+      toast('✅ '+monthLabel+' processed!');
+      log('📄 CA PDF processed: '+monthLabel+' ('+selectedTopics.length+' topics)','ok');
+      loadProcessedMonths();
+      return;
+    }
+    var topic=selectedTopics[idx];
+    processed++;
+    var pct=Math.round((processed/total)*100);
+    if(progBar) progBar.style.width=pct+'%';
+    if(progMsg) progMsg.textContent='Topic '+processed+'/'+total+': '+topic.name;
+    addLog('⏳ Processing: '+topic.name+'...');
+
+    var prompt='You are processing a monthly Current Affairs PDF for Indian competitive exams.\n'
+      +'Month: '+monthLabel+'\n'
+      +'Topic to extract: "'+topic.name+'"\n\n'
+      +'PDF Content:\n'+pdfChunk+'\n\n'
+      +'Extract content about "'+topic.name+'" and generate 10 MCQ questions.\n'
+      +'Return ONLY a JSON array: [{"q":"Hindi?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"explanation","difficulty":"easy","pyq":false}]\n'
+      +'Rules: Hindi Devanagari questions, use ONLY PDF facts, no guessing.';
+
+    fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:2000,
+        temperature:0.3,
+        messages:[
+          {role:'system',content:'JSON array generator. Return ONLY valid JSON array.'},
+          {role:'user',content:prompt}
+        ]
+      })
+    }).then(function(r){return r.json();})
+    .then(function(data){
+      if(data.error) throw new Error(data.error.message);
+      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var s=txt.indexOf('['),e=txt.lastIndexOf(']');
+      if(s===-1) throw new Error('No JSON');
+      var arr=JSON.parse(txt.substring(s,e+1));
+      arr=arr.filter(function(q){return q&&q.opts&&q.opts.length>=4;});
+      if(!arr.length) throw new Error('No valid questions');
+      // Save to Firestore
+      return db.collection('ca_content').doc(monthKey).collection('topics').doc(topic.id).set({
+        topicId:topic.id,topicName:topic.name,
+        questions:arr,count:arr.length,
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }).then(function(){
+      addLog('✅ '+topic.name+' — done!');
+      setTimeout(function(){processNext(idx+1);},1500); // Rate limit delay
+    }).catch(function(e){
+      addLog('❌ '+topic.name+' — '+e.message.substring(0,50));
+      setTimeout(function(){processNext(idx+1);},1500);
+    });
+  }
+
+  processNext(0);
+}
+
+function loadProcessedMonths(){
+  var list=document.getElementById('cpdf-months-list');
+  if(!list)return;
+  db.collection('ca_content').orderBy('processedAt','desc').get().then(function(snap){
+    if(snap.empty){list.innerHTML='<div style="color:var(--t2);font-size:.72rem;text-align:center;padding:16px">Abhi koi PDF process nahi hua</div>';return;}
+    var html='';var totalTopics=0;var totalQ=0;
+    snap.docs.forEach(function(doc){
+      var d=doc.data();
+      totalTopics+=d.topicsCount||0;
+      html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr)">'
+        +'<div><div style="font-size:.78rem;font-weight:700">📅 '+esc(d.label||doc.id)+'</div>'
+        +'<div style="font-size:.62rem;color:var(--t2)">'+( d.topicsCount||0)+' topics</div></div>'
+        +'<div style="display:flex;gap:6px">'
+        +'<button data-mk="'+doc.id+'" data-lb="'+esc(d.label||doc.id)+'" onclick="reprocessMonth(this.dataset.mk,this.dataset.lb)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);border-radius:6px;color:var(--ac);font-size:.62rem;padding:4px 8px;cursor:pointer">🔄 Redo</button>'
+        +'<button data-mk="'+doc.id+'" onclick="deleteMonth(this.dataset.mk)" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:var(--rd);font-size:.62rem;padding:4px 8px;cursor:pointer">🗑</button>'
+        +'</div></div>';
+    });
+    list.innerHTML=html;
+    var el=document.getElementById('cpdf-total');if(el)el.textContent=snap.size;
+    el=document.getElementById('cpdf-topics');if(el)el.textContent=totalTopics;
+  }).catch(function(){list.innerHTML='<div style="color:var(--rd);font-size:.72rem">Error loading</div>';});
+}
+
+function deleteMonth(monthKey){
+  confirmAction('Delete karna hai?',monthKey+' ka sara data delete ho jaayega!',function(){
+    db.collection('ca_content').doc(monthKey).collection('topics').get().then(function(snap){
+      var batch=db.batch();snap.docs.forEach(function(d){batch.delete(d.ref);});return batch.commit();
+    }).then(function(){
+      return db.collection('ca_content').doc(monthKey).delete();
+    }).then(function(){toast('✅ Deleted!');loadProcessedMonths();});
+  });
+}
+
+function reprocessMonth(monthKey,label){
+  toast('PDF dobara select karo aur Process karo','i');
 }
 
 </script>
