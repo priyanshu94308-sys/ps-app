@@ -165,7 +165,7 @@ select.inp{cursor:pointer;}
     <div class="tab" onclick="showPage('apimonitor',this)">🔑 API Monitor</div>
     <div class="tab" onclick="showPage('chat',this)">💬 Chat</div>
     <div class="tab" onclick="showPage('errors',this)">🐛 Errors</div>
-    <div class="tab" onclick="showPage('capdf',this)">📄 CA PDF</div>
+    <div class="tab" onclick="showPage('capdf',this);setTimeout(initCAPDFPage,100)">📄 CA PDF</div>
     <div class="tab" onclick="showPage('maintenance',this)">🔧 Maintenance</div>
     <div class="tab" onclick="showPage('actions',this)">⚡ Actions</div>
     <div class="tab" onclick="showPage('logs',this)">📋 Logs</div>
@@ -1438,10 +1438,11 @@ function onPDFSelect(input){
     var typedArray=new Uint8Array(e.target.result);
     if(typeof pdfjsLib==='undefined'){toast('PDF.js load nahi hua - refresh karo','w');return;}
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    var _totalPages=0;
     pdfjsLib.getDocument({data:typedArray}).promise.then(function(pdf){
-      var totalPages=pdf.numPages;
+      _totalPages=pdf.numPages;
       var textPromises=[];
-      for(var i=1;i<=totalPages;i++){
+      for(var i=1;i<=_totalPages;i++){
         textPromises.push(pdf.getPage(i).then(function(page){
           return page.getTextContent().then(function(content){
             return content.items.map(function(item){return item.str;}).join(' ');
@@ -1452,8 +1453,8 @@ function onPDFSelect(input){
     }).then(function(pages){
       _pdfText=pages.join('\n');
       var fn2=document.getElementById('cpdf-filename');
-      if(fn2) fn2.textContent=file.name+' — '+Math.round(_pdfText.length/1000)+'K characters extracted ✅';
-      toast('✅ PDF ready! '+totalPages+' pages extracted','i');
+      if(fn2) fn2.textContent=file.name+' — '+Math.round(_pdfText.length/1000)+'K chars, '+_totalPages+' pages ✅';
+      toast('✅ PDF ready! '+_totalPages+' pages extracted','i');
     }).catch(function(e){toast('PDF read error: '+e.message,'w');});
   };
   reader.readAsArrayBuffer(file);
@@ -1470,10 +1471,14 @@ function processPDF(){
   var monthLabel=monthNames[parseInt(month)]+' '+year;
 
   // Get selected topics
+  // Force render checkboxes if not done
+  var cont2=document.getElementById('cpdf-topic-checkboxes');
+  if(cont2&&!cont2.children.length) initCAPDFPage();
   var selectedTopics=CPDF_TOPICS.filter(function(t){
-    var el=document.getElementById('ck_'+t.id);return el&&el.checked;
+    var el=document.getElementById('ck_'+t.id);
+    return !el || el.checked; // if checkbox not found, include topic
   });
-  if(!selectedTopics.length){toast('Koi topic select nahi!','w');return;}
+  if(!selectedTopics.length) selectedTopics=CPDF_TOPICS; // fallback: all topics
 
   // Show progress
   var prog=document.getElementById('cpdf-progress');
