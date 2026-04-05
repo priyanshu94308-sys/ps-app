@@ -4619,28 +4619,21 @@ function loadCAQuestions(id,name,more){
   var offset=cont.querySelectorAll('.qcard').length;
 
   function generateMCQ(context){
-    var qprompt='You are an expert Indian competitive exam content generator for SSC GD, Bihar Police, and SSC CGL.\n'
-      +'Today: '+currentDate+' | Generate content for year: '+yr+'\n'
-      +'Topic: '+name+'\n\n'
-      +'Generate ONLY a valid JSON object with NO markdown, NO explanation outside JSON.\n'
-      +'Use ONLY verified facts from 2024-'+yr+'. Do NOT guess or make up facts.\n\n'
-      +'EXACT JSON FORMAT TO RETURN:\n'
-      +'{"notes":{"heading":"<topic>","points":["<fact1>","<fact2>","<fact3>","<fact4>","<fact5>"]},'
-      +'"one_liners":["<fact1>","<fact2>","<fact3>","<fact4>","<fact5>"],'
-      +'"mcqs":[{"q":"<Hindi question in Devanagari>","opts":["(A) <opt>","(B) <opt>","(C) <opt>","(D) <opt>"],"ans":<0-3>,"sol":"<explanation in Hindi>","difficulty":"<easy/medium/hard>","pyq":<true/false>,"wrong_explain":"<why wrong options are wrong>"}]}\n\n'
-      +'RULES:\n'
-      +'1. Return ONLY the JSON object - no text before or after\n'
-      +'2. Generate exactly 15 MCQs: 5 easy, 7 medium, 3 hard\n'
-      +'3. Distribute ans values: use 0,1,2,3 roughly equally\n'
-      +'4. All questions and explanations in Hindi Devanagari\n'
-      +'5. Proper nouns (names, places) can be in English\n'
-      +'6. Make options tricky - no obvious answers\n'
-      +'7. pyq:true only if this exact topic appeared in SSC/Bihar Police PYQ\n'
+    var qprompt='Generate 15 MCQ questions for Indian competitive exams (SSC GD, Bihar Police, SSC CGL).\n'
+      +'Topic: '+name+' | Year: '+yr+' | Date: '+currentDate+'\n\n'
+      +'Return ONLY a JSON array. No text before or after. No markdown.\n'
+      +'Format: [{"q":"Hindi question?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":1,"sol":"Hindi explanation","difficulty":"easy","pyq":false}]\n\n'
+      +'Rules:\n'
+      +'- 15 questions: 5 easy, 7 medium, 3 hard\n'
+      +'- Use only verified 2024-'+yr+' facts\n'
+      +'- Questions and explanations in Hindi Devanagari\n'
+      +'- ans must be 0, 1, 2, or 3 (distributed evenly)\n'
+      +'- Make wrong options realistic and tricky\n'
       +avoid;
         groqFetch(key,{
       _models:['compound-beta','llama-3.3-70b-versatile','llama3-70b-8192'],
       messages:[
-        {role:'system',content:'You are a JSON generator. Return ONLY valid JSON. No markdown, no explanation outside JSON.'},
+        {role:'system',content:'You are a JSON array generator. Return ONLY a valid JSON array starting with [ and ending with ]. No markdown, no text outside the array.'},
         {role:'user',content:qprompt}
       ],
       max_tokens:2500,temperature:0.3
