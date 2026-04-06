@@ -1529,40 +1529,48 @@ function processPDF(){
       +'Return ONLY a JSON array: [{"q":"Hindi?","opts":["(A)","(B)","(C)","(D)"],"ans":0,"sol":"explanation","difficulty":"easy","pyq":false}]\n'
       +'Rules: Hindi Devanagari questions, use ONLY PDF facts, no guessing.';
 
-    fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-      body:JSON.stringify({
-        model:'llama3-8b-8192',
-        max_tokens:1500,
-        temperature:0.3,
-        messages:[
-          {role:'system',content:'JSON array generator. Return ONLY valid JSON array.'},
-          {role:'user',content:prompt}
-        ]
-      })
-    }).then(function(r){return r.json();})
-    .then(function(data){
-      if(data.error) throw new Error(data.error.message);
-      var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=txt.indexOf('['),e=txt.lastIndexOf(']');
-      if(s===-1) throw new Error('No JSON');
-      var arr=JSON.parse(txt.substring(s,e+1));
-      arr=arr.filter(function(q){return q&&q.opts&&q.opts.length>=4;});
-      if(!arr.length) throw new Error('No valid questions');
-      // Save to Firestore
-      return db.collection('ca_content').doc(monthKey).collection('topics').doc(topic.id).set({
-        topicId:topic.id,topicName:topic.name,
-        questions:arr,count:arr.length,
-        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    function callGroq(retryCount){
+      fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+        body:JSON.stringify({
+          model:'gemma2-9b-it',
+          max_tokens:1200,
+          temperature:0.4,
+          messages:[
+            {role:'system',content:'Return ONLY a valid JSON array. No markdown. No explanation.'},
+            {role:'user',content:prompt}
+          ]
+        })
+      }).then(function(r){return r.json();})
+      .then(function(data){
+        if(data.error){
+          if(data.error.message&&data.error.message.indexOf('rate')>-1&&retryCount<2){
+            addLog('⏳ Rate limit — 8 sec retry...');
+            setTimeout(function(){callGroq(retryCount+1);},8000);return;
+          }
+          throw new Error(data.error.message);
+        }
+        var txt=data.choices[0].message.content.replace(/```json/gi,'').replace(/```/g,'').trim();
+        var s=txt.indexOf('['),e=txt.lastIndexOf(']');
+        if(s===-1) throw new Error('No JSON array');
+        var arr=JSON.parse(txt.substring(s,e+1));
+        arr=arr.filter(function(q){return q&&q.opts&&q.opts.length>=4;});
+        if(!arr.length) throw new Error('No valid MCQs');
+        return db.collection('ca_content').doc(monthKey).collection('topics').doc(topic.id).set({
+          topicId:topic.id,topicName:topic.name,
+          questions:arr,count:arr.length,
+          updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }).then(function(){
+        addLog('✅ '+topic.name);
+        setTimeout(function(){processNext(idx+1);},4000);
+      }).catch(function(e){
+        addLog('❌ '+topic.name+' — '+e.message.substring(0,60));
+        setTimeout(function(){processNext(idx+1);},4000);
       });
-    }).then(function(){
-      addLog('✅ '+topic.name+' — done!');
-      setTimeout(function(){processNext(idx+1);},3000);
-    }).catch(function(e){
-      addLog('❌ '+topic.name+' — '+e.message.substring(0,50));
-      setTimeout(function(){processNext(idx+1);},3000);
-    });
+    }
+    callGroq(0);
   }
 
   processNext(0);
@@ -1573,13 +1581,13 @@ function loadProcessedMonths(){
   if(!list)return;
   db.collection('ca_content').orderBy('processedAt','desc').get().then(function(snap){
     if(snap.empty){list.innerHTML='<div style="color:var(--t2);font-size:.72rem;text-align:center;padding:16px">Abhi koi PDF process nahi hua</div>';return;}
-    var html='';var totalTopics=0;var totalQ=0;
+    var html='';var totalTopics=0;
     snap.docs.forEach(function(doc){
       var d=doc.data();
       totalTopics+=d.topicsCount||0;
       html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bdr)">'
         +'<div><div style="font-size:.78rem;font-weight:700">📅 '+esc(d.label||doc.id)+'</div>'
-        +'<div style="font-size:.62rem;color:var(--t2)">'+( d.topicsCount||0)+' topics</div></div>'
+        +'<div style="font-size:.62rem;color:var(--t2)">'+(d.topicsCount||0)+' topics</div></div>'
         +'<div style="display:flex;gap:6px">'
         +'<button data-mk="'+doc.id+'" data-lb="'+esc(d.label||doc.id)+'" onclick="reprocessMonth(this.dataset.mk,this.dataset.lb)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.3);border-radius:6px;color:var(--ac);font-size:.62rem;padding:4px 8px;cursor:pointer">🔄 Redo</button>'
         +'<button data-mk="'+doc.id+'" onclick="deleteMonth(this.dataset.mk)" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:var(--rd);font-size:.62rem;padding:4px 8px;cursor:pointer">🗑</button>'
