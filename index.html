@@ -3822,21 +3822,29 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     avoidStr='\n\uD83D\uDCA1 FOCUS: '+angles0[Math.floor(Math.random()*angles0.length)]+'.';
   }
   var topicSeed=Math.floor(Math.random()*9999);
+  var topicSeed=Math.floor(Math.random()*9999);
+  var qTypes=['factual','statement','match'];
+  var qType=qTypes[Math.floor(Math.random()*qTypes.length)];
   var prompt='Generate 10 MCQ questions for SSC GD Constable and Bihar Police Sipahi exam.\n'
     +'Topic: "'+topic+'"\n'
-    +'Seed: '+topicSeed+' (vary questions each time)\n\n'
+    +'Seed: '+topicSeed+'\n\n'
+    +'QUESTION TYPES (mix karo):\n'
+    +'- 6 Factual: specific dates, names, numbers, places\n'
+    +'- 2 Statement-based: "कथन 1: ... कथन 2: ... कौन सा सही है?" style\n'
+    +'  Options: (A) केवल 1 सही (B) केवल 2 सही (C) दोनों सही (D) दोनों गलत\n'
+    +'- 2 Match the following OR Fill in the blank\n\n'
     +'STRICT RULES:\n'
-    +'1. ALL questions must be from "'+topic+'" ONLY\n'
-    +'2. Use NCERT Class 6-12 verified facts\n'
-    +'3. SSC GD/Bihar Police PYQ pattern — specific dates, names, numbers, places\n'
-    +'4. DIFFERENT facts in each question — no repetition\n'
-    +'5. ans: 0,1,2,3 each used 2-3 times\n'
-    +'6. Wrong options: realistic, plausible, not obvious\n'
-    +'7. Hindi Devanagari for questions and explanations\n'
-    +'8. Return ONLY JSON array — no text before/after\n'
+    +'1. ONLY "'+topic+'" topic\n'
+    +'2. NCERT Class 6-12 verified facts\n'
+    +'3. SSC GD/Bihar Police PYQ pattern\n'
+    +'4. Different facts — no repetition\n'
+    +'5. ans: 0,1,2,3 distributed evenly\n'
+    +'6. Wrong options: realistic, tricky\n'
+    +'7. Hindi Devanagari\n'
+    +'8. sol: 2-3 lines — sahi answer explain karo + wrong options kyun galat hain\n'
     +avoidStr
-    +'\n\nFormat: [{"q":"प्रश्न?","opts":["(A) ","(B) ","(C) ","(D) "],"ans":0,"sol":"व्याख्या + key fact"}]';
-  groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:2500,temperature:0.85},function(data,_m){
+    +'\n\nFormat: [{"q":"प्रश्न?","opts":["(A) ","(B) ","(C) ","(D) "],"ans":0,"sol":"विस्तृत व्याख्या","type":"factual/statement/match"}]';
+    groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:2500,temperature:0.85},function(data,_m){
     clearTimeout(_rwaTimeout);
     if(signal&&signal.aborted){rwaLoading=false;rwaAbortController=null;return;}
     rwaLoading=false;rwaAbortController=null;
@@ -3961,14 +3969,13 @@ function checkRWAAnswer(i){
     document.getElementById('rwa-sol').innerHTML='<div style="background:rgba(124,111,255,.1);border-left:3px solid var(--ac);border-radius:6px;padding:8px 10px;font-size:.72rem;line-height:1.6;margin-top:6px">💡 '+esc(sol)+'</div>';
   }
   document.getElementById('rwa-next-btn').style.display='block';
-  // Bookmark button - wrong answer pe show karo
+  // Wrong answer handling
   if(i!==correct){
     var q2=rwaQuizState.qs[rwaQuizState.cur];
     var bmData={q:q2.q,opts:q2.opts||q2.options||[],ans:correct,sol:q2.sol||'',topic:rwaQuizState.topic,src:'rwa',ts:Date.now()};
     var bmKey=q2.q.substring(0,40);
     var alreadySaved=S.bookmarks&&S.bookmarks.some(function(b){return b.q&&b.q.substring(0,40)===bmKey;});
     window._pendingBM=bmData;
-    // Inject bookmark button directly into quiz content area
     var existing=document.getElementById('rwa-bookmark-btn');
     if(existing) existing.parentNode.removeChild(existing);
     var bmEl=document.createElement('div');
@@ -3979,6 +3986,40 @@ function checkRWAAnswer(i){
       :'<button onclick="saveRWABookmark(this)" style="background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.4);border-radius:8px;color:var(--ac);font-size:.72rem;font-weight:700;padding:8px 14px;cursor:pointer;width:100%">🔖 Galat tha — Save karo</button>';
     var solEl=document.getElementById('rwa-sol');
     if(solEl&&solEl.parentNode) solEl.parentNode.insertBefore(bmEl,solEl.nextSibling);
+
+    // AI detailed explain
+    var gkey2=getGKey();
+    if(gkey2&&q2.q){
+      var aiDiv=document.createElement('div');
+      aiDiv.id='rwa-ai-explain';
+      aiDiv.style.cssText='margin-top:10px;padding:12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;font-size:.7rem;line-height:1.7';
+      aiDiv.innerHTML='<div style="font-weight:800;color:var(--ac);margin-bottom:4px">🤖 AI Explain kar raha hai...</div>';
+      if(solEl&&solEl.parentNode) solEl.parentNode.insertBefore(aiDiv,solEl.nextSibling);
+
+      var selOptText=q2.opts?q2.opts[i]:'';
+      var corOptText=q2.opts?q2.opts[correct]:'';
+      var aiPrompt='SSC GD exam question galat tha. Detail mein samjhao:\n'
+        +'Question: '+q2.q+'\n'
+        +'Maine choose kiya: '+selOptText+'\n'
+        +'Sahi answer: '+corOptText+'\n'
+        +'Topic: '+rwaQuizState.topic+'\n\n'
+        +'3-4 lines mein Hindi mein batao:\n'
+        +'1. Sahi answer kyun sahi hai (key fact ke saath)\n'
+        +'2. Mera answer kyun galat tha\n'
+        +'3. Ek memory tip (yaad rakhne ke liye trick)';
+
+      groqFetch(gkey2,{
+        _models:['llama-3.1-8b-instant','llama3-8b-8192'],
+        messages:[{role:'user',content:aiPrompt}],
+        max_tokens:300,temperature:0.3
+      },function(data){
+        var txt=data.choices[0].message.content;
+        aiDiv.innerHTML='<div style="font-weight:800;color:var(--rd);margin-bottom:6px">❌ Galat kyun?</div>'
+          +'<div style="color:var(--t2)">'+esc(txt).split('\n').join('<br>')+'</div>';
+      },function(){
+        aiDiv.remove();
+      });
+    }
   }
 }
 
