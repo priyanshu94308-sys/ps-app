@@ -1013,6 +1013,11 @@ display:none;
         <div id="refStatus" style="font-size:.63rem;margin-top:5px"></div>
       </div>
       <div class="scard">
+        <div class="sec">🔄 Topic History Reset</div>
+        <div style="font-size:.69rem;color:var(--t2);margin-bottom:8px">Repeat questions aa rahe hain? History clear karo — naye questions aayenge</div>
+        <button onclick="clearAllRWAHistory()" style="width:100%;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;color:var(--rd);font-size:.75rem;font-weight:800;padding:9px;cursor:pointer">🗑 Topic History Clear Karo</button>
+      </div>
+      <div class="scard">
         <div class="sec">📢 WhatsApp Channel</div>
         <a href="https://whatsapp.com/channel/0029Vb7xgWwIHphBvJhJYY0E" target="_blank" class="btn" style="display:block;text-align:center;text-decoration:none;padding:10px;margin-bottom:6px;background:linear-gradient(135deg,#25D366,#128C7E)">📢 PS Channel Join Karo</a>
         <button onclick="showContactPopup()" style="width:100%;background:linear-gradient(135deg,#5c6af0,#7c3aed);border:none;border-radius:12px;color:#fff;font-size:.78rem;font-weight:800;padding:10px;cursor:pointer">👨‍💻 Contact Developer</button>
@@ -3745,16 +3750,38 @@ function _getRWAHistory(cacheKey){
   }
   return _rwaHistory[cacheKey];
 }
+
+// Load all RWA history from Firestore on login
+function _loadRWAHistoryFromFirestore(){
+  var uid=getUid();if(!uid)return;
+  db.collection('users').doc(uid).get().then(function(doc){
+    if(!doc.exists)return;
+    var data=doc.data();
+    var hist=data.rwaHistory||{};
+    Object.keys(hist).forEach(function(key){
+      if(!_rwaHistory[key]||!_rwaHistory[key].length){
+        _rwaHistory[key]=hist[key]||[];
+        try{localStorage.setItem('rwa_h_'+key,JSON.stringify(_rwaHistory[key]));}catch(e){}
+      }
+    });
+  }).catch(function(){});
+}
 function _saveRWAHistory(cacheKey,qs){
   var h=_getRWAHistory(cacheKey);
   qs.forEach(function(q){
     var txt=(q.q||'').substring(0,100);
     if(txt&&h.indexOf(txt)===-1) h.push(txt);
   });
-  // Keep last 60 questions max
-  if(h.length>60) h=h.slice(-60);
+  // Keep last 200 questions max
+  if(h.length>200) h=h.slice(-200);
   _rwaHistory[cacheKey]=h;
   try{localStorage.setItem('rwa_h_'+cacheKey,JSON.stringify(h));}catch(e){}
+  // Also save to Firestore for cross-device sync
+  var uid=getUid();
+  if(uid&&h.length%10===0){ // Save every 10 questions to reduce writes
+    var upd={};upd['rwaHistory.'+cacheKey]=h.slice(-100);
+    db.collection('users').doc(uid).update(upd).catch(function(){});
+  }
 }
 
 function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
@@ -3784,7 +3811,7 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   var hist=_getRWAHistory(cacheKey);
   var avoidStr='';
   if(hist.length>0){
-    var recent=hist.slice(-40);
+    var recent=hist.slice(-60);
     avoidStr='\n\n\uD83D\uDEAB YE QUESTIONS ALREADY POOCHE JA CHUKE HAIN — INSE MILTE-JULTE BILKUL MAT BANANA:\n'
       +recent.map(function(q,i){return (i+1)+'. '+q;}).join('\n')
       +'\n\n\u2705 AB NAYI ANGLES CHOOSE KARO — alag events, persons, dates, places.';
@@ -3794,18 +3821,21 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
     var angles0=['Pramukh tithiyaan aur saal','Pramukh vyakti','Pramukh sthal','Karan aur parinaam'];
     avoidStr='\n\uD83D\uDCA1 FOCUS: '+angles0[Math.floor(Math.random()*angles0.length)]+'.';
   }
-  var prompt='TOPIC: "'+topic+'"\n\n'
-    +'Is TOPIC se SIRF 10 SPECIFIC MCQ banao. Har question topic ke ek specific fact ke baare mein ho.\n'
-    +'⚠️ STRICT: Sirf "'+topic+'" ke andar raho — dusre topics bilkul nahi.\n'
-    +'RULES:\n'
-    +'- 4 options: ek sahi, teen galat realistic\n'
-    +'- ans: 0/1/2/3 equally vary karo\n'
-    +'- SSC GD/Bihar Police level — specific dates/names/numbers puchho\n'
-    +'- sol: sahi answer + ek extra fact\n'
-    +'- NCERT Class 6-12 facts use karo\n'
+  var topicSeed=Math.floor(Math.random()*9999);
+  var prompt='Generate 10 MCQ questions for SSC GD Constable and Bihar Police Sipahi exam.\n'
+    +'Topic: "'+topic+'"\n'
+    +'Seed: '+topicSeed+' (vary questions each time)\n\n'
+    +'STRICT RULES:\n'
+    +'1. ALL questions must be from "'+topic+'" ONLY\n'
+    +'2. Use NCERT Class 6-12 verified facts\n'
+    +'3. SSC GD/Bihar Police PYQ pattern — specific dates, names, numbers, places\n'
+    +'4. DIFFERENT facts in each question — no repetition\n'
+    +'5. ans: 0,1,2,3 each used 2-3 times\n'
+    +'6. Wrong options: realistic, plausible, not obvious\n'
+    +'7. Hindi Devanagari for questions and explanations\n'
+    +'8. Return ONLY JSON array — no text before/after\n'
     +avoidStr
-    +'\n\nOUTPUT (sirf JSON, kuch nahi):\n'
-    +'[{"q":"प्रश्न?","opts":["(A) opt","(B) opt","(C) opt","(D) opt"],"ans":2,"sol":"explanation"}]';
+    +'\n\nFormat: [{"q":"प्रश्न?","opts":["(A) ","(B) ","(C) ","(D) "],"ans":0,"sol":"व्याख्या + key fact"}]';
   groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:2500,temperature:0.85},function(data,_m){
     clearTimeout(_rwaTimeout);
     if(signal&&signal.aborted){rwaLoading=false;rwaAbortController=null;return;}
@@ -4296,6 +4326,7 @@ function initApp(){
   // Save today's task snapshot so Log tab shows correct tasks
   if(S.tasks && S.tasks.length) _saveTaskSnapshot();
   setTimeout(initReferral, 500);
+  setTimeout(_loadRWAHistoryFromFirestore, 800);
   setTimeout(checkMaintenanceLocks, 1000);
   var isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   var apkB=document.getElementById('apkBanner');if(apkB)apkB.style.display=isStandalone?'none':'flex';
@@ -5653,6 +5684,20 @@ function creditReferrer(theirCode){db.collection('users').where('refCode','==',t
 // ── MAINTENANCE ──
 function showMaintenance(tab,msg){var existing=document.getElementById('maintenanceOverlay');if(existing)existing.remove();var overlay=document.createElement('div');overlay.id='maintenanceOverlay';overlay.style.cssText='position:fixed;inset:0;z-index:9990;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center';overlay.innerHTML='<div style="font-size:3.5rem;margin-bottom:16px">🔧</div><div style="font-size:1.1rem;font-weight:900;color:var(--ac);margin-bottom:8px">Maintenance Mode</div><div style="font-size:.78rem;color:var(--t2);line-height:1.7;max-width:280px">'+esc(msg||'Yeh section update ho raha hai!')+'</div><div id="maintHomeBtn" style="margin-top:24px;background:var(--ac);border:none;border-radius:12px;color:#000;font-weight:800;padding:10px 24px;cursor:pointer;font-size:.78rem">🏠 Home Jao</div>';overlay.querySelector('#maintHomeBtn').onclick=function(){var ov=document.getElementById('maintenanceOverlay');if(ov)ov.remove();sw('home');};document.body.appendChild(overlay);}
 function checkMaintenanceLocks(){db.collection('admin').doc('maintenance').onSnapshot(function(doc){var locks={};if(doc.exists)locks=doc.data().locks||{};try{localStorage.setItem('ps_locks',JSON.stringify(locks));}catch(e){}['home','rwa','ca','ask','report','chat','settings'].forEach(function(t){var tbEl=document.getElementById('tb-'+t);if(!tbEl)return;if(locks[t]){tbEl.style.opacity='0.4';}else{tbEl.style.opacity='';}});var currentTab=location.hash.replace('#','')||'home';var overlay=document.getElementById('maintenanceOverlay');if(locks[currentTab]){if(!overlay)showMaintenance(currentTab,locks[currentTab]);}else{if(overlay)overlay.remove();}},function(){});}
+
+
+function clearAllRWAHistory(){
+  try{
+    Object.keys(localStorage).forEach(function(k){
+      if(k.indexOf('rwa_h_')===0) localStorage.removeItem(k);
+    });
+    _rwaHistory={};
+    // Also clear Firestore
+    var uid=getUid();
+    if(uid) db.collection('users').doc(uid).update({rwaHistory:{}}).catch(function(){});
+    toast('✅ History clear! Ab naye questions aayenge','i');
+  }catch(e){toast('Error: '+e.message,'w');}
+}
 
 
 window.addEventListener('DOMContentLoaded',function(){initFirebase();});
