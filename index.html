@@ -3976,15 +3976,78 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   var signal=rwaAbortController?rwaAbortController.signal:null;
   var _rwaTimeout=setTimeout(function(){rwaLoading=false;rwaAbortController=null;},30000);
   var subjectPrompts={
-    history:'Tu SSC GD/Bihar Police History MCQ expert hai. NCERT Class 6-12 — Prachin (Cl.6), Madhyakalin (Cl.7), Aadhunik (Cl.8/10/12). Dates, rulers, battles sab accurate. SIRF Hindi Devanagari.',
-    geography:'Tu SSC GD/Bihar Police Geography MCQ expert hai. NCERT Class 6-12 — India+World geo, rivers, mountains, climate. SIRF Hindi Devanagari.',
-    polity:'Tu SSC GD/Bihar Police Polity MCQ expert hai. NCERT Class 9-12 — Constitution articles, amendments, bodies. Accurate facts. SIRF Hindi Devanagari.',
-    economy:'Tu SSC GD/Bihar Police Economy MCQ expert hai. NCERT Class 9-12 — banking, GDP, yojanayein. SIRF Hindi Devanagari.',
-    science:'Tu SSC GD/Bihar Police Science MCQ expert hai. NCERT Class 6-12 Physics+Chemistry+Biology. SIRF diye gaye topic ka vigyan. SIRF Hindi Devanagari.',
-    computer:'Tu SSC GD/Bihar Police Computer MCQ expert hai. Hardware, software, MS Office, internet, shortcut keys. SIRF Hindi Devanagari.',
-    static_gk:'Tu SSC GD/Bihar Police Static GK MCQ expert hai. Rashtriya pratik, puraskar, khel, pustak, sthal. SIRF Hindi Devanagari.'
+    history:'You are an expert MCQ generator for SSC GD Constable and Bihar Police Sipahi exam. '
+      +'Generate questions STRICTLY from NCERT textbooks: '
+      +'Class 6 (Our Pasts I — Prachin Itihas), '
+      +'Class 7 (Our Pasts II — Madhyakalin), '
+      +'Class 8 (Our Pasts III — Aadhunik/British), '
+      +'Class 10 (India and Contemporary World), '
+      +'Class 12 (Themes in Indian History I, II, III). '
+      +'Focus: exact dates, ruler names, battles, treaties, movements, acts. '
+      +'All questions in Hindi Devanagari. Proper nouns in English.',
+
+    geography:'You are an expert MCQ generator for SSC GD and Bihar Police exam. '
+      +'Generate questions STRICTLY from NCERT Geography: '
+      +'Class 6 (The Earth Our Habitat), '
+      +'Class 7 (Our Environment), '
+      +'Class 8 (Resources and Development), '
+      +'Class 9 (Contemporary India I), '
+      +'Class 10 (Contemporary India II), '
+      +'Class 11 (Fundamentals of Physical Geography + India Physical Environment), '
+      +'Class 12 (Human Geography + India People and Economy). '
+      +'Focus: rivers, mountains, climate, soil, agriculture, industries, population. '
+      +'All questions in Hindi Devanagari.',
+
+    polity:'You are an expert MCQ generator for SSC GD and Bihar Police exam. '
+      +'Generate questions STRICTLY from NCERT Polity: '
+      +'Class 9 (Democratic Politics I), '
+      +'Class 10 (Democratic Politics II), '
+      +'Class 11 (Indian Constitution at Work + Political Theory), '
+      +'Class 12 (Contemporary World Politics + Politics in India). '
+      +'Focus: Constitution articles, amendments, fundamental rights, DPSP, Parliament, judiciary, elections. '
+      +'All questions in Hindi Devanagari.',
+
+    economy:'You are an expert MCQ generator for SSC GD and Bihar Police exam. '
+      +'Generate questions STRICTLY from NCERT Economics: '
+      +'Class 9 (Economics — villages, food security), '
+      +'Class 10 (Understanding Economic Development), '
+      +'Class 11 (Indian Economic Development — statistics, development), '
+      +'Class 12 (Introductory Macroeconomics + Indian Economy). '
+      +'Focus: GDP, inflation, banking, RBI, planning, poverty, schemes. '
+      +'All questions in Hindi Devanagari.',
+
+    science:'You are an expert MCQ generator for SSC GD and Bihar Police exam. '
+      +'Generate questions STRICTLY from NCERT Science: '
+      +'Class 6-8 (Science — basic Physics, Chemistry, Biology), '
+      +'Class 9 (Science — Matter, Motion, Life processes), '
+      +'Class 10 (Science — Chemical reactions, Electricity, Heredity, Light), '
+      +'Class 11 (Physics + Chemistry + Biology — detailed theory), '
+      +'Class 12 (Physics + Chemistry + Biology — advanced concepts). '
+      +'Focus: definitions, formulas, scientists, discoveries, diseases, elements. '
+      +'All questions in Hindi Devanagari.',
+
+    computer:'You are an expert MCQ generator for SSC GD and Bihar Police exam. '
+      +'Generate questions on Computer fundamentals: '
+      +'Hardware (CPU, RAM, ROM, storage devices), '
+      +'Software (OS types, MS Office shortcuts, functions), '
+      +'Internet (protocols, browsers, email, cybersecurity), '
+      +'Number systems (binary, decimal, hexadecimal), '
+      +'Computer generations, important inventors. '
+      +'Focus: exact facts, shortcut keys, definitions. '
+      +'All questions in Hindi Devanagari.',
+
+    static_gk:'You are an expert MCQ generator for SSC GD and Bihar Police exam. '
+      +'Generate questions on Static GK: '
+      +'National symbols (animal, bird, flower, sport, emblem), '
+      +'Important days and themes, '
+      +'Awards (Bharat Ratna, Padma, Arjuna, Nobel), '
+      +'Books and authors, '
+      +'Sports (Olympics, Asian Games, Commonwealth — Indian winners), '
+      +'Important places, headquarters of organizations, '
+      +'India ke firsts (first PM, President, etc). '
+      +'All questions in Hindi Devanagari.'
   };
-  var systemMsg=(subjectPrompts[key]||'Tu MCQ generator hai. SIRF valid JSON array. Hindi Devanagari.')+' OUTPUT SIRF valid JSON array — no markdown, no text.';
+  var systemMsg='You are an elite MCQ question setter for Indian government competitive exams (SSC GD, Bihar Police, SSC CHSL). '+(subjectPrompts[key]||'Generate NCERT-based questions.')+'\n\nCRITICAL: Return ONLY a valid JSON array starting with [ and ending with ]. No markdown, no explanation, no text before or after the array. Every fact must be from NCERT Class 6-12.';
   var hist=_getRWAHistory(cacheKey);
   var avoidStr='';
   if(hist.length>0){
@@ -4002,25 +4065,65 @@ function fetchRWAQuestionsBackground(key,idx,topic,cacheKey){
   var topicSeed=Math.floor(Math.random()*9999);
   var qTypes=['factual','statement','match'];
   var qType=qTypes[Math.floor(Math.random()*qTypes.length)];
-  var prompt='Generate 10 MCQ questions for SSC GD Constable and Bihar Police Sipahi exam.\n'
+  var prompt=''
+    +'=== EXAM MCQ GENERATION ENGINE ===\n'
+    +'Role: Expert question setter for SSC GD Constable, Bihar Police Sipahi, SSC CHSL, SSC MTS\n'
     +'Topic: "'+topic+'"\n'
-    +'Seed: '+topicSeed+'\n\n'
-    +'QUESTION TYPES (mix karo):\n'
-    +'- 6 Factual: specific dates, names, numbers, places\n'
-    +'- 2 Statement-based: "कथन 1: ... कथन 2: ... कौन सा सही है?" style\n'
-    +'  Options: (A) केवल 1 सही (B) केवल 2 सही (C) दोनों सही (D) दोनों गलत\n'
-    +'- 2 Match the following OR Fill in the blank\n\n'
-    +'STRICT RULES:\n'
-    +'1. ONLY "'+topic+'" topic\n'
-    +'2. NCERT Class 6-12 verified facts\n'
-    +'3. SSC GD/Bihar Police PYQ pattern\n'
-    +'4. Different facts — no repetition\n'
-    +'5. ans: 0,1,2,3 distributed evenly\n'
-    +'6. Wrong options: realistic, tricky\n'
-    +'7. Hindi Devanagari\n'
-    +'8. sol: 2-3 lines — sahi answer explain karo + wrong options kyun galat hain\n'
+    +'Session ID: '+topicSeed+' (generate fresh unique questions)\n\n'
+
+    +'=== PRIMARY SOURCE ===\n'
+    +'STRICTLY use NCERT textbooks Class 6-12 only.\n'
+    +'Every fact must be traceable to a specific NCERT chapter.\n'
+    +'DO NOT use Wikipedia, internet, or guessed facts.\n\n'
+
+    +'=== MANDATORY QUESTION MIX (10 questions total) ===\n'
+    +'Q1-Q4: Direct Factual (who/what/when/where from NCERT)\n'
+    +'Q5-Q6: Statement Based —\n'
+    +'  Format: "निम्नलिखित कथनों पर विचार करें:\n'
+    +'  कथन 1: [NCERT verified fact]\n'
+    +'  कथन 2: [NCERT verified fact]\n'
+    +'  उपरोक्त में से कौन सा/से कथन सही है/हैं?"\n'
+    +'  Options: (A) केवल 1 (B) केवल 2 (C) 1 और 2 दोनों (D) न 1 न 2\n'
+    +'Q7: Assertion-Reason —\n'
+    +'  Format: "अभिकथन (A): [fact] | कारण (R): [reason]"\n'
+    +'  Options: (A) A और R दोनों सही, R सही कारण है (B) A और R दोनों सही, R सही कारण नहीं (C) A सही R गलत (D) A गलत R सही\n'
+    +'Q8: Match the Following —\n'
+    +'  Format: "सुमेलित करें: सूची-I --- सूची-II"\n'
+    +'Q9: Fill in the Blank — "[____] को [fact] के लिए जाना जाता है"\n'
+    +'Q10: Chronological/Sequence — "निम्न को सही क्रम में लगाएं"\n\n'
+
+    +'=== DISTRACTOR (WRONG OPTIONS) RULES ===\n'
+    +'- Wrong options must be from SAME era/category (not obviously wrong)\n'
+    +'- Example for "First President": wrong options = other early leaders, not cartoon names\n'
+    +'- At least 2 wrong options should seem plausible to average student\n'
+    +'- Never use obviously impossible options\n\n'
+
+    +'=== ANSWER DISTRIBUTION ===\n'
+    +'- ans=0 (A): 2-3 times\n'
+    +'- ans=1 (B): 2-3 times\n'
+    +'- ans=2 (C): 2-3 times\n'
+    +'- ans=3 (D): 2-3 times\n'
+    +'- Never put correct answer at same position more than 3 times\n\n'
+
+    +'=== EXPLANATION (sol) RULES ===\n'
+    +'- Line 1: Correct answer ka key fact + NCERT class/chapter reference\n'
+    +'- Line 2: Why each wrong option is wrong (briefly)\n'
+    +'- Line 3: One extra related exam-important fact\n'
+    +'- Language: Hindi Devanagari\n\n'
+
+    +'=== LANGUAGE ===\n'
+    +'- Questions: Hindi Devanagari ONLY\n'
+    +'- Proper nouns (names, places): English allowed\n'
+    +'- No Roman script for Hindi words\n\n'
+
     +avoidStr
-    +'\n\nFormat: [{"q":"प्रश्न?","opts":["(A) ","(B) ","(C) ","(D) "],"ans":0,"sol":"विस्तृत व्याख्या","type":"factual/statement/match"}]';
+
+    +'\n\n=== OUTPUT FORMAT ===\n'
+    +'Return ONLY valid JSON array. No markdown. No explanation. No extra text.\n'
+    +'[\n'
+    +'{"q":"प्रश्न पाठ?","opts":["(A) विकल्प","(B) विकल्प","(C) विकल्प","(D) विकल्प"],"ans":2,"sol":"व्याख्या — NCERT Cl.X, Ch.Y","type":"factual"},\n'
+    +'{"q":"कथन आधारित प्रश्न?","opts":["(A) केवल 1","(B) केवल 2","(C) 1 और 2 दोनों","(D) न 1 न 2"],"ans":0,"sol":"व्याख्या","type":"statement"}\n'
+    +']';
     groqFetch(gkey,{messages:[{role:'system',content:systemMsg},{role:'user',content:prompt}],max_tokens:2500,temperature:0.85},function(data,_m){
     clearTimeout(_rwaTimeout);
     if(signal&&signal.aborted){rwaLoading=false;rwaAbortController=null;return;}
