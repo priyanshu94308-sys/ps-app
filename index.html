@@ -719,8 +719,37 @@ display:none;
       </div>
       <!-- Level 2: Topics list -->
       <div id="rwa-topics-view" style="display:none">
-        <button onclick="rwaBreadcrumbBack(0)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Subjects</button>
-        <div style="font-size:.88rem;font-weight:900;margin-bottom:10px" id="rwa-topic-title"></div>
+        <button onclick="rwaBreadcrumbBack(0)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:10px">← Subjects</button>
+        <div style="font-size:.88rem;font-weight:900;margin-bottom:8px" id="rwa-topic-title"></div>
+
+        <!-- Smart suggestion -->
+        <div id="rwa-smart-tip" style="display:none;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:8px 12px;font-size:.68rem;color:var(--ac);margin-bottom:8px"></div>
+
+        <!-- Subject Stats -->
+        <div id="rwa-subject-stats" style="background:var(--bg2);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;gap:12px;align-items:center">
+          <div style="text-align:center"><div style="font-size:1rem;font-weight:900" id="rwa-stat-acc">—</div><div style="font-size:.55rem;color:var(--t2)">Accuracy</div></div>
+          <div style="text-align:center"><div style="font-size:1rem;font-weight:900;color:var(--gr)" id="rwa-stat-done">0</div><div style="font-size:.55rem;color:var(--t2)">Topics Done</div></div>
+          <div style="text-align:center"><div style="font-size:1rem;font-weight:900;color:var(--or)" id="rwa-stat-weak">0</div><div style="font-size:.55rem;color:var(--t2)">Weak Topics</div></div>
+          <div style="flex:1;height:6px;background:var(--bg3);border-radius:99px;overflow:hidden">
+            <div id="rwa-stat-bar" style="height:100%;background:linear-gradient(90deg,var(--ac),var(--gr));border-radius:99px;width:0%;transition:width .5s"></div>
+          </div>
+        </div>
+
+        <!-- Difficulty filter -->
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button onclick="setRWADifficulty('all')" id="rwa-diff-all" style="flex:1;background:var(--ac);border:none;border-radius:8px;color:#000;font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">📚 Sab</button>
+          <button onclick="setRWADifficulty('easy')" id="rwa-diff-easy" style="flex:1;background:var(--bg3);border:none;border-radius:8px;color:var(--t2);font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">🟢 Easy</button>
+          <button onclick="setRWADifficulty('medium')" id="rwa-diff-medium" style="flex:1;background:var(--bg3);border:none;border-radius:8px;color:var(--t2);font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">🟡 Medium</button>
+          <button onclick="setRWADifficulty('hard')" id="rwa-diff-hard" style="flex:1;background:var(--bg3);border:none;border-radius:8px;color:var(--t2);font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">🔴 Hard</button>
+        </div>
+
+        <!-- Mode toggle: Normal / PYQ -->
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button onclick="setRWAMode('normal')" id="rwa-mode-normal" style="flex:1;background:var(--ac);border:none;border-radius:8px;color:#000;font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">📝 Normal</button>
+          <button onclick="setRWAMode('pyq')" id="rwa-mode-pyq" style="flex:1;background:var(--bg3);border:none;border-radius:8px;color:var(--t2);font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">⭐ PYQ Only</button>
+          <button onclick="setRWAMode('bookmark')" id="rwa-mode-bookmark" style="flex:1;background:var(--bg3);border:none;border-radius:8px;color:var(--t2);font-size:.65rem;font-weight:800;padding:6px;cursor:pointer">🔖 Bookmarks</button>
+        </div>
+
         <div id="rwa-topics-list"></div>
       </div>
       <!-- Saved Questions View -->
@@ -732,7 +761,15 @@ display:none;
       <!-- Level 3: Quiz -->
       <div id="rwa-quiz-view" style="display:none">
         <button onclick="rwaBreadcrumbBack(1)" style="background:var(--cd2);border:1px solid var(--br2);border-radius:8px;color:var(--tx);font-size:.72rem;font-weight:700;padding:6px 12px;cursor:pointer;margin-bottom:12px">← Topics</button>
-        <div style="font-size:.82rem;font-weight:900;margin-bottom:10px" id="rwa-quiz-title"></div>
+        <div style="font-size:.82rem;font-weight:900;margin-bottom:6px" id="rwa-quiz-title"></div>
+        <!-- Concept Notes (collapsible) -->
+        <div id="rwa-concept-notes" style="display:none;background:rgba(92,106,240,.1);border:1px solid rgba(92,106,240,.3);border-radius:10px;margin-bottom:10px;overflow:hidden">
+          <div onclick="toggleConceptNotes()" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;cursor:pointer">
+            <div style="font-size:.7rem;font-weight:800;color:#7b87ff">📖 Concept Notes</div>
+            <div id="notes-arrow" style="font-size:.7rem;color:#7b87ff">▼</div>
+          </div>
+          <div id="rwa-notes-content" style="display:none;padding:0 12px 10px;font-size:.68rem;color:var(--t2);line-height:1.7"></div>
+        </div>
         <div id="rwa-ai-ready" style="display:none;font-size:.6rem;color:#0c6;margin-bottom:8px;background:rgba(0,200,100,.1);border-radius:6px;padding:4px 8px">✅ AI questions ready — quiz khatam hone ke baad milenge!</div>
         <div id="rwa-quiz-content"></div>
       </div>
@@ -3698,6 +3735,114 @@ function deleteSavedQ(idx){
   renderRWASavedBtn();
 }
 
+var _rwaDifficulty='all';
+var _rwaMode='normal';
+
+function setRWADifficulty(diff){
+  _rwaDifficulty=diff;
+  ['all','easy','medium','hard'].forEach(function(d){
+    var btn=document.getElementById('rwa-diff-'+d);
+    if(!btn)return;
+    btn.style.background=d===diff?'var(--ac)':'var(--bg3)';
+    btn.style.color=d===diff?'#000':'var(--t2)';
+  });
+  if(rwaCurrentSubject) renderTopicsList(rwaCurrentSubject);
+}
+
+function setRWAMode(mode){
+  _rwaMode=mode;
+  ['normal','pyq','bookmark'].forEach(function(m){
+    var btn=document.getElementById('rwa-mode-'+m);
+    if(!btn)return;
+    btn.style.background=m===mode?'var(--ac)':'var(--bg3)';
+    btn.style.color=m===mode?'#000':'var(--t2)';
+  });
+  if(rwaCurrentSubject) renderTopicsList(rwaCurrentSubject);
+}
+
+function renderTopicsList(key){
+  var s=RWA_TOPICS[key];
+  var cont=document.getElementById('rwa-topics-list');
+  if(!cont)return;
+  cont.innerHTML='';
+
+  // Calculate stats
+  var totalDone=0,totalCorrect=0,totalQ=0,weakTopics=0;
+  s.subtopics.forEach(function(topic,i){
+    var stats=S.sStats&&S.sStats['rwa_'+key+'_'+i];
+    if(stats&&stats.total>0){totalDone++;totalCorrect+=stats.correct||0;totalQ+=stats.total||0;if((stats.correct/stats.total)<0.5)weakTopics++;}
+  });
+  var overallAcc=totalQ>0?Math.round(totalCorrect/totalQ*100):0;
+
+  // Update stats bar
+  var accEl=document.getElementById('rwa-stat-acc');if(accEl)accEl.textContent=totalQ>0?overallAcc+'%':'—';
+  var doneEl=document.getElementById('rwa-stat-done');if(doneEl)doneEl.textContent=totalDone;
+  var weakEl=document.getElementById('rwa-stat-weak');if(weakEl)weakEl.textContent=weakTopics;
+  var barEl=document.getElementById('rwa-stat-bar');if(barEl)barEl.style.width=Math.round(totalDone/s.subtopics.length*100)+'%';
+
+  // Smart suggestion
+  var tipEl=document.getElementById('rwa-smart-tip');
+  if(tipEl){
+    var weakList=[];
+    s.subtopics.forEach(function(topic,i){
+      var stats=S.sStats&&S.sStats['rwa_'+key+'_'+i];
+      if(stats&&stats.total>0&&(stats.correct/stats.total)<0.5)weakList.push(topic);
+    });
+    if(weakList.length){
+      tipEl.style.display='block';
+      tipEl.textContent='💡 Weak topics: '+weakList.slice(0,2).join(', ')+(weakList.length>2?' +'+(weakList.length-2)+' aur':'')+' — aaj practice karo!';
+    } else if(totalDone===0){
+      tipEl.style.display='block';
+      tipEl.textContent='🚀 Is subject mein abhi koi topic complete nahi hua — shuru karo!';
+    } else {
+      tipEl.style.display='none';
+    }
+  }
+
+  // Render topics
+  s.subtopics.forEach(function(topic,i){
+    var ck='rwa_'+key+'_'+i;
+    var stats=S.sStats&&S.sStats[ck];
+    var acc=stats&&stats.total>0?Math.round(stats.correct/stats.total*100):-1;
+    var diff=_rwaDifficulty;
+
+    // Difficulty filter based on accuracy
+    if(diff==='easy'&&acc>70)return;
+    if(diff==='medium'&&(acc<=70||acc>85))return;
+    if(diff==='hard'&&acc<=85&&acc!==-1)return;
+
+    // PYQ mode - skip non-PYQ topics (basic filter by name)
+    if(_rwaMode==='pyq'){
+      var pyqTopics=['संविधान','मौलिक अधिकार','संसद','चुनाव','न्यायपालिका','मुगल','ब्रिटिश','1857','गांधी','स्वतंत्रता','नदी','पर्वत','जलवायु'];
+      var isPYQ=pyqTopics.some(function(p){return topic.indexOf(p)>-1;});
+      if(!isPYQ)return;
+    }
+
+    // Bookmark mode
+    if(_rwaMode==='bookmark'){
+      var hasBM=S.bookmarks&&S.bookmarks.some(function(b){return b.topic&&b.topic.indexOf(topic)>-1;});
+      if(!hasBM)return;
+    }
+
+    var accColor=acc<0?'var(--t2)':acc>=70?'var(--gr)':acc>=50?'var(--or)':'var(--rd)';
+    var accBadge=acc>=0?'<span style="background:'+accColor+';color:#000;font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:6px">'+acc+'%</span>':'';
+    var weakBadge=acc>=0&&acc<50?'<span style="background:rgba(239,68,68,.2);color:var(--rd);font-size:.55rem;font-weight:800;padding:2px 6px;border-radius:99px;margin-left:4px">Weak</span>':'';
+
+    var div=document.createElement('div');
+    div.style.cssText='background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:11px 13px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;'+(acc>=0&&acc<50?'border-color:rgba(239,68,68,.3);':'');
+    div.innerHTML='<div style="flex:1"><div style="font-size:.78rem;font-weight:700">'+topic+accBadge+weakBadge+'</div>'
+      +(stats&&stats.total>0?'<div style="font-size:.58rem;color:var(--t2);margin-top:2px">'+stats.correct+'/'+stats.total+' sahi</div>':'')
+      +'</div>'
+      +'<div style="font-size:.75rem;color:var(--ac)">▶</div>';
+    div.onclick=(function(k,j){return function(){openRWATopic(k,j);};})(key,i);
+    cont.appendChild(div);
+  });
+
+  if(!cont.children.length){
+    cont.innerHTML='<div style="text-align:center;padding:20px;color:var(--t2);font-size:.72rem">Is filter mein koi topic nahi mila</div>';
+  }
+}
+
 function openRWASubject(key){
   rwaCurrentSubject=key;
   var s=RWA_TOPICS[key];
@@ -3705,17 +3850,18 @@ function openRWASubject(key){
   document.getElementById('rwa-topics-view').style.display='block';
   document.getElementById('rwa-quiz-view').style.display='none';
   document.getElementById('rwa-topic-title').textContent=s.label;
-  var html='';
-  s.subtopics.forEach(function(topic,i){
-    var ck='rwa_'+key+'_'+i;
-    var cached=null;
-    try{var c=localStorage.getItem(ck);if(c)cached=JSON.parse(c);}catch(e){}
-    var badge=cached?'<span style="font-size:.55rem;background:rgba(0,200,100,.2);color:#0c6;border-radius:4px;padding:1px 5px;margin-left:5px">✓ Cached</span>':'';
-    html+='<div onclick="openRWATopic(\''+key+'\','+i+')" style="background:var(--cd2);border:1px solid var(--br2);border-radius:10px;padding:11px 13px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">'
-      +'<div style="font-size:.78rem;font-weight:700">'+topic+badge+'</div>'
-      +'<div style="font-size:.75rem;color:var(--ac)">▶</div></div>';
-  });
-  document.getElementById('rwa-topics-list').innerHTML=html;
+  _rwaDifficulty='all';_rwaMode='normal';
+  setRWADifficulty('all');setRWAMode('normal');
+  renderTopicsList(key);
+}
+
+function toggleConceptNotes(){
+  var cont=document.getElementById('rwa-notes-content');
+  var arrow=document.getElementById('notes-arrow');
+  if(!cont)return;
+  var open=cont.style.display==='block';
+  cont.style.display=open?'none':'block';
+  if(arrow)arrow.textContent=open?'▼':'▲';
 }
 
 function openRWATopic(key,idx){
@@ -3727,6 +3873,37 @@ function openRWATopic(key,idx){
   document.getElementById('rwa-topics-view').style.display='none';
   document.getElementById('rwa-quiz-view').style.display='block';
   document.getElementById('rwa-quiz-title').textContent=topic;
+
+  // Load Concept Notes
+  var notesDiv=document.getElementById('rwa-concept-notes');
+  var notesContent=document.getElementById('rwa-notes-content');
+  if(notesDiv&&notesContent){
+    notesDiv.style.display='block';
+    notesContent.style.display='none';
+    document.getElementById('notes-arrow').textContent='▼';
+    // Check localStorage cache first
+    var cachedNotes=null;
+    try{var cn=localStorage.getItem('notes_'+cacheKey);if(cn)cachedNotes=cn;}catch(e){}
+    if(cachedNotes){
+      notesContent.innerHTML=cachedNotes.split('\n').map(function(l){return l?'<div style="margin-bottom:3px">→ '+esc(l)+'</div>':'';}).join('');
+    } else {
+      var gk=getGKey();
+      if(gk){
+        notesContent.innerHTML='<div style="color:var(--t2)">Loading...</div>';
+        groqFetch(gk,{
+          _models:['llama-3.1-8b-instant'],
+          messages:[{role:'user',content:'SSC GD/Bihar Police exam ke liye "'+topic+'" ke 5 most important points batao. Hindi mein. Sirf bullet points — no heading, no extra text. Format: point 1\npoint 2\n...'}],
+          max_tokens:300,temperature:0.3
+        },function(data){
+          var txt=data.choices[0].message.content;
+          try{localStorage.setItem('notes_'+cacheKey,txt);}catch(e){}
+          notesContent.innerHTML=txt.split('\n').filter(Boolean).map(function(l){
+            return '<div style="margin-bottom:4px">→ '+esc(l.replace(/^[-\u2022*] */,''))+'</div>';
+          }).join('');
+        },function(){notesContent.innerHTML='<div style="color:var(--t2)">Notes load nahi hue</div>';});
+      }
+    }
+  }
 
   // Always show loader first, then fetch all questions at once
   document.getElementById('rwa-quiz-content').innerHTML=
